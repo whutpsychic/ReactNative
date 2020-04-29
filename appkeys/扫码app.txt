@@ -1,0 +1,2 @@
+keytool -genkeypair -v -keystore D:\smapp-key.keystore -alias smapp-key-alias -keyalg RSA -keysize 2048 -validity 10000
+123456

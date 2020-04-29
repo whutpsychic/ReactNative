@@ -1,0 +1,10 @@
+.app-contents .am-navbar {
+	background-color: #003363;
+	height: 100px;
+	font-weight: bold;
+}
+
+.am-navbar-title {
+	font-size: 30px;
+	letter-spacing: 6px;
+}

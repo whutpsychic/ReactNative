@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "react-native-honeywell-barcode-reader": "^1.0.6"
+  }
+}

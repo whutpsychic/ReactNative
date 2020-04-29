@@ -1,0 +1,69 @@
+.jpsmjg {
+	padding-top: 0;
+	position: relative;
+}
+
+.table-container {
+	width: calc(100% - 20px);
+	overflow: auto;
+	margin: 10px;
+	min-height: 100px;
+	max-height: calc(100vh - 340px);
+}
+
+.info-container {
+	margin: 8px;
+	background-color: #b6ceeb;
+	display: flex;
+	flex-wrap: wrap;
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+.info-container span {
+	display: block;
+	font-size: 18px;
+	font-weight: bold;
+	flex-basis: 33.33%;
+	color: #000;
+	text-align: center;
+	min-height: 40px;
+	line-height: 40px;
+	border: solid 1px #4971a0;
+	border-collapse: collapse;
+}
+
+.info-container span.title {
+	background-color: #3c5d85;
+	color: #fff;
+}
+
+.table-container .ant-table th,
+.table-container .ant-table td {
+	min-width: unset;
+}
+
+.table-container .ant-table th {
+	white-space: nowrap;
+}
+
+.table-container .ant-table td {
+	padding: 8px 8px;
+}
+
+.table-container .ant-table th.date,
+.table-container .ant-table td.date {
+	/*max-width: 100px;*/
+	width: 50px;
+}
+
+.table-container .ant-table th.baohao,
+.table-container .ant-table td.baohao {
+	/*max-width: 100px;*/
+	width: 50px;
+}
+
+.table-container .ant-table th.barcode,
+.table-container .ant-table td.barcode {
+	/*max-width: 100px;*/
+}

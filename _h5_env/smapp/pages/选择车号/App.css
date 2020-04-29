@@ -1,0 +1,39 @@
+.xzchh {
+	padding-top: 0;
+	position: relative;
+}
+
+.table-container {
+	width: 100%;
+	max-height: 360px;
+	overflow: auto;
+}
+
+.chehao {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 10px 0;
+}
+
+.chehao label {
+	display: block;
+	font-size: 16px;
+	font-weight: bold;
+	margin: 0 10px;
+}
+
+.chehao input {
+	display: block;
+	border: solid 1px #bbb;
+	border-radius: 6px;
+	background-color: #b6ceeb;
+	font-size: 24px;
+	font-weight: bold;
+	color: #111;
+	width: 150px;
+	min-width: 100px;
+	height: 40px;
+	line-height: 34px;
+	text-align: center;
+}

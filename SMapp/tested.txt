@@ -1,0 +1,35 @@
+【from npm】
+1. "react-native-honeywell-scanner": "^2.0.0"-----------failed
+2.react-native-esb24-honeywell-scanner ----------------failed
+3."react-native-honeywell-barcode-reader": "^1.0.6"----failed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

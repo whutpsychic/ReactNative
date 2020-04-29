@@ -1,0 +1,39 @@
+.jpdmx {
+	padding-top: 0;
+	position: relative;
+}
+
+.table-container {
+	width: calc(100% - 20px);
+	height: calc(100vh - 200px - 30px);
+	overflow: auto;
+	margin: 10px;
+}
+
+.table-container .ant-table th,
+.table-container .ant-table td {
+	min-width: unset;
+}
+
+.table-container .ant-table th {
+	white-space: nowrap;
+}
+
+.table-container .ant-table td {
+	padding: 8px 8px;
+}
+
+.table-container .ant-table th.jianpeidan,
+.table-container .ant-table td.jianpeidan {
+	min-width: 100px;
+}
+
+.table-container .ant-table th.picihao,
+.table-container .ant-table td.picihao {
+	min-width: 80px;
+}
+
+.table-container .ant-table th.picibianma,
+.table-container .ant-table td.picibianma {
+	min-width: 150px;
+}

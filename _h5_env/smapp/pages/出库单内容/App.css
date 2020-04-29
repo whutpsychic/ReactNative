@@ -1,0 +1,52 @@
+.ckdnr {
+	padding-top: 0;
+	position: relative;
+}
+
+.am-navbar.am-navbar-light {
+	margin-bottom: 10px;
+}
+
+.ddd {
+	display: block;
+	background-color: #003363;
+	padding: 12px;
+	border-radius: 4px;
+	height: 12px;
+	margin-left: 8px;
+}
+
+.items {
+}
+
+.items li {
+	font-size: 14px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 40px;
+	line-height: 40px;
+	margin: 10px 16px 0 16px;
+}
+
+.items li > * {
+	display: block;
+}
+
+.items li label {
+	white-space: nowrap;
+	flex-basis: calc(25% - 16px);
+	text-align: right;
+	margin: 0 8px;
+	min-width: 60px;
+}
+
+.items li p {
+	margin: 0;
+	flex-basis: 75%;
+	background-color: #fff;
+	height: 36px;
+	line-height: 36px;
+	border-radius: 4px;
+	text-indent: 4px;
+}

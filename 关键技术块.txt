@@ -1,0 +1,55 @@
+================================================
+==================== 正统RN部分 ====================
+================================================
+1.禁止或启用键盘影响视口范围（全局）
+[一键配置 AndroidManifest.xml]
+<activity android:windowSoftInputMode="adjustPan"/>
+----------------------------------------------------------------------------------
+2.禁止或启用可旋转屏幕（全局）
+[一键配置 AndroidManifest.xml]
+<activity android:screenOrientation="portrait"/>
+----------------------------------------------------------------------------------
+3.临时允许android9以上进行http通讯 
+[配置并添加文件 AndroidManifest.xml]
+<application
+android:usesCleartextTraffic="true"
+android:networkSecurityConfig="@xml/network_security_config"/>
++file: ./res/xml/network_security_config.xml
+```
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
+```
+4.修改应用图标
+需要一组大小不同的图标以适配不同屏幕
+mipmap-hdpi---------------72
+mipmap-mdpi--------------48
+mipmap-xhdpi--------------96
+mipmap-xxhdpi-------------144
+mipmap-xxxhdpi------------192
+
+
+
+
+
+
+
+
+
+
+
+
+
+================================================
+==================== web部分 ======================
+================================================
+
+
+
+
+

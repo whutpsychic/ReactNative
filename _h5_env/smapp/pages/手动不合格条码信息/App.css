@@ -1,0 +1,53 @@
+.jpdmx {
+	padding-top: 0;
+	position: relative;
+}
+
+.items {
+	margin: 16px 0;
+}
+
+.items li {
+	font-size: 16px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 40px;
+	line-height: 40px;
+	margin: 10px 16px 0 16px;
+}
+
+.items li > * {
+	display: block;
+}
+
+.items li label {
+	white-space: nowrap;
+	flex-basis: calc(16% - 16px);
+	text-align: right;
+	margin: 0 8px;
+	min-width: 54px;
+	font-weight: bold;
+	color: #003263;
+}
+
+.items li span {
+	white-space: nowrap;
+	margin: 0 8px;
+	color: #bfbfbf;
+}
+
+.items li input {
+	margin: 0;
+	flex-basis: 60%;
+	background-color: #fff;
+	height: 36px;
+	line-height: 36px;
+	border-radius: 4px;
+	text-indent: 4px;
+}
+
+.bbtns {
+	display: flex;
+	justify-content: space-around;
+}

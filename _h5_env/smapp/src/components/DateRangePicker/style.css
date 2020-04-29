@@ -1,0 +1,17 @@
+.dateSelector {
+	position: relative;
+	margin: 10px 0;
+}
+
+.dateSelector p {
+	margin: 0;
+	position: absolute;
+	top: 0;
+	height: 44px;
+	line-height: 44px;
+	right: 40px;
+}
+
+.dateRender {
+	text-align: center;
+}
