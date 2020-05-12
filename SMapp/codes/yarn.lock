@@ -5959,6 +5959,11 @@ react-native-iphone-x-helper@^1.2.1:
   resolved "https://registry.npm.taobao.org/react-native-iphone-x-helper/download/react-native-iphone-x-helper-1.2.1.tgz#645e2ffbbb49e80844bb4cbbe34a126fda1e6772"
   integrity sha1-ZF4v+7tJ6AhEu0y740oSb9oeZ3I=
 
+react-native-keyevent@^0.2.8:
+  version "0.2.8"
+  resolved "https://registry.npm.taobao.org/react-native-keyevent/download/react-native-keyevent-0.2.8.tgz#f6c035bf17b8d8221e546e85e430cd1d3021c5d7"
+  integrity sha1-9sA1vxe42CIeVG6F5DDNHTAhxdc=
+
 react-native-modal-popover@^0.0.12:
   version "0.0.12"
   resolved "https://registry.npm.taobao.org/react-native-modal-popover/download/react-native-modal-popover-0.0.12.tgz#5c0b5e9e0323490c3c5867821fc94b6582bfa3dc"

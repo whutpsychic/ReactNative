@@ -2,7 +2,9 @@
   package="com.codes">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <!-- for honeywell -->
+    <uses-permission android:name="com.honeywell.decode.permission.DECODE" />
+    
     <application
       android:name=".MainApplication"
       android:label="@string/app_name"

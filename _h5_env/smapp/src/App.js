@@ -2,22 +2,13 @@ import React from "react";
 import "./index.css";
 import "./App.css";
 
-import { Table } from "antd";
 import util from "./util/index";
-import { TopNavigator, Btns } from "./components";
-
-const { Btn } = Btns;
+import { TopNavigator } from "./components";
 
 class App extends React.Component {
   state = {
-    tableloading: false,
-    data: [],
-    currentLine: null,
-
-    yingj: "",
-    yij1: "",
-    yij2: "",
-    ques: ""
+    user: "",
+    time: ""
   };
 
   componentDidMount() {
@@ -37,107 +28,41 @@ class App extends React.Component {
   }
 
   render() {
-    const columns = [
-      {
-        title: "日期",
-        dataIndex: "date",
-        key: "date",
-        className: "date"
-      },
-      {
-        title: "包号",
-        dataIndex: "number",
-        key: "number",
-        className: "baohao"
-      },
-      {
-        title: "条码",
-        dataIndex: "barcode",
-        key: "barcode",
-        className: "barcode"
-      },
-      {
-        title: "重量",
-        dataIndex: "weight",
-        key: "weight"
-      }
-    ].map(item => {
-      item.align = "center";
-      return item;
-    });
-
-    const { tableloading, data } = this.state;
-    const { yingj, yij1, yij2, ques } = this.state;
+    const { user, time } = this.state;
     return (
       <div className="app-container">
-        <div className="app-contents jpsmjg">
-          <TopNavigator
-            title="拣配"
-            scan={this.onClickScan}
-            onLeftClick={() => {
-              util.traceBack("event", { target: "backBtn" });
-            }}
-          />
-          <div className="table-container">
-            <Table
-              columns={columns}
-              dataSource={data}
-              pagination={false}
-              loading={tableloading}
-              onRow={record => {
-                return {
-                  onClick: event => {
-                    event.preventDefault();
-                    util.setItUp(
-                      event.target.parentNode,
-                      event.target.parentNode.parentNode
-                    );
-                    this.setState({
-                      currentLine: record
-                    });
-                  } // 点击行
-                };
-              }}
-            />
+        <div className="app-contents main">
+          <TopNavigator title="主菜单" />
+          <div className="info">
+            <p>当前用户：{user}</p>
+            <p>登录时间：{time}</p>
           </div>
-          <div className="info-container">
-            <span className="title">应拣</span>
-            <span className="title">已拣</span>
-            <span className="title">缺少</span>
-            <span>{yingj}</span>
-            <span>{yij1}</span>
-            <span>{ques}</span>
-            <span></span>
-            <span>{yij2}</span>
-            <span></span>
+          <div className="main-btns">
+            <div className="btn" onClick={this.onClickJianPei}>
+              拣配
+            </div>
+            <div className="btn" onClick={this.onClickJianPeiDanQuery}>
+              查询拣配单
+            </div>
+            <div className="btn" onClick={this.onClickCancelLogin}>
+              退出登录
+            </div>
           </div>
-          <Btns>
-            <Btn title={"确认"} type={"btn2"} onPress={this.onPressConfirm} />
-            <Btn title={"手动"} type={"btn3"} onPress={this.onPressShoudong} />
-            <Btn title={"剔除"} type={"btn4"} onPress={this.onPressTichu} />
-          </Btns>
         </div>
       </div>
     );
   }
 
-  onClickScan = () => {
-    util.traceBack("scan");
+  onClickJianPei = () => {
+    util.traceBack("jianpei");
   };
 
-  onPressConfirm = () => {
-    let { currentLine } = this.state;
-    util.traceBack("confirm", { currentLine });
+  onClickJianPeiDanQuery = () => {
+    util.traceBack("jianpeidanQuery");
   };
 
-  onPressShoudong = () => {
-    let { currentLine } = this.state;
-    util.traceBack("shoudong", { currentLine });
-  };
-
-  onPressTichu = () => {
-    let { currentLine } = this.state;
-    util.traceBack("tichu", { currentLine });
+  onClickCancelLogin = () => {
+    util.traceBack("cancelLogin");
   };
 }
 

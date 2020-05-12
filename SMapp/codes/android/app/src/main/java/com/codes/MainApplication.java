@@ -12,7 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 // =========================
-// import com.codes.HoneywellBarcodeReaderPackage;
+import com.github.kevinejohn.keyevent.KeyEventPackage;  // <--- import
 // =========================
 
 public class MainApplication extends Application implements ReactApplication {

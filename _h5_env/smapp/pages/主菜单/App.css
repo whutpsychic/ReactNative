@@ -35,3 +35,8 @@
 .main-btns .btn:nth-child(2n + 1) {
 	background-color: darkorange;
 }
+
+.info {
+	padding: 0 12vw;
+	font-size: 14px;
+}

@@ -1,0 +1,13 @@
+.logo {
+	background-color: #042048;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
+}
+
+.logo img {
+	display: block;
+	margin-top: 36vh;
+	width: 115vw;
+}

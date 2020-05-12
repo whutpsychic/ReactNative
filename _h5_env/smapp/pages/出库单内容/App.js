@@ -53,7 +53,7 @@ class App extends React.Component {
     util.traceBack("pageState", "componentDidMount");
     //监听事件以及时读取RN传回的数据
     document.addEventListener("message", event => {
-      alert(res.etype === "data")
+      let res = JSON.parse(event.data);
       if (res.etype === "data") {
         let obj = { ...res };
         delete obj.etype;
@@ -89,7 +89,7 @@ class App extends React.Component {
             <ViewItemBar label="收货单位" value={shdw} />
             <ViewItemBar label="车号" value={ch} extra={extraIcon} fp={58} />
           </ul>
-          <Btns>
+          <Btns suffix>
             <Btn title={"返回"} type={"btn5"} onPress={this.onClickBack} />
             <Btn title={"扫描"} type={"btn1"} onPress={this.onClickScan} />
           </Btns>

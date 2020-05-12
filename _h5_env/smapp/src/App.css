@@ -1,69 +1,42 @@
-.jpsmjg {
+.main {
 	padding-top: 0;
 	position: relative;
 }
 
-.table-container {
-	width: calc(100% - 20px);
-	overflow: auto;
-	margin: 10px;
-	min-height: 100px;
-	max-height: calc(100vh - 340px);
-}
-
-.info-container {
-	margin: 8px;
-	background-color: #b6ceeb;
+.main-btns {
+	color: #fff;
 	display: flex;
 	flex-wrap: wrap;
-	border-radius: 6px;
-	overflow: hidden;
+	position: relative;
+	height: calc(100vh - 100px);
+	justify-content: center;
+	align-content: flex-start;
+	overflow: auto;
 }
 
-.info-container span {
-	display: block;
-	font-size: 18px;
+.main-btns .btn {
+	flex-basis: 100%;
+	font-size: 24px;
 	font-weight: bold;
-	flex-basis: 33.33%;
-	color: #000;
+	max-width: 60vw;
 	text-align: center;
-	min-height: 40px;
-	line-height: 40px;
-	border: solid 1px #4971a0;
-	border-collapse: collapse;
+	max-height: 16vw;
+	/*margin: 40px 0;*/
+	margin-bottom: 20px;
+	padding: 16px 24px;
+	border-radius: 4px;
+	background-color: #003363;
 }
 
-.info-container span.title {
-	background-color: #3c5d85;
-	color: #fff;
+.main-btns .btn:first-child {
+	margin-top: 20px;
 }
 
-.table-container .ant-table th,
-.table-container .ant-table td {
-	min-width: unset;
+.main-btns .btn:nth-child(2n + 1) {
+	background-color: darkorange;
 }
 
-.table-container .ant-table th {
-	white-space: nowrap;
-}
-
-.table-container .ant-table td {
-	padding: 8px 8px;
-}
-
-.table-container .ant-table th.date,
-.table-container .ant-table td.date {
-	/*max-width: 100px;*/
-	width: 50px;
-}
-
-.table-container .ant-table th.baohao,
-.table-container .ant-table td.baohao {
-	/*max-width: 100px;*/
-	width: 50px;
-}
-
-.table-container .ant-table th.barcode,
-.table-container .ant-table td.barcode {
-	/*max-width: 100px;*/
+.info {
+	padding: 0 12vw;
+	font-size: 14px;
 }

@@ -42,3 +42,8 @@
 	margin: 0;
 	white-space: nowrap;
 }
+
+.btns.suffix{
+	position: relative;
+	bottom: unset;
+}

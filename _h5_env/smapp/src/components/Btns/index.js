@@ -51,8 +51,8 @@ class Btn extends React.Component {
 
 class Default extends React.Component {
 	render() {
-		const { children } = this.props;
-		return <div className="btns">{children}</div>;
+		const { children, suffix } = this.props;
+		return <div className={suffix ? "btns suffix" : "btns"}>{children}</div>;
 	}
 }
 

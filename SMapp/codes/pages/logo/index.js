@@ -6,6 +6,8 @@ import {initializing, login} from '../../redux/actions.js';
 import storage from '../../core/storage.js';
 import logo from './logo.png';
 
+import {WebView} from 'react-native-webview';
+const uri = 'file:///android_asset/h5/logo/index.html';
 // import sa from '../../core/style-adaption.js';
 // const {vw, vh} = sa;
 
@@ -35,7 +37,12 @@ class Default extends React.Component {
           translucent={true}
         />
         <View style={styles.sectionContainer}>
-          <Image style={styles.bg} resizeMode={'contain'} source={logo} />
+          <WebView
+            ref="webview"
+            style={{flex: 1}}
+            originWhitelist={['*']}
+            source={{uri}}
+          />
         </View>
       </React.Fragment>
     );
@@ -63,6 +70,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'darkblue',
     flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
   },
   bg: {},
 });

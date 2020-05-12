@@ -136,7 +136,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.2.2"
+        versionName "1.3.0"
     }
     splits {
         abi {
@@ -209,6 +209,8 @@ dependencies {
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'
     //多dex
     implementation 'com.android.support:multidex:1.0.3'
+
+    compile project(':react-native-keyevent')   //keyevent
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'

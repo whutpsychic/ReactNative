@@ -25,6 +25,7 @@ android:networkSecurityConfig="@xml/network_security_config"/>
     </base-config>
 </network-security-config>
 ```
+----------------------------------------------------------------------------------
 4.修改应用图标
 需要一组大小不同的图标以适配不同屏幕
 mipmap-hdpi---------------72
@@ -32,11 +33,22 @@ mipmap-mdpi--------------48
 mipmap-xhdpi--------------96
 mipmap-xxhdpi-------------144
 mipmap-xxxhdpi------------192
-
-
-
-
-
+----------------------------------------------------------------------------------
+5.启用multiDex
+配置文件 app/build.gradle
+```
+ defaultConfig {
+       multiDexEnabled true
+       ...
+    }
+```
+```
+ dependencies{
+      ...
+      implementation 'com.android.support:multidex:1.0.1'
+      ...
+    }
+```
 
 
 

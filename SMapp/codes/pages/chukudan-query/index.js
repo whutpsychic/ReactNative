@@ -12,6 +12,8 @@ import Tips from '../../components/Tips/index';
 const uri = 'file:///android_asset/h5/chukudan-query/index.html';
 
 class Default extends React.Component {
+  componentWillUnmount() {}
+
   componentDidMount() {}
 
   render() {

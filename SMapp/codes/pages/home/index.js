@@ -1,16 +1,19 @@
 import React from 'react';
 import {
+  AppState,
   StyleSheet,
   View,
   Text,
   StatusBar,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 import {WebView} from 'react-native-webview';
 import storage from '../../core/storage.js';
 import {Provider, Modal} from '@ant-design/react-native';
 import {connect} from 'react-redux';
 import {login} from '../../redux/actions.js';
+import moment from 'moment';
 
 const uri = 'file:///android_asset/h5/home/index.html';
 
@@ -18,6 +21,8 @@ class Default extends React.Component {
   state = {
     showConfirm: false,
   };
+
+  componentWillUnmount() {}
 
   componentDidMount() {}
 
@@ -31,6 +36,7 @@ class Default extends React.Component {
         <StatusBar barStyle={'dark-content'} />
         <View style={styles.container}>
           <WebView
+            ref="webview"
             style={{flex: 1}}
             originWhitelist={['*']}
             source={{uri}}
@@ -99,6 +105,15 @@ class Default extends React.Component {
       receivedData.etype === 'pageState' &&
       receivedData.info === 'componentDidMount'
     ) {
+      //初始化加入用户名和时间
+      storage.getData('smapp_userName').then(uname => {
+        let time = moment().format('YYYY年MM月DD日 HH:MM:SS');
+        this.postMessage({
+          etype: 'data',
+          user: uname,
+          time,
+        });
+      });
     }
     //点击拣配按钮
     else if (receivedData.etype === 'jianpei') {

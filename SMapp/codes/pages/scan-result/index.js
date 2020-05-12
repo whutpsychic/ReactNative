@@ -11,8 +11,54 @@ import {Modal} from '@ant-design/react-native';
 import storage from '../../core/storage.js';
 import api from '../../api/index.js';
 import Tips from '../../components/Tips/index';
+import Toast from '../../components/ToastModule/index';
+import tool from '../../core/tool.js';
+
+import HoneywellBarcodeReader from '../../components/Honeywell/index.js';
 
 const uri = 'file:///android_asset/h5/scan-result/index.html';
+
+//解码规则
+const decode = barcode => {
+  let arr = barcode.split('');
+  //企业代码 三位
+  const qiyedaima = arr.slice(0, 3).join('');
+  //产品类别代码 二位
+  const chanpinleibie = arr.slice(3, 5).join('');
+  //产品等级代码 二位
+  const chanpindengji = arr.slice(5, 7).join('');
+  //生产日期代码 六位
+  const shengchanriqi = arr.slice(7, 13).join('');
+  //产品批号 四位
+  const chanpinpihao = arr.slice(13, 17).join('');
+  //捆序号 三位
+  const kunxuhao = arr.slice(17, 20).join('');
+  //捆净重代码 五位
+  const kunjingzhong = arr.slice(20, 24).join('') + `.` + arr[24];
+
+  return new Promise((resolve, reject) => {
+    resolve({
+      barcode,
+      qiyedaima,
+      chanpinleibie,
+      chanpindengji,
+      shengchanriqi,
+      chanpinpihao,
+      kunxuhao,
+      kunjingzhong,
+    });
+  });
+};
+
+//检查是否已存在
+const checkIfExist = (arr, obj) => {
+  let result = arr.find(item => {
+    return item.barcode === obj.barcode;
+  });
+  return new Promise((resolve, reject) => {
+    resolve(result);
+  });
+};
 
 const takeItout = (arr, item) => {
   let resultIndex = arr.findIndex(_item => {
@@ -24,6 +70,7 @@ const takeItout = (arr, item) => {
 
 class Default extends React.Component {
   state = {
+    isHoneywell: false,
     existDatabar: [],
     showConfirm: false,
     yijianWeight: 0,
@@ -34,27 +81,101 @@ class Default extends React.Component {
     tipsText: '',
   };
 
+  arrangeBarcode = (existDatabar, data) => {
+    //条码格式验证通过
+    if (tool.checkBarcodeIfqualified(data)) {
+      return api
+        .checkBatchNo({strBarCode: data})
+        .then(res => {
+          const {CheckBatchNoResult} = res;
+
+          //如果已拣配
+          if (!CheckBatchNoResult) {
+            this.refs.tips.show('该批次已经拣配装车，请勿重复选择！');
+            return;
+          }
+          //如果未拣配
+          else {
+            //按规则解析条码
+            decode(data).then(result => {
+              let date = result.shengchanriqi,
+                number = result.kunxuhao,
+                barcode = result.barcode,
+                weight = result.kunjingzhong;
+              let databar = {date, number, barcode, weight};
+              checkIfExist(existDatabar, databar).then(exist => {
+                if (!exist) {
+                  return databar;
+                } else if (exist) {
+                  this.refs.tips.show('该批次已经选择，请勿重复选择！');
+                  return;
+                }
+              });
+            });
+          }
+        })
+        .catch(err => {
+          this.refs.tips.show('验证错误，请检查网络连接');
+        });
+    }
+    //条码格式验证未通过
+    else {
+      this.refs.tips.show('对不起，此条码不符合规范');
+      return new Promise((resolve, reject) => {
+        reject('not ruled');
+      });
+    }
+  };
+
+  componentWillUnmount() {
+    if (this.state.isHoneywell) HoneywellBarcodeReader.stopReader();
+  }
+
   componentDidMount() {
-    const {navigation} = this.props;
-    //订阅的回退监测事件
-    navigation.addListener('focus', e => {
-      if (e.preventDefault) e.preventDefault();
-      const {existDatabar} = this.state;
-      //
-      const {route} = this.props;
-      if (route && route.params) {
-        const {
-          route: {
-            params: {newDatabar},
-          },
-        } = this.props;
-        //如果有新扫描到的有效数据时
-        if (newDatabar) {
-          let newDataArr = [...existDatabar, newDatabar];
-          this.calcData(newDataArr);
+    let isHoneywell = HoneywellBarcodeReader.isCompatible;
+    let _this = this;
+    if (isHoneywell) {
+      this.setState({isHoneywell: true});
+      //初始化Honey系统
+      HoneywellBarcodeReader.startReader().then(result => {
+        HoneywellBarcodeReader.onBarcodeReadSuccess(res => {
+          const {data} = res;
+          const {existDatabar} = _this.state;
+          //
+          _this.arrangeBarcode(existDatabar, data).then(databar => {
+            if (databar) {
+              let newDataArr = [...existDatabar, databar];
+              _this.calcData(newDataArr);
+            }
+          });
+        });
+      });
+
+      setTimeout(() => {
+        Toast.show('检测到您正在使用霍尼韦尔设备');
+      }, 0);
+    } else {
+      const {navigation} = this.props;
+      //订阅的回退监测事件
+      navigation.addListener('focus', e => {
+        if (e.preventDefault) e.preventDefault();
+        const {existDatabar} = this.state;
+        //
+        const {route} = this.props;
+        if (route && route.params) {
+          const {
+            route: {
+              params: {newDatabar},
+            },
+          } = this.props;
+          //如果有新扫描到的有效数据时
+          if (newDatabar) {
+            let newDataArr = [...existDatabar, newDatabar];
+            this.calcData(newDataArr);
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   render() {
@@ -311,7 +432,12 @@ class Default extends React.Component {
         this.calcData(newExistDatabarArr);
       }
     } else if (receivedData.etype === 'scan') {
-      navigate('scanning', {existDatabar});
+      const {isHoneywell} = this.state;
+      if (isHoneywell) {
+        HoneywellBarcodeReader.reading();
+      } else {
+        navigate('scanning', {existDatabar});
+      }
     } else if (
       receivedData.etype === 'event' &&
       receivedData.target === 'backBtn'

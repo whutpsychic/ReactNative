@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<title></title>
+		<script type="text/javascript">
+			document.addEventListener('plusready', function() {
+				//console.log("所有plus api都应该在此事件发生后调用，否则会出现plus is undefined。")
+				// mui.init();
+				alert("plusalready")
+
+				var main = null; //声明接收原生Android MainActivity的变量
+				var receiver = null; //声明广播接收者
+
+				document.getElementById('openButton').addEventListener('tap', function() {
+					scanReady();
+				});
+
+				document.getElementById("openScanner").addEventListener('tap', function() {
+					doScan(true);
+				});
+
+				document.getElementById('closeButton').addEventListener('tap', function() {
+					scanStop();
+				});
+
+
+				function scanReady() {
+					main = plus.android.runtimeMainActivity(); //得到原生Android MainActivity
+					var context = plus.android.importClass('android.content.Context');
+
+					receiver = plus.android.implements('io.dcloud.feature.internal.reflect.BroadcastReceiver', { //广播接收者
+						onReceive: getReceive //广播接收方法getReceive
+					});
+
+					var IntentFilter = plus.android.importClass('android.content.IntentFilter'); //得到原生IntentFilter.
+					var Intent = plus.android.importClass('android.content.Intent'); //得到原生Intent
+
+					var filter = new IntentFilter();
+					filter.addAction('com.Honeywell.scan'); //添加Action值，此值即为PDA端Intent Action中所设值。
+					main.registerReceiver(receiver, filter); //注册广播接收
+					alert("打开广播扫描成功，可以进行扫描");
+				}
+
+				function getReceive(context, intent) {
+					var mgs = intent.getStringExtra("data"); //接收值
+					alert(mgs);
+					doScan(false);
+				}
+
+				//销毁广播。
+				function scanStop() {
+					if (main != null) {
+						main.unregisterReceiver(receiver);
+						main.
+						main = null;
+						receiver = null;
+						alert("广播扫描关闭成功");
+					} else {
+						alert("广播扫描未打开");
+					}
+				}
+
+				function doScan(keyDown) {
+					if (main == null) {
+						alert("main == null");
+						return;
+					}
+
+					var KeyEvent = plus.android.importClass("android.view.KeyEvent");
+					var SystemClock = plus.android.importClass("android.os.SystemClock");
+					var Intent = plus.android.importClass('android.content.Intent');
+					var KeyCharacterMap = plus.android.importClass("android.view.KeyCharacterMap");
+
+					var action = keyDown ? KeyEvent.ACTION_DOWN : KeyEvent.ACTION_UP;
+
+					var keyEvent = new KeyEvent(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
+						action, KeyEvent.KEYCODE_UNKNOWN, 0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0,
+						KeyEvent.FLAG_SOFT_KEYBOARD | KeyEvent.FLAG_KEEP_TOUCH_MODE);
+					var intent = new Intent("com.honeywell.intent.action.SCAN_BUTTON", null);
+					intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+					intent.putExtra(Intent.EXTRA_KEY_EVENT, keyEvent);
+					main.sendOrderedBroadcast(intent, null);
+				}
+
+
+			});
+		</script>
+	</head>
+	<body>
+		<ul class="mui-table-view">
+			<li class="mui-table-view-cell">
+				<a class="mui-navigate-right">
+					Item 1
+				</a>
+			</li>
+			<li class="mui-table-view-cell">
+				<a class="mui-navigate-right">
+					Item 2
+				</a>
+			</li>
+			<li class="mui-table-view-cell">
+				<a class="mui-navigate-right">
+					Item 3
+				</a>
+			</li>
+		</ul>
+		<button type="button" class="mui-btn mui-btn-blue" id="openButton">openButton</button>
+		<button type="button" class="mui-btn mui-btn-blue" id="openScanner">openScanner</button>
+		<button type="button" class="mui-btn mui-btn-blue" id="closeButton">closeButton</button>
+	</body>
+</html>

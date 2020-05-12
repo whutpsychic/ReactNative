@@ -1,6 +1,7 @@
 .ckdnr {
 	padding-top: 0;
 	position: relative;
+	overflow-y: auto;
 }
 
 .am-navbar.am-navbar-light {

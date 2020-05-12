@@ -1,6 +1,7 @@
 .jpdmx {
 	padding-top: 0;
 	position: relative;
+	overflow-y: auto;
 }
 
 .items {
@@ -39,7 +40,8 @@
 
 .items li input {
 	margin: 0;
-	flex-basis: 60%;
+	flex-basis: 54%;
+	width: 54vw;
 	background-color: #fff;
 	height: 36px;
 	line-height: 36px;
