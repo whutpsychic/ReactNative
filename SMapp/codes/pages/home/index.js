@@ -17,14 +17,18 @@ import moment from 'moment';
 
 const uri = 'file:///android_asset/h5/home/index.html';
 
-class Default extends React.Component {
+class Default extends React.MyPage {
+  constructor() {
+    super();
+  }
+
   state = {
     showConfirm: false,
   };
 
   componentWillUnmount() {}
 
-  componentDidMount() {}
+  onLoad() {}
 
   render() {
     const footerButtons = [
@@ -94,7 +98,7 @@ class Default extends React.Component {
   };
 
   //监听页面事件变化
-  onReceive = e => {
+  onReceive = (e) => {
     const {
       navigation: {navigate},
     } = this.props;
@@ -106,7 +110,7 @@ class Default extends React.Component {
       receivedData.info === 'componentDidMount'
     ) {
       //初始化加入用户名和时间
-      storage.getData('smapp_userName').then(uname => {
+      storage.getData('smapp_userName').then((uname) => {
         let time = moment().format('YYYY年MM月DD日 HH:MM:SS');
         this.postMessage({
           etype: 'data',
@@ -134,7 +138,7 @@ class Default extends React.Component {
   };
 
   //往页面传数据
-  postMessage = obj => {
+  postMessage = (obj) => {
     this.refs.webview.postMessage(JSON.stringify(obj));
   };
 }
@@ -180,7 +184,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(
-  null,
-  mapDispatchToProps,
-)(Default);
+export default connect(null, mapDispatchToProps)(Default);

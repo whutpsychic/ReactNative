@@ -25,6 +25,7 @@ public class CustomPackages implements ReactPackage {
 
         modules.add(new ToastModule(reactContext));
         modules.add(new HoneywellBarcodeReaderModule(reactContext));
+        modules.add(new RroadCastModule(reactContext));
 
         return modules;
     }

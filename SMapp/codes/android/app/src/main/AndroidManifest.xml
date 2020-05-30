@@ -4,7 +4,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- for honeywell -->
     <uses-permission android:name="com.honeywell.decode.permission.DECODE" />
-    
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
       android:name=".MainApplication"
       android:label="@string/app_name"
@@ -26,6 +28,11 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
+      <receiver android:name="com.codes.BroadcastRNReceiver" android:enabled="true">
+          <intent-filter>
+              <action android:name="com.codes.intent.action.TAIJI" />
+          </intent-filter>
+      </receiver>
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
     </application>
 

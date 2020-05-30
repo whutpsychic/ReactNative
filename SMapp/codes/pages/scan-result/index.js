@@ -5,6 +5,8 @@ import {
   Text,
   StatusBar,
   TouchableOpacity,
+  DeviceEventEmitter,
+  NativeModules,
 } from 'react-native';
 import {WebView} from 'react-native-webview';
 import {Modal} from '@ant-design/react-native';
@@ -13,13 +15,18 @@ import api from '../../api/index.js';
 import Tips from '../../components/Tips/index';
 import Toast from '../../components/ToastModule/index';
 import tool from '../../core/tool.js';
-
+import {connect} from 'react-redux';
+import {login} from '../../redux/actions.js';
+import config from '../../config.js';
 import HoneywellBarcodeReader from '../../components/Honeywell/index.js';
+
+const {RNBroadCast} = NativeModules;
+const TAG = 'TAIJI';
 
 const uri = 'file:///android_asset/h5/scan-result/index.html';
 
 //解码规则
-const decode = barcode => {
+const decode = (barcode) => {
   let arr = barcode.split('');
   //企业代码 三位
   const qiyedaima = arr.slice(0, 3).join('');
@@ -52,7 +59,7 @@ const decode = barcode => {
 
 //检查是否已存在
 const checkIfExist = (arr, obj) => {
-  let result = arr.find(item => {
+  let result = arr.find((item) => {
     return item.barcode === obj.barcode;
   });
   return new Promise((resolve, reject) => {
@@ -61,7 +68,7 @@ const checkIfExist = (arr, obj) => {
 };
 
 const takeItout = (arr, item) => {
-  let resultIndex = arr.findIndex(_item => {
+  let resultIndex = arr.findIndex((_item) => {
     return _item.barcode === item.barcode;
   });
   //将之剔除出去
@@ -86,7 +93,7 @@ class Default extends React.Component {
     if (tool.checkBarcodeIfqualified(data)) {
       return api
         .checkBatchNo({strBarCode: data})
-        .then(res => {
+        .then((res) => {
           const {CheckBatchNoResult} = res;
 
           //如果已拣配
@@ -97,13 +104,13 @@ class Default extends React.Component {
           //如果未拣配
           else {
             //按规则解析条码
-            decode(data).then(result => {
+            decode(data).then((result) => {
               let date = result.shengchanriqi,
                 number = result.kunxuhao,
                 barcode = result.barcode,
                 weight = result.kunjingzhong;
               let databar = {date, number, barcode, weight};
-              checkIfExist(existDatabar, databar).then(exist => {
+              checkIfExist(existDatabar, databar).then((exist) => {
                 if (!exist) {
                   return databar;
                 } else if (exist) {
@@ -114,7 +121,7 @@ class Default extends React.Component {
             });
           }
         })
-        .catch(err => {
+        .catch((err) => {
           this.refs.tips.show('验证错误，请检查网络连接');
         });
     }
@@ -128,28 +135,62 @@ class Default extends React.Component {
   };
 
   componentWillUnmount() {
-    if (this.state.isHoneywell) HoneywellBarcodeReader.stopReader();
+    // if (this.state.isHoneywell) HoneywellBarcodeReader.stopReader();
+    if (this.hell) this.hell.remove();
   }
 
   componentDidMount() {
+    const {navigation} = this.props;
+    const {logout} = this.props;
+    navigation.addListener('focus', () => {
+      this.timeoutKey = setTimeout(() => {
+        logout();
+        Toast.show('因长时间停留此页面，您已登出');
+      }, config.scanningTimeout);
+    });
+
+    navigation.addListener('blur', () => {
+      if (this.timeoutKey) {
+        clearTimeout(this.timeoutKey);
+      }
+    });
+
     let isHoneywell = HoneywellBarcodeReader.isCompatible;
     let _this = this;
     if (isHoneywell) {
       this.setState({isHoneywell: true});
-      //初始化Honey系统
-      HoneywellBarcodeReader.startReader().then(result => {
-        HoneywellBarcodeReader.onBarcodeReadSuccess(res => {
+      // //初始化Honey系统
+      // HoneywellBarcodeReader.startReader().then(result => {
+      //   HoneywellBarcodeReader.onBarcodeReadSuccess(res => {
+      //     const {data} = res;
+      //     const {existDatabar} = _this.state;
+      //     //
+      //     _this.arrangeBarcode(existDatabar, data).then(databar => {
+      //       if (databar) {
+      //         let newDataArr = [...existDatabar, databar];
+      //         _this.calcData(newDataArr);
+      //       }
+      //     });
+      //   });
+      // });
+
+      //直接监听扫码事件
+      RNBroadCast.receiveEvent('com.codes.intent.action.' + TAG);
+      _this.hell = DeviceEventEmitter.addListener(
+        'com.codes.intent.action.' + TAG,
+        (res) => {
+          // alert(JSON.stringify(res));
           const {data} = res;
           const {existDatabar} = _this.state;
           //
-          _this.arrangeBarcode(existDatabar, data).then(databar => {
+          _this.arrangeBarcode(existDatabar, data).then((databar) => {
             if (databar) {
               let newDataArr = [...existDatabar, databar];
               _this.calcData(newDataArr);
             }
           });
-        });
-      });
+        },
+      );
 
       setTimeout(() => {
         Toast.show('检测到您正在使用霍尼韦尔设备');
@@ -157,7 +198,7 @@ class Default extends React.Component {
     } else {
       const {navigation} = this.props;
       //订阅的回退监测事件
-      navigation.addListener('focus', e => {
+      navigation.addListener('focus', (e) => {
         if (e.preventDefault) e.preventDefault();
         const {existDatabar} = this.state;
         //
@@ -249,7 +290,7 @@ class Default extends React.Component {
     );
   }
 
-  calcData = dataArr => {
+  calcData = (dataArr) => {
     const {
       route: {
         params: {yingjian},
@@ -260,7 +301,7 @@ class Default extends React.Component {
       existDatabar: dataArr,
     });
 
-    let yij1 = dataArr.map(item => {
+    let yij1 = dataArr.map((item) => {
       return parseFloat(item.weight);
     });
 
@@ -327,7 +368,7 @@ class Default extends React.Component {
     const {existDatabar, yijianWeight} = this.state;
 
     //获取本地存储的登录名
-    storage.getData('smapp_userName').then(userName => {
+    storage.getData('smapp_userName').then((userName) => {
       //
       let condition = {};
 
@@ -335,7 +376,7 @@ class Default extends React.Component {
       condition.strDeliveryNo = fahuodanhao;
       //条码数组
       condition.strBarcodes = existDatabar
-        .map(item => {
+        .map((item) => {
           return item.barcode + ',';
         })
         .join('');
@@ -351,7 +392,7 @@ class Default extends React.Component {
       // condition.id = danjuhao || '';
       condition.id = '';
       //
-      api.uploadBarcodes(condition).then(res => {
+      api.uploadBarcodes(condition).then((res) => {
         const {result, strMsg} = res;
         //错误
         if (!result) {
@@ -367,11 +408,11 @@ class Default extends React.Component {
     });
   };
 
-  postMessage = obj => {
+  postMessage = (obj) => {
     this.refs.webview.postMessage(JSON.stringify(obj));
   };
 
-  onReceive = event => {
+  onReceive = (event) => {
     const {
       navigation,
       navigation: {navigate},
@@ -434,7 +475,8 @@ class Default extends React.Component {
     } else if (receivedData.etype === 'scan') {
       const {isHoneywell} = this.state;
       if (isHoneywell) {
-        HoneywellBarcodeReader.reading();
+        // HoneywellBarcodeReader.reading();
+        Toast.show('请您按扫描键');
       } else {
         navigate('scanning', {existDatabar});
       }
@@ -480,4 +522,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Default;
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    logout: () => {
+      dispatch(login(false));
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(Default);

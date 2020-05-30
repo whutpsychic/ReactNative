@@ -12,16 +12,18 @@ import Tips from '../../components/Tips/index';
 import {Modal} from '@ant-design/react-native';
 import Toast from '../../components/ToastModule/index';
 import Confirm from '../../components/Confirm/index';
+import {connect} from 'react-redux';
+import {login} from '../../redux/actions.js';
 
 const uri = 'file:///android_asset/h5/jianpeidan-result/index.html';
 
-class Default extends React.Component {
+class Default extends React.MyPage {
   state = {
     showConfirm: false,
     currLine: null,
   };
 
-  componentDidMount() {
+  onLoad() {
     const {navigation} = this.props;
     navigation.addListener('focus', e => {
       //强行后置
@@ -256,4 +258,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Default;
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    logout: () => {
+      dispatch(login(false));
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(Default);

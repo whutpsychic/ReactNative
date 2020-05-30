@@ -10,11 +10,13 @@ import {WebView} from 'react-native-webview';
 import Tips from '../../components/Tips/index';
 import api from '../../api/index';
 import tool from '../../core/tool.js';
+import {connect} from 'react-redux';
+import {login} from '../../redux/actions.js';
 
 const uri = 'file:///android_asset/h5/xuanzechehao/index.html';
 
-class Default extends React.Component {
-  componentDidMount() {}
+class Default extends React.MyPage {
+  onLoad() {}
 
   render() {
     return (
@@ -34,11 +36,11 @@ class Default extends React.Component {
     );
   }
 
-  postMessage = obj => {
+  postMessage = (obj) => {
     this.refs.webview.postMessage(JSON.stringify(obj));
   };
 
-  onReceive = event => {
+  onReceive = (event) => {
     const {
       navigation,
       navigation: {navigate},
@@ -111,7 +113,7 @@ class Default extends React.Component {
     }
   };
 
-  query = condition => {
+  query = (condition) => {
     console.log(condition);
     this.postMessage({
       etype: 'data',
@@ -119,7 +121,7 @@ class Default extends React.Component {
     });
     return api
       .chooseCHEHAO(condition)
-      .then(res => {
+      .then((res) => {
         //查询完毕
         if (!res.length) {
           this.refs.tips.show('未能查到任何数据');
@@ -135,7 +137,7 @@ class Default extends React.Component {
           });
         }
       })
-      .catch(err => {
+      .catch((err) => {
         this.postMessage({
           etype: 'data',
           loading: false,
@@ -178,4 +180,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Default;
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    logout: () => {
+      dispatch(login(false));
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(Default);

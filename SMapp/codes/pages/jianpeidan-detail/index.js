@@ -9,11 +9,13 @@ import {
 import {WebView} from 'react-native-webview';
 import api from '../../api/index';
 import Tips from '../../components/Tips/index';
+import {connect} from 'react-redux';
+import {login} from '../../redux/actions.js';
 
 const uri = 'file:///android_asset/h5/jianpeidan-detail/index.html';
 
-class Default extends React.Component {
-  componentDidMount() {}
+class Default extends React.MyPage {
+  onLoad() {}
 
   render() {
     return (
@@ -118,4 +120,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Default;
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    logout: () => {
+      dispatch(login(false));
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(Default);

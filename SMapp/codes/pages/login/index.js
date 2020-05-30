@@ -62,11 +62,12 @@ class Default extends React.Component {
       receivedData.etype === 'pageState' &&
       receivedData.info === 'componentDidMount'
     ) {
-      let p1 = storage.getData('smapp_userName');
-      let p2 = storage.getData('smapp_psw');
-      Promise.all([p1, p2]).then(res => {
-        this.postMessage({etype: 'data', userName: res[0], psw: res[1]});
-      });
+      //自动填写上次登陆的用户名密码
+      // let p1 = storage.getData('smapp_userName');
+      // let p2 = storage.getData('smapp_psw');
+      // Promise.all([p1, p2]).then(res => {
+      //   this.postMessage({etype: 'data', userName: res[0], psw: res[1]});
+      // });
     } else if (receivedData.etype === 'cancel') {
       //强制报错退出
       alert(zbc)

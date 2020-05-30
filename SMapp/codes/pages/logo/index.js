@@ -14,10 +14,13 @@ const uri = 'file:///android_asset/h5/logo/index.html';
 class Default extends React.Component {
   componentDidMount() {
     const {setLoginState} = this.props;
-    //检查是否已登录状态设定
-    storage.getData('smapp_isLoggin').then(state => {
-      setLoginState(!!state);
-    });
+    // //检查是否已登录状态设定
+    // storage.getData('smapp_isLoggin').then(state => {
+    //   setLoginState(!!state);
+    // });
+
+    //每次都需要登录
+    setLoginState(false);
 
     //停留两秒
     setTimeout(() => {

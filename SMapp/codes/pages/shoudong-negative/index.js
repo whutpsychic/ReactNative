@@ -10,12 +10,14 @@ import {WebView} from 'react-native-webview';
 import tool from '../../core/tool.js';
 import api from '../../api/index.js';
 import Tips from '../../components/Tips/index';
+import {connect} from 'react-redux';
+import {login} from '../../redux/actions.js';
 
 const uri = 'file:///android_asset/h5/shoudong-negative/index.html';
 
 //检查是否已存在
 const checkIfExist = (arr, obj) => {
-  let result = arr.find(item => {
+  let result = arr.find((item) => {
     return item.barcode === obj.barcode;
   });
   return new Promise((resolve, reject) => {
@@ -24,7 +26,7 @@ const checkIfExist = (arr, obj) => {
 };
 
 //解码规则
-const decode = barcode => {
+const decode = (barcode) => {
   let arr = barcode.split('');
   //企业代码 三位
   const qiyedaima = arr.slice(0, 3).join('');
@@ -55,8 +57,8 @@ const decode = barcode => {
   });
 };
 
-class Default extends React.Component {
-  componentDidMount() {}
+class Default extends React.MyPage {
+  onLoad() {}
 
   render() {
     return (
@@ -76,11 +78,11 @@ class Default extends React.Component {
     );
   }
 
-  postMessage = obj => {
+  postMessage = (obj) => {
     this.refs.webview.postMessage(JSON.stringify(obj));
   };
 
-  onReceive = event => {
+  onReceive = (event) => {
     const {
       navigation,
       navigation: {navigate},
@@ -98,7 +100,7 @@ class Default extends React.Component {
       //
       let condition = {};
       condition.strBatchno = bianhao + `-` + picihao;
-      api.getBarcodeByPB(condition).then(barcode => {
+      api.getBarcodeByPB(condition).then((barcode) => {
         //强制清空
         if (!barcode) {
           barcode = ' ';
@@ -119,7 +121,7 @@ class Default extends React.Component {
       if (tool.checkBarcodeIfqualified(barcode)) {
         api
           .checkBatchNo({strBarCode: barcode})
-          .then(res => {
+          .then((res) => {
             const {CheckBatchNoResult} = res;
 
             //如果已拣配
@@ -135,13 +137,13 @@ class Default extends React.Component {
                 },
               } = this.props;
               //按规则解析条码
-              decode(barcode).then(result => {
+              decode(barcode).then((result) => {
                 let date = result.shengchanriqi,
                   number = result.kunxuhao,
                   barcode = result.barcode,
                   weight = result.kunjingzhong;
                 let databar = {date, number, barcode, weight};
-                checkIfExist(existDatabar, databar).then(exist => {
+                checkIfExist(existDatabar, databar).then((exist) => {
                   if (!exist) {
                     //回退至结果页并告知新条目
                     navigate('scan-result', {newDatabar: databar});
@@ -159,7 +161,7 @@ class Default extends React.Component {
               });
             }
           })
-          .catch(err => {
+          .catch((err) => {
             console.log(err);
             this.refs.tips.show('验证错误，请检查网络连接');
           });
@@ -208,4 +210,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Default;
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    logout: () => {
+      dispatch(login(false));
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(Default);

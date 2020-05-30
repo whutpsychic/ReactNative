@@ -5,6 +5,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {Provider as AntdProvider} from '@ant-design/react-native';
 import {Provider} from 'react-redux';
 import store from './redux/store.js';
+import './class/Page.js';
 
 import Navigations from './Navigations.js';
 import storage from './core/storage.js';

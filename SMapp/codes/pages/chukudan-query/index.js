@@ -8,13 +8,15 @@ import {
 } from 'react-native';
 import {WebView} from 'react-native-webview';
 import Tips from '../../components/Tips/index';
+import {connect} from 'react-redux';
+import {login} from '../../redux/actions.js';
 
 const uri = 'file:///android_asset/h5/chukudan-query/index.html';
 
-class Default extends React.Component {
+class Default extends React.MyPage {
   componentWillUnmount() {}
 
-  componentDidMount() {}
+  onLoad() {}
 
   render() {
     return (
@@ -103,4 +105,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Default;
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    logout: () => {
+      dispatch(login(false));
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(Default);

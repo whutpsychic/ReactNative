@@ -9,11 +9,13 @@ import {
 import {WebView} from 'react-native-webview';
 import tool from '../../core/tool.js';
 import Tips from '../../components/Tips/index';
+import {connect} from 'react-redux';
+import {login} from '../../redux/actions.js';
 
 const uri = 'file:///android_asset/h5/chukudan-detail/index.html';
 
-class Default extends React.Component {
-  componentDidMount() {
+class Default extends React.MyPage {
+  onLoad() {
     const {navigation} = this.props;
     navigation.addListener('focus', e => {
       // Prevent default action
@@ -155,4 +157,13 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Default;
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    logout: () => {
+      dispatch(login(false));
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(Default);
+
