@@ -111,7 +111,7 @@ class Default extends React.MyPage {
     ) {
       //初始化加入用户名和时间
       storage.getData('smapp_userName').then((uname) => {
-        let time = moment().format('YYYY年MM月DD日 HH:MM:SS');
+        let time = moment().format('YYYY年MM月DD日 LTS ');
         this.postMessage({
           etype: 'data',
           user: uname,

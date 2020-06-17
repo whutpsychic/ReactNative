@@ -9,6 +9,9 @@ import './class/Page.js';
 
 import Navigations from './Navigations.js';
 import storage from './core/storage.js';
+import moment from 'moment';
+import 'moment/locale/zh-cn';
+moment.locale('zh-cn');
 
 //////////////////初始化逻辑/////////////////////
 //////////////////初始化逻辑/////////////////////
