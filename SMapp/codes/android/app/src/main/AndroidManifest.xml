@@ -28,7 +28,7 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
-      <receiver android:name="com.codes.BroadcastRNReceiver" android:enabled="true">
+      <receiver android:name=".MyReceiver">
           <intent-filter>
               <action android:name="com.codes.intent.action.TAIJI" />
           </intent-filter>

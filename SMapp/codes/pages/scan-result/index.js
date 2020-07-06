@@ -191,6 +191,9 @@ class Default extends React.Component {
           });
         },
       );
+      setTimeout(() => {
+        Toast.show('ih how ni mao');
+      }, 0);
 
       setTimeout(() => {
         Toast.show('检测到您正在使用霍尼韦尔设备');

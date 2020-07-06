@@ -2,9 +2,6 @@ package com.codes;
 
 import com.facebook.react.ReactActivity;
 
-import android.view.KeyEvent; // <--- import
-import com.github.kevinejohn.keyevent.KeyEventModule; // <--- import
-
 public class MainActivity extends ReactActivity {
 
   /**
