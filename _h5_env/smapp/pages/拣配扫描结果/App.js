@@ -2,9 +2,9 @@ import React from "react";
 import "./index.css";
 import "./App.css";
 
-import { Table } from "antd";
+// import { Table } from "antd";
 import util from "./util/index";
-import { TopNavigator, Btns } from "./components";
+import { TopNavigator, Btns, Table } from "./components";
 
 const { Btn } = Btns;
 
@@ -111,7 +111,7 @@ class App extends React.Component {
             <span>{yij2}</span>
             <span></span>
           </div>
-          <Btns>
+          <Btns suffix>
             <Btn title={"确认"} type={"btn2"} onPress={this.onPressConfirm} />
             <Btn title={"手动"} type={"btn3"} onPress={this.onPressShoudong} />
             <Btn title={"剔除"} type={"btn4"} onPress={this.onPressTichu} />

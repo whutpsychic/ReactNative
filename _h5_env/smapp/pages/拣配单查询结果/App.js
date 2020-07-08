@@ -2,9 +2,9 @@ import React from "react";
 import "./index.css";
 import "./App.css";
 
-import { Table } from "antd";
+// import { Table } from "antd";
 import util from "./util/index";
-import { TopNavigator, Btns } from "./components";
+import { TopNavigator, Btns, Table } from "./components";
 
 const { Btn } = Btns;
 

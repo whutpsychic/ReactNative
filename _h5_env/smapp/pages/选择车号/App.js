@@ -2,9 +2,9 @@ import React from "react";
 import "./index.css";
 import "./App.css";
 
-import { Table } from "antd";
+// import { Table } from "antd";
 import util from "./util/index";
-import { TopNavigator, DateRangePicker, Btns } from "./components";
+import { TopNavigator, DateRangePicker, Btns, Table } from "./components";
 
 const { Btn } = Btns;
 
@@ -90,7 +90,7 @@ class App extends React.Component {
             <label>车牌号</label>
             <input value={inputValue} onChange={this.onChangeText} />
           </div>
-          <Btns>
+          <Btns suffix>
             <Btn title={"查询"} type={"btn1"} onPress={this.onPressQueryBtn} />
             <Btn
               title={"确认"}

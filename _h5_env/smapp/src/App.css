@@ -1,42 +1,39 @@
-.main {
+.jpdmx {
 	padding-top: 0;
 	position: relative;
 }
 
-.main-btns {
-	color: #fff;
-	display: flex;
-	flex-wrap: wrap;
-	position: relative;
-	height: calc(100vh - 100px);
-	justify-content: center;
-	align-content: flex-start;
+.table-container {
+	width: calc(100% - 20px);
+	height: calc(100vh - 200px - 30px);
 	overflow: auto;
+	margin: 10px;
 }
 
-.main-btns .btn {
-	flex-basis: 100%;
-	font-size: 24px;
-	font-weight: bold;
-	max-width: 60vw;
-	text-align: center;
-	max-height: 16vw;
-	/*margin: 40px 0;*/
-	margin-bottom: 20px;
-	padding: 16px 24px;
-	border-radius: 4px;
-	background-color: #003363;
+.table-container .ant-table th,
+.table-container .ant-table td {
+	min-width: unset;
 }
 
-.main-btns .btn:first-child {
-	margin-top: 20px;
+.table-container .ant-table th {
+	white-space: nowrap;
 }
 
-.main-btns .btn:nth-child(2n + 1) {
-	background-color: darkorange;
+.table-container .ant-table td {
+	padding: 8px 8px;
 }
 
-.info {
-	padding: 0 12vw;
-	font-size: 14px;
+.table-container .ant-table th.jianpeidan,
+.table-container .ant-table td.jianpeidan {
+	min-width: 100px;
+}
+
+.table-container .ant-table th.picihao,
+.table-container .ant-table td.picihao {
+	min-width: 80px;
+}
+
+.table-container .ant-table th.picibianma,
+.table-container .ant-table td.picibianma {
+	min-width: 150px;
 }

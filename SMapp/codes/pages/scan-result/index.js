@@ -63,7 +63,7 @@ const checkIfExist = (arr, obj) => {
     return item.barcode === obj.barcode;
   });
   return new Promise((resolve, reject) => {
-    resolve(result);
+    resolve({result, obj});
   });
 };
 
@@ -95,7 +95,6 @@ class Default extends React.Component {
         .checkBatchNo({strBarCode: data})
         .then((res) => {
           const {CheckBatchNoResult} = res;
-
           //如果已拣配
           if (!CheckBatchNoResult) {
             this.refs.tips.show('该批次已经拣配装车，请勿重复选择！');
@@ -104,25 +103,28 @@ class Default extends React.Component {
           //如果未拣配
           else {
             //按规则解析条码
-            decode(data).then((result) => {
-              let date = result.shengchanriqi,
-                number = result.kunxuhao,
-                barcode = result.barcode,
-                weight = result.kunjingzhong;
-              let databar = {date, number, barcode, weight};
-              checkIfExist(existDatabar, databar).then((exist) => {
-                if (!exist) {
-                  return databar;
-                } else if (exist) {
+            return decode(data)
+              .then((result) => {
+                let date = result.shengchanriqi,
+                  number = result.kunxuhao,
+                  barcode = result.barcode,
+                  weight = result.kunjingzhong;
+                let databar = {date, number, barcode, weight};
+                return checkIfExist(existDatabar, databar);
+              })
+              .then(({result, obj}) => {
+                if (!result) {
+                  return obj;
+                } else if (result) {
                   this.refs.tips.show('该批次已经选择，请勿重复选择！');
                   return;
                 }
               });
-            });
           }
         })
         .catch((err) => {
           this.refs.tips.show('验证错误，请检查网络连接');
+          return;
         });
     }
     //条码格式验证未通过
@@ -179,7 +181,6 @@ class Default extends React.Component {
       _this.hell = DeviceEventEmitter.addListener(
         'com.codes.intent.action.' + TAG,
         (res) => {
-          // alert(JSON.stringify(res));
           const {data} = res;
           const {existDatabar} = _this.state;
           //
@@ -191,9 +192,6 @@ class Default extends React.Component {
           });
         },
       );
-      setTimeout(() => {
-        Toast.show('ih how ni mao');
-      }, 0);
 
       setTimeout(() => {
         Toast.show('检测到您正在使用霍尼韦尔设备');
@@ -319,7 +317,7 @@ class Default extends React.Component {
     let ques = (parseFloat(yingjian) - yij1).toFixed(4);
 
     if (ques < 0) {
-      this.refs.tips.show('请求数量过多！');
+      Toast.show('请求数量过多！');
     }
 
     //记录已拣重量
@@ -392,8 +390,9 @@ class Default extends React.Component {
       //秤房
       condition.weighthousename = chengfang || '';
       //单据
-      // condition.id = danjuhao || '';
-      condition.id = '';
+      condition.id = danjuhao || '';
+
+      // condition.id = '';
       //
       api.uploadBarcodes(condition).then((res) => {
         const {result, strMsg} = res;

@@ -2,13 +2,16 @@ import React from "react";
 import "./index.css";
 import "./App.css";
 
+// import { Table } from "antd";
 import util from "./util/index";
-import { TopNavigator } from "./components";
+import { TopNavigator, Btns, Table } from "./components";
+
+const { Btn } = Btns;
 
 class App extends React.Component {
   state = {
-    user: "",
-    time: ""
+    loading: false,
+    data: []
   };
 
   componentDidMount() {
@@ -28,41 +31,80 @@ class App extends React.Component {
   }
 
   render() {
-    const { user, time } = this.state;
+    //'拣配单号', '批次号', '批次编码', '重量', '块数', '计量单位'
+    const columns = [
+      {
+        title: "拣配单号",
+        dataIndex: "jianpeidan",
+        key: "jianpeidan",
+        className: "jianpeidan"
+      },
+      {
+        title: "批次号",
+        dataIndex: "picihao",
+        key: "picihao",
+        className: "picihao"
+      },
+      {
+        title: "批次编码",
+        dataIndex: "picibianma",
+        key: "picibianma",
+        className: "picibianma"
+      },
+      {
+        title: "重量",
+        dataIndex: "weight",
+        key: "weight"
+      },
+      {
+        title: "块数",
+        dataIndex: "kuaishu",
+        key: "kuaishu"
+      },
+      {
+        title: "计量单位",
+        dataIndex: "unit",
+        key: "unit"
+      }
+    ].map(item => {
+      item.align = "center";
+      return item;
+    });
+
+    const { loading, data } = this.state;
+
     return (
       <div className="app-container">
-        <div className="app-contents main">
-          <TopNavigator title="主菜单" />
-          <div className="info">
-            <p>当前用户：{user}</p>
-            <p>登录时间：{time}</p>
+        <div className="app-contents jpdmx">
+          <TopNavigator title="拣配单明细" />
+          <div className="table-container">
+            <Table
+              columns={columns}
+              dataSource={data}
+              pagination={false}
+              loading={loading}
+              onRow={record => {
+                return {
+                  onClick: event => {
+                    event.preventDefault();
+                    util.setItUp(
+                      event.target.parentNode,
+                      event.target.parentNode.parentNode
+                    );
+                  } // 点击行
+                };
+              }}
+            />
           </div>
-          <div className="main-btns">
-            <div className="btn" onClick={this.onClickJianPei}>
-              拣配
-            </div>
-            <div className="btn" onClick={this.onClickJianPeiDanQuery}>
-              查询拣配单
-            </div>
-            <div className="btn" onClick={this.onClickCancelLogin}>
-              退出登录
-            </div>
-          </div>
+          <Btns>
+            <Btn title={"返回"} type={"btn5"} onPress={this.onPressBtn1} />
+          </Btns>
         </div>
       </div>
     );
   }
-
-  onClickJianPei = () => {
-    util.traceBack("jianpei");
-  };
-
-  onClickJianPeiDanQuery = () => {
-    util.traceBack("jianpeidanQuery");
-  };
-
-  onClickCancelLogin = () => {
-    util.traceBack("cancelLogin");
+  onPressBtn1 = () => {
+    util.traceBack("back");
   };
 }
 

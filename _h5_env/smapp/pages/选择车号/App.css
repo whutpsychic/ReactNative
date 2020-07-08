@@ -1,12 +1,11 @@
 .xzchh {
 	padding-top: 0;
 	position: relative;
+	overflow: auto;
 }
 
 .table-container {
-	width: 100%;
 	max-height: 360px;
-	overflow: auto;
 }
 
 .chehao {

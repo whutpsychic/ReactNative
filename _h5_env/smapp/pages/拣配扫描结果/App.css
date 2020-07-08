@@ -1,14 +1,11 @@
 .jpsmjg {
 	padding-top: 0;
 	position: relative;
+	overflow: auto;
 }
 
 .table-container {
-	width: calc(100% - 20px);
-	overflow: auto;
-	margin: 10px;
-	min-height: 100px;
-	max-height: calc(100vh - 340px);
+
 }
 
 .info-container {

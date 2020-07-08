@@ -2,14 +2,22 @@ import React from "react";
 import "./index.css";
 import "./App.css";
 
-import { Table } from "antd";
+// import { Table } from "antd";
 import util from "./util/index";
-import { TopNavigator, Btns } from "./components";
+import { TopNavigator, Btns,Table } from "./components";
 
 const { Btn } = Btns;
 
 class App extends React.Component {
-  state = { loading: true, data: [], currentLine: null };
+  state = {
+    loading: true,
+    data: [
+      // { name: "xxxxxxx1", unit: "xccccccccccc", weight: "klksljldfjglk" },
+      // { name: "xxxxxxx2", unit: "xccccccccccc", weight: "klksljldfjglk" },
+      // { name: "xxxxxxx3", unit: "xccccccccccc", weight: "klksljldfjglk" }
+    ],
+    currentLine: null
+  };
 
   componentDidMount() {
     //告知RN页面已经装载完毕
