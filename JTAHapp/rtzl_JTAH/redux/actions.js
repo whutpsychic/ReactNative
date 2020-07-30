@@ -36,6 +36,12 @@ const setMMB4 = value => ({
 	value,
 });
 
+//设置第五个菜单的 badge
+const setMMB5 = value => ({
+	type: 'SET_MAIN_MENU_BADGE5',
+	value,
+});
+
 //设置网络状态
 const setNetworkState = value => ({
 	type: 'SET_NETWORK_STATE',
@@ -50,5 +56,6 @@ export {
 	setMMB2,
 	setMMB3,
 	setMMB4,
+	setMMB5,
 	setNetworkState,
 };

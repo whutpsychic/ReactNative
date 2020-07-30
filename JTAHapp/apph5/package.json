@@ -2,10 +2,17 @@
   "name": "apph5",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
+    "@ant-design/icons": "^4.2.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "antd": "^4.5.0",
+    "antd-mobile": "^2.3.3",
+    "echarts": "^4.8.0",
+    "echarts-for-react": "^2.0.16",
+    "province-city-china": "^6.0.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1"

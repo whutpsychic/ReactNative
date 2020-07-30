@@ -6,6 +6,7 @@ import {
   set_MMBN2_Reducer,
   set_MMBN3_Reducer,
   set_MMBN4_Reducer,
+  set_MMBN5_Reducer,
   set_NETWORKSTATE_Reducer,
 } from './reducers';
 
@@ -18,12 +19,14 @@ const store = createStore(
 
     //首页小红点
     mainMenuBadge1: set_MMBN1_Reducer,
-    //学习小红点
+    //信息维护小红点
     mainMenuBadge2: set_MMBN2_Reducer,
-    //考试小红点
+    //信息查询小红点
     mainMenuBadge3: set_MMBN3_Reducer,
-    //我的小红点
+    //视频小红点
     mainMenuBadge4: set_MMBN4_Reducer,
+    //我的小红点
+    mainMenuBadge5: set_MMBN5_Reducer,
 
     //网络连接状态
     network: set_NETWORKSTATE_Reducer,

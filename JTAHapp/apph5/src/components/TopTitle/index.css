@@ -1,0 +1,16 @@
+.top-title {
+	font-size: 18px;
+	font-weight: bold;
+	color: #fff;
+	background-color: #389edc;
+	position: relative;
+	width: 100%;
+	height: 40px;
+	line-height: 40px;
+}
+
+.top-title > p:first-child {
+	text-align: center;
+	width: 100%;
+	height: 100%;
+}

@@ -52,6 +52,15 @@ const set_MMBN4_Reducer = (state = 0, action) => {
   }
 };
 
+const set_MMBN5_Reducer = (state = 0, action) => {
+  switch (action.type) {
+    case 'SET_MAIN_MENU_BADGE5':
+      return action.value;
+    default:
+      return state;
+  }
+};
+
 const set_NETWORKSTATE_Reducer = (
   state = {isConnected: false, connectionType: null},
   action,
@@ -74,5 +83,6 @@ export {
   set_MMBN2_Reducer,
   set_MMBN3_Reducer,
   set_MMBN4_Reducer,
+  set_MMBN5_Reducer,
   set_NETWORKSTATE_Reducer,
 };

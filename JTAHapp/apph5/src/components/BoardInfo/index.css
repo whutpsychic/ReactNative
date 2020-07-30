@@ -1,0 +1,37 @@
+.board-info-container {
+	background-color: #fff;
+	margin: 8px;
+	border: solid 1px #ddd;
+	border-radius: 4px;
+}
+
+.board-info-container .board-info-title {
+	font-size: 15px;
+	font-weight: bold;
+	height: 30px;
+	line-height: 30px;
+	border-bottom: solid 1px #eee;
+	margin: 8px 10px;
+	margin-top: 4px;
+	color: #666;
+}
+
+.board-info-container > p {
+	font-size: 14px;
+	margin: 0 10px;
+	display: flex;
+	justify-content: space-between;
+	line-height: 24px;
+	margin-bottom: 6px;
+}
+
+.board-info-container > p > span:first-child {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.board-info-container > p > span:nth-child(2) {
+	min-width: 76px;
+	color: #aaa;
+}

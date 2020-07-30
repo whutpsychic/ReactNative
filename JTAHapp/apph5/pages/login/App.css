@@ -1,0 +1,134 @@
+.app-contents {
+  background-image: url("../img/bg.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.bg {
+}
+
+.main {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-top: 10vh;
+}
+
+.main > * {
+  width: 100%;
+  flex-basis: 100%;
+}
+
+.main .logo {
+  display: block;
+  width: 120px;
+  height: 120px;
+  max-width: 120px;
+  max-height: 120px;
+}
+
+.main p {
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  white-space: nowrap;
+  letter-spacing: 1px;
+  width: 100%;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.form-outer {
+  border: solid 1px #fff;
+  margin: 0 10vw;
+  padding: 8px;
+}
+
+.form {
+  position: relative;
+  height: calc(80vw - 18px);
+  background-image: url("../img/fb.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  /***************/
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+}
+
+.form > * {
+  flex-basis: 100%;
+}
+
+.form > img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(80vw - 18px);
+  height: calc(80vw - 18px);
+}
+
+.form p {
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+
+.form ul {
+  margin: 0;
+}
+
+.form ul li {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-around;
+  height: 30px;
+  line-height: 30px;
+}
+
+.form ul li label {
+  display: block;
+  text-align: right;
+  min-width: 60px;
+  color: #fff;
+}
+
+.form ul li input,
+.form ul li > div {
+  flex-basis: 100%;
+  margin: 0 10px;
+  height: 100%;
+}
+
+.form ul li input {
+  text-indent: 8px;
+}
+
+.form ul li > div {
+  display: flex;
+  align-items: center;
+}
+
+.form ul li > div span {
+  font-size: 14px;
+  color: #fff;
+  margin-left: 10px;
+}
+
+.loginBtn {
+  width: 180px;
+  height: 50px;
+  background-repeat: no-repeat;
+  background-size: 180px 50px;
+  background-position: center;
+  background-image: url("../img/loginBtn.png");
+}
+
+.loginBtn:active {
+  background-image: url("../img/loginBtn_active.png");
+}
+
+.form .rmbpsw {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
