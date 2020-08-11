@@ -1,0 +1,12 @@
+.app-contents {
+}
+
+.menu-container {
+	padding-top: 8px;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+	align-content: flex-start;
+	overflow: auto;
+	height: calc(100vh - 40px - 8px);
+}

@@ -75,7 +75,6 @@ util.calcColumn = (arr1, arr2) => {
     _item.key = arr2[i];
     return _item;
   });
-  console.log(arr);
   return arr;
 };
 
@@ -94,6 +93,13 @@ util.deepClone = obj => {
     }
   }
   return newObj;
+};
+
+util.executeNumber = num => {
+  if (typeof num !== "number")
+    throw new Error("executeNumber函数传进的参数不是一个数字类型");
+  if (num > 0 && num < 10) return `0${num}`;
+  return num.toString();
 };
 
 export default util;

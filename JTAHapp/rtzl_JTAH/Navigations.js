@@ -17,6 +17,10 @@ import Query from './pages/main-query/index';
 import Video from './pages/main-video/index';
 import Mine from './pages/main-mine/index';
 import Nav from './pages/nav/index';
+// -------------------------------------------
+import Stxfxx from './pages/stxfxx/index';
+import Xfgl from './pages/xfgl/index';
+import Yhpczl from './pages/yhpczl/index';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -102,6 +106,9 @@ class App extends React.Component {
             <Fragment>
               <Stack.Screen name="nav" component={Nav} />
               <Stack.Screen name="main" component={BottomTabs} />
+              <Stack.Screen name="stxfxx" component={Stxfxx} />
+              <Stack.Screen name="xfgl" component={Xfgl} />
+              <Stack.Screen name="yhpczl" component={Yhpczl} />
             </Fragment>
           ) : (
             <Stack.Screen name="login" component={Login} />

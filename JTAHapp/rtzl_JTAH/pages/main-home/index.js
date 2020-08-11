@@ -3,7 +3,7 @@ import {View} from 'react-native';
 import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
 
-const pageUri = 'file:///android_asset/h5/home/index.html';
+const pageUri = 'file:///android_asset/h5/main-home/index.html';
 
 class Default extends React.Component {
   state = {};

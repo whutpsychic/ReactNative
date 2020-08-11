@@ -1,0 +1,122 @@
+.app-contents {
+	overflow: auto;
+}
+
+.condition-ul {
+}
+
+.condition-ul li {
+	padding: 0 10px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 6px;
+}
+
+.condition-ul li .select {
+	flex-basis: 100%;
+	margin: 0 10px;
+}
+
+.condition-ul li label {
+	width: 100px;
+	min-width: 100px;
+	text-align: right;
+	white-space: nowrap;
+}
+
+ul.btns {
+	display: flex;
+	justify-content: space-around;
+}
+
+ul.btns li {
+	display: block;
+}
+
+@media screen and (max-width: 340px) {
+	ul.btns {
+		flex-wrap: wrap;
+	}
+	ul.btns li {
+		flex-basis: 40%;
+		margin-bottom: 8px;
+	}
+}
+/*-------------------------------------------*/
+
+.tips-title {
+	font-size: 14px;
+	text-align: center;
+	background-color: #c9e2f6;
+	height: 40px;
+	line-height: 40px;
+}
+
+/*-------------------------------------------*/
+.main-list {
+}
+
+.main-list li.list-item {
+	display: flex;
+	justify-content: space-between;
+	height: 120px;
+	background-color: #fff;
+	margin-bottom: 10px;
+}
+
+.main-list li.list-item .left-img {
+	display: block;
+	width: 120px;
+	height: 100px;
+	margin: 10px;
+	background-color: orange;
+}
+
+.main-list li.list-item .right-info {
+	display: block;
+	margin: 10px;
+	margin-left: 0;
+	flex-basis: calc(100% - 140px);
+	height: 100px;
+	overflow: hidden;
+}
+
+.main-list li.list-item .right-info > p {
+	font-size: 15px;
+	font-weight: bold;
+	height: 24px;
+	line-height: 24px;
+	text-indent: 10px;
+	margin-top: 6px;
+}
+
+.main-list li.list-item .right-info > p {
+	font-size: 14px;
+}
+
+.main-list li.list-item .right-info > p span {
+	font-size: 13px;
+	color: #888;
+	margin-left: 10px;
+}
+
+.main-list li.list-item .right-info .img-items {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+}
+
+.main-list li.list-item .right-info .img-items li {
+	width: 60px;
+	height: 60px;
+	margin-top: 10px;
+	margin-left: calc(25% - 45px);
+}
+
+.main-list li.list-item .right-info .img-items li img {
+	display: block;
+	width: 60px;
+	height: 60px;
+	background-color: #389edc;
+}

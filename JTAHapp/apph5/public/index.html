@@ -8,44 +8,72 @@
       user-scalable="0"
     />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-
+    <script src="https://map.qq.com/api/js?v=2.exp&key=I3YBZ-RVH3S-AK4O5-6VYS4-VLSGJ-TXFX7"></script>
     <title>React App</title>
     <style>
-    #webview-loading-screen{
-      position: fixed;top: 0;left: 0;width:100vw;height: 100vh;display: flex;justify-content: center;align-items: center;}
-    #webview-loading-main-contents-container {
-    position: relative;
-    width: 30px;
-    height: 30px;
-    animation: rotate 2.4s infinite linear;
-    }
-    #webview-loading-main-contents-container .loading-dot-item{
-    position: absolute;width: 4px;height: 4px;background-color: #389edc;border-radius:50%;
-    }
-    #webview-loading-main-contents-container .loading-dot-item:first-child {
-    top:calc(21% - 2px);left:calc(21% - 2px);}
-    #webview-loading-main-contents-container .loading-dot-item:nth-child(2){
-    top:calc(50% - 2px);left:calc(10% - 2px);}
-    #webview-loading-main-contents-container .loading-dot-item:nth-child(3){
-    top:calc(79% - 2px);left:calc(21% - 2px);}
-    #webview-loading-main-contents-container .loading-dot-item:nth-child(4){
-    top:calc(90% - 2px);left:calc(50% - 2px);}
-    #webview-loading-main-contents-container .loading-dot-item:nth-child(5){
-    top:calc(79% - 2px);left:calc(79% - 2px);}
-    #webview-loading-main-contents-container .loading-dot-item:nth-child(6){
-    top:calc(21% - 2px);left:calc(79% - 2px);}
-    #webview-loading-main-contents-container .loading-dot-item:nth-child(7){
-    top:calc(50% - 2px);left:calc(90% - 2px);}
-    #webview-loading-main-contents-container .loading-dot-item:nth-child(8){
-    top:calc(10% - 2px);left:calc(50% - 2px);}
-    @keyframes rotate{
-      from {
-        transform: rotate(0deg)
+      #webview-loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
-      to {
-        transform: rotate(360deg)
+      #webview-loading-main-contents-container {
+        position: relative;
+        width: 30px;
+        height: 30px;
+        animation: rotate 2.4s infinite linear;
       }
-    }
+      #webview-loading-main-contents-container .loading-dot-item {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background-color: #389edc;
+        border-radius: 50%;
+      }
+      #webview-loading-main-contents-container .loading-dot-item:first-child {
+        top: calc(21% - 2px);
+        left: calc(21% - 2px);
+      }
+      #webview-loading-main-contents-container .loading-dot-item:nth-child(2) {
+        top: calc(50% - 2px);
+        left: calc(10% - 2px);
+      }
+      #webview-loading-main-contents-container .loading-dot-item:nth-child(3) {
+        top: calc(79% - 2px);
+        left: calc(21% - 2px);
+      }
+      #webview-loading-main-contents-container .loading-dot-item:nth-child(4) {
+        top: calc(90% - 2px);
+        left: calc(50% - 2px);
+      }
+      #webview-loading-main-contents-container .loading-dot-item:nth-child(5) {
+        top: calc(79% - 2px);
+        left: calc(79% - 2px);
+      }
+      #webview-loading-main-contents-container .loading-dot-item:nth-child(6) {
+        top: calc(21% - 2px);
+        left: calc(79% - 2px);
+      }
+      #webview-loading-main-contents-container .loading-dot-item:nth-child(7) {
+        top: calc(50% - 2px);
+        left: calc(90% - 2px);
+      }
+      #webview-loading-main-contents-container .loading-dot-item:nth-child(8) {
+        top: calc(10% - 2px);
+        left: calc(50% - 2px);
+      }
+      @keyframes rotate {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
     </style>
   </head>
   <body>
@@ -53,14 +81,14 @@
     <div id="root">
       <div id="webview-loading-screen">
         <div id="webview-loading-main-contents-container">
-          <i class="loading-dot-item" ></i>
-          <i class="loading-dot-item" ></i>
-          <i class="loading-dot-item" ></i>
-          <i class="loading-dot-item" ></i>
-          <i class="loading-dot-item" ></i>
-          <i class="loading-dot-item" ></i>
-          <i class="loading-dot-item" ></i>
-          <i class="loading-dot-item" ></i>
+          <i class="loading-dot-item"></i>
+          <i class="loading-dot-item"></i>
+          <i class="loading-dot-item"></i>
+          <i class="loading-dot-item"></i>
+          <i class="loading-dot-item"></i>
+          <i class="loading-dot-item"></i>
+          <i class="loading-dot-item"></i>
+          <i class="loading-dot-item"></i>
         </div>
       </div>
     </div>

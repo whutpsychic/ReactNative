@@ -1,0 +1,109 @@
+.app-contents {
+	overflow: auto;
+}
+
+.condition-ul {
+}
+
+.condition-ul li {
+	padding: 0 10px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 6px;
+}
+
+.condition-ul li .select {
+	flex-basis: 100%;
+	margin: 0 10px;
+}
+
+.condition-ul li label {
+	width: 100px;
+	min-width: 100px;
+	text-align: right;
+	white-space: nowrap;
+}
+
+ul.btns {
+	display: flex;
+	justify-content: space-around;
+}
+
+ul.btns li {
+	display: block;
+}
+
+@media screen and (max-width: 340px) {
+	ul.btns {
+		flex-wrap: wrap;
+	}
+	ul.btns li {
+		flex-basis: 40%;
+		margin-bottom: 8px;
+	}
+}
+/*-------------------------------------------*/
+.main-list {
+}
+
+.main-list li.list-item {
+	display: flex;
+	justify-content: space-between;
+	height: 120px;
+	background-color: #fff;
+	margin-bottom: 10px;
+}
+
+.main-list li.list-item .left-img {
+	display: block;
+	width: 120px;
+	height: 100px;
+	margin: 10px;
+	background-color: orange;
+}
+
+.main-list li.list-item .right-info {
+	display: block;
+	margin: 10px;
+	margin-left: 0;
+	flex-basis: calc(100% - 140px);
+	height: 100px;
+	overflow: hidden;
+}
+
+.main-list li.list-item .right-info > p {
+	font-size: 15px;
+	font-weight: bold;
+	height: 24px;
+	line-height: 24px;
+	text-indent: 10px;
+	margin-top: 6px;
+}
+
+.main-list li.list-item .right-info .text-items {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+}
+
+.main-list li.list-item .right-info .text-items li {
+	margin-left: calc(25% - 45px - 12px);
+	margin-bottom: 4px;
+}
+
+.main-list li.list-item .right-info .text-items li span {
+	font-size: 14px;
+	display: block;
+	width: 60px;
+	height: 24px;
+	line-height: 24px;
+	padding: 4px 8px;
+	text-align: center;
+}
+
+.main-list li.list-item .right-info .text-items li span.active {
+	background-color: #389edc;
+	color: #fff;
+	border-radius: 16px;
+}

@@ -1,0 +1,49 @@
+.app-contents {
+	overflow: auto;
+}
+
+.condition-ul {
+}
+
+.condition-ul li {
+	padding: 0 10px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 6px;
+}
+
+.condition-ul li .select {
+	flex-basis: 100%;
+	margin: 0 10px;
+}
+
+.condition-ul li label {
+	width: 100px;
+	min-width: 100px;
+	text-align: right;
+	white-space: nowrap;
+}
+
+ul.btns {
+	display: flex;
+	justify-content: space-around;
+}
+
+ul.btns li {
+	display: block;
+}
+
+.table-container {
+	min-height: 300px;
+}
+
+@media screen and (max-width: 340px) {
+	ul.btns {
+		flex-wrap: wrap;
+	}
+	ul.btns li {
+		flex-basis: 40%;
+		margin-bottom: 8px;
+	}
+}

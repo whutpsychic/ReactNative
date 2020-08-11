@@ -3,7 +3,7 @@ import {View, Text} from 'react-native';
 import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
 
-const pageUri = 'file:///android_asset/h5/home/index.html';
+const pageUri = 'file:///android_asset/h5/main-query/index.html';
 
 class Default extends React.Component {
   state = {};
@@ -17,12 +17,11 @@ class Default extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        {/*<WebView
+        <WebView
           ref="webview"
           source={{uri: pageUri}}
           onMessage={this.onReceive}
-        />*/}
-        <Text style={{fontSize: 20, fontWeight: 'bold'}}>信息查询</Text>
+        />
       </View>
     );
   }
