@@ -2,11 +2,17 @@ import React from 'react';
 import {View, Text} from 'react-native';
 import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
+import Toast from '../../components/Toast/index';
+import myFetch from '../../core/myFetch.js';
+import moment from 'moment';
 
 const pageUri = 'file:///android_asset/h5/ecology-repair-info/index.html';
 
 class Default extends React.Component {
-  state = {};
+  state = {
+    year: new Date().getFullYear(),
+    mainData: [],
+  };
 
   componentDidMount() {}
 
@@ -36,80 +42,132 @@ class Default extends React.Component {
     console.log(receivedData);
     //初始化完成之后互通消息然后放置数据
     if (etype === 'pageState' && receivedData.info === 'componentDidMount') {
+      // fixed
       this.postMessage({
         etype: 'data',
-        selectData1: [
-          {label: '名称1', value: 1},
-          {label: '名称2', value: 2},
-          {label: '名称3', value: 3},
-          {label: '名称4', value: 4},
-          {label: '名称5', value: 5},
-        ],
-        mainData: [
-          {
-            img: '',
-            title: '银山矿业',
-            subtitle: '修复面积:XXXX(公顷)',
-            data: [{img: ''}, {img: ''}, {img: ''}],
-          },
-          {
-            img: '',
-            title: '永平铜矿',
-            subtitle: '修复面积:XXXX(公顷)',
-            data: [{img: ''}, {img: ''}, {img: ''}],
-          },
-          {
-            img: '',
-            title: '银山矿业',
-            subtitle: '修复面积:XXXX(公顷)',
-            data: [{img: ''}, {img: ''}, {img: ''}],
-          },
-          {
-            img: '',
-            title: '永平铜矿',
-            subtitle: '修复面积:XXXX(公顷)',
-            data: [{img: ''}, {img: ''}, {img: ''}],
-          },
-          {
-            img: '',
-            title: '银山矿业',
-            subtitle: '修复面积:XXXX(公顷)',
-            data: [{img: ''}, {img: ''}, {img: ''}],
-          },
-          {
-            img: '',
-            title: '永平铜矿',
-            subtitle: '修复面积:XXXX(公顷)',
-            data: [{img: ''}, {img: ''}, {img: ''}],
-          },
-          {
-            img: '',
-            title: '银山矿业',
-            subtitle: '修复面积:XXXX(公顷)',
-            data: [{img: ''}, {img: ''}, {img: ''}],
-          },
-          {
-            img: '',
-            title: '永平铜矿',
-            subtitle: '修复面积:XXXX(公顷)',
-            data: [{img: ''}, {img: ''}, {img: ''}],
-          },
-        ],
+        pageLoading: true,
+      });
+
+      myFetch('institutions/imgUrlList', {}, 'get')
+        .then((res) => {
+          console.log(res);
+          const {data} = res;
+          //如果没数据
+          if (!data || !data.length) {
+            Toast.show('没有任何数据');
+            this.postMessage({
+              etype: 'data',
+              pageLoading: false,
+            });
+            return;
+          }
+          //
+          this.setState({
+            mainData: data,
+          });
+          return data;
+        })
+        .catch((err) => {
+          Toast.show('主数据查询失败了');
+          this.postMessage({
+            etype: 'data',
+            pageLoading: false,
+          });
+        })
+        .then((data) => {
+          if (!data) {
+            return;
+          }
+          this.query();
+        });
+
+      // this.postMessage({
+      //   etype: 'data',
+      //   pageLoading: false,
+      //   title: '江铜集团有限公司2019年生态修复总面积：xxxx(公顷)',
+      //   mainData: [
+      //     {
+      //       img: '',
+      //       title: '银山矿业',
+      //       subtitle: '修复面积:XXXX(公顷)',
+      //       data: [{img: ''}, {img: ''}, {img: ''}],
+      //     },
+      //   ],
+      // });
+    }
+    //
+    else if (etype === 'onChangeDate') {
+      const {date} = receivedData;
+      let year = moment(date).year();
+      this.setState({
+        year,
       });
     }
     //
-    else if (etype === 'xxxxxxxxxx') {
+    else if (etype === 'btn-query') {
+      this.query();
     }
     //
     else if (etype === 'back-btn') {
       navigation.goBack();
     }
   };
+
+  query = () => {
+    this.postMessage({
+      etype: 'data',
+      pageLoading: true,
+    });
+
+    let data = this.state.mainData;
+    myFetch(
+      'Repair/list',
+      {year: this.state.year, ofs: 0, ps: 999},
+      'get',
+    ).then((res) => {
+      console.log(res);
+      const {
+        data: {list},
+      } = res;
+      let totalArea = 0;
+      let totalCost = 0;
+
+      list.forEach((item) => {
+        totalArea += item.restoreArea;
+        totalCost += item.cost;
+      });
+      let mainData = data.map((item) => {
+        let dyobj =
+          list.filter((_item) => {
+            return _item.institutionId === item.identity;
+          })[0] || {};
+
+        let obj = {};
+        obj.img = item.imgUrl;
+        obj.title = item.title;
+        obj.subtitle = `修复面积${dyobj.restoreArea || ''}(公顷)`;
+        obj.data = dyobj.fileList
+          ? dyobj.fileList.map((item) => {
+              return {img: item.url};
+            })
+          : [];
+        return obj;
+      });
+
+      this.postMessage({
+        etype: 'data',
+        pageLoading: false,
+        title: `江铜集团有限公司${this.state.year}年生态修复总面积：${totalArea}(公顷)  生态修复总金额：${totalCost}(万元)`,
+        mainData: mainData,
+      });
+    });
+  };
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'orange',
   },
 });
 

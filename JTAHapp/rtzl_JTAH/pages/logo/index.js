@@ -20,12 +20,15 @@ class Default extends React.Component {
 			let P = Promise.all([p1, p2]).then((resArr) => {
 				console.log(resArr);
 				if (resArr[0] && resArr[1]) {
-					this.login({name: resArr[0], psw: resArr[1], rememberPsw: true}).then(
-						() => {
+					this.login({name: resArr[0], psw: resArr[1], rememberPsw: true})
+						.then(() => {
 							login(true);
 							initialized();
-						},
-					);
+						})
+						.catch((err) => {
+							login(false);
+							initialized();
+						});
 				} else {
 					login(false);
 					initialized();
@@ -63,6 +66,7 @@ class Default extends React.Component {
 				console.log(res);
 				if (res.errcode) {
 					Toast.show(res.errmsg);
+					throw new Error('error');
 					return;
 				}
 
@@ -78,6 +82,7 @@ class Default extends React.Component {
 			})
 			.catch((err) => {
 				console.log(err);
+				login(false);
 				Toast.show('登录请求发生错误,请稍后再试');
 			});
 	};

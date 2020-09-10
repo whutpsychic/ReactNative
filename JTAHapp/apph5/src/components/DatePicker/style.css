@@ -4,8 +4,8 @@
 
 .dater {
 	min-width: 30px;
-	height: 24px;
-	line-height: 24px;
+	height: 30px;
+	line-height: 30px;
 	text-indent: 8px;
 	border: solid 1px #ccc;
 	background-color: #fff;
@@ -16,6 +16,9 @@
 
 .dater span {
 	font-size: 14px;
+	display: block;
+	width: 100%;
+	text-align: center;
 }
 
 .dater img {
@@ -46,10 +49,9 @@
 	position: relative;
 	width: 100vw;
 	height: 40vh;
-	top: 60vh;
+	bottom: -60vh;
 	background-color: #fff;
-	/*transition: 0.3s;*/
-	/*animation: moveIn;*/
+	animation: moveIn 0.15s;
 }
 
 .top-btns {
@@ -66,9 +68,12 @@
 
 @keyframes moveIn {
 	from {
-		bottom: 0vh;
+		bottom: -100vh;
 	}
 	to {
 		bottom: -60vh;
 	}
+}
+/*=================================*/
+.dater span.year {
 }

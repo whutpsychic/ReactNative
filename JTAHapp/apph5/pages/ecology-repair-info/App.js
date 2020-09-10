@@ -1,11 +1,16 @@
 import React from "react";
 import "./App.css";
 import util from "../util/index";
+import PageLoading from "../components/PageLoading/index";
 import TopTitle from "../components/TopTitle/index";
 
 import Button from "../components/Button/index";
 import Select from "../components/Select/index";
 import DatePicker from "../components/DatePicker/index";
+
+import { NoticeBar } from "antd-mobile";
+
+const { YearPicker } = DatePicker;
 
 class ListItem extends React.Component {
 	render() {
@@ -35,8 +40,9 @@ class ListItem extends React.Component {
 
 class App extends React.Component {
 	state = {
-		selectData1: [],
-		mainData: []
+		pageLoading: true,
+		mainData: [],
+		title: ""
 	};
 
 	componentDidMount() {
@@ -58,93 +64,34 @@ class App extends React.Component {
 		});
 
 		// ***************************************************
-		// this.setState({
-		// 	mainData: [
-		// 		{
-		// 			img: "",
-		// 			title: "银山矿业",
-		// 			subtitle: "修复面积:XXXX(公顷)",
-		// 			data: [{ img: "" }, { img: "" }, { img: "" }]
-		// 		},
-		// 		{
-		// 			img: "",
-		// 			title: "永平铜矿",
-		// 			subtitle: "修复面积:XXXX(公顷)",
-		// 			data: [{ img: "" }, { img: "" }, { img: "" }]
-		// 		},
-		// 		{
-		// 			img: "",
-		// 			title: "银山矿业",
-		// 			subtitle: "修复面积:XXXX(公顷)",
-		// 			data: [{ img: "" }, { img: "" }, { img: "" }]
-		// 		},
-		// 		{
-		// 			img: "",
-		// 			title: "永平铜矿",
-		// 			subtitle: "修复面积:XXXX(公顷)",
-		// 			data: [{ img: "" }, { img: "" }, { img: "" }]
-		// 		},
-		// 		{
-		// 			img: "",
-		// 			title: "银山矿业",
-		// 			subtitle: "修复面积:XXXX(公顷)",
-		// 			data: [{ img: "" }, { img: "" }, { img: "" }]
-		// 		},
-		// 		{
-		// 			img: "",
-		// 			title: "永平铜矿",
-		// 			subtitle: "修复面积:XXXX(公顷)",
-		// 			data: [{ img: "" }, { img: "" }, { img: "" }]
-		// 		},
-		// 		{
-		// 			img: "",
-		// 			title: "银山矿业",
-		// 			subtitle: "修复面积:XXXX(公顷)",
-		// 			data: [{ img: "" }, { img: "" }, { img: "" }]
-		// 		},
-		// 		{
-		// 			img: "",
-		// 			title: "永平铜矿",
-		// 			subtitle: "修复面积:XXXX(公顷)",
-		// 			data: [{ img: "" }, { img: "" }, { img: "" }]
-		// 		}
-		// 	]
-		// });
 	}
 
 	render() {
-		const { selectData1, mainData } = this.state;
+		const { pageLoading, title, mainData } = this.state;
 		return (
 			<div className="app-container">
 				<div className="app-contents">
 					<TopTitle title="生态修复信息" canBack />
 					<ul className="condition-ul">
 						<li>
-							<label>检查项目名称</label>
-							<Select
-								ref="s1"
-								data={selectData1}
-								onChange={this.onChangeSelect1}
-							/>
+							<YearPicker ref="d" onChange={this.onChangeDate} />
 						</li>
-						<li>
-							<label>排查截止时间</label>
-							<DatePicker ref="d" onChange={this.onChangeDate} />
-						</li>
-					</ul>
-					<ul className="btns">
 						<li>
 							<Button text="查询" onClick={this.onClickQuery} />
 						</li>
 					</ul>
-					<p className="tips-title">
-						江铜集团有限公司2019年生态修复总面积：XXXXX(公顷)
-					</p>
+					<NoticeBar
+						icon={null}
+						marqueeProps={{ loop: true, style: { padding: "0 7.5px" } }}
+					>
+						{title}
+					</NoticeBar>
 					<ul className="main-list">
 						{mainData.map((item, i) => {
 							return <ListItem key={`item${i}`} item={item} />;
 						})}
 					</ul>
+					{pageLoading ? <PageLoading /> : null}
 				</div>
 			</div>
 		);
@@ -152,34 +99,17 @@ class App extends React.Component {
 
 	onClickQuery = () => {
 		const condition = {
-			s1: this.refs.s1.getValue(),
 			d: this.refs.d.getValue().format("YYYY-MM-DD")
 		};
 		util.traceBack("btn-query", condition);
-	};
-
-	onClickAdd = () => {
-		util.traceBack("btn-add", {});
-	};
-
-	onClickOutput = () => {
-		util.traceBack("btn-output", {});
-	};
-
-	onClickInput = () => {
-		util.traceBack("btn-input", {});
 	};
 
 	onChangeSelect1 = obj => {
 		util.traceBack("s1", obj);
 	};
 
-	onChangeSelect2 = obj => {
-		util.traceBack("s2", obj);
-	};
-
 	onChangeDate = v => {
-		util.traceBack("date", v);
+		util.traceBack("onChangeDate", { date: v });
 	};
 }
 

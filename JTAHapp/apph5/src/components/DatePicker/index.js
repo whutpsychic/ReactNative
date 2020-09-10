@@ -255,7 +255,7 @@ class YearPicker extends React.Component {
 		return (
 			<React.Fragment>
 				<div className="dater" onClick={this.onOpenBox}>
-					<span>{text}</span>
+					<span className="year">{text} 年</span>
 					<img alt="" src={calendar} />
 				</div>
 				<div

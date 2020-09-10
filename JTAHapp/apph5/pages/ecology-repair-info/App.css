@@ -3,6 +3,11 @@
 }
 
 .condition-ul {
+	margin: 12px 0;
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	margin-bottom: 0;
 }
 
 .condition-ul li {
@@ -10,11 +15,11 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 6px;
+	margin-bottom: 12px;
 }
 
-.condition-ul li .select {
-	flex-basis: 100%;
+.condition-ul li .dater {
+	min-width: 160px;
 	margin: 0 10px;
 }
 
@@ -25,24 +30,6 @@
 	white-space: nowrap;
 }
 
-ul.btns {
-	display: flex;
-	justify-content: space-around;
-}
-
-ul.btns li {
-	display: block;
-}
-
-@media screen and (max-width: 340px) {
-	ul.btns {
-		flex-wrap: wrap;
-	}
-	ul.btns li {
-		flex-basis: 40%;
-		margin-bottom: 8px;
-	}
-}
 /*-------------------------------------------*/
 
 .tips-title {
@@ -89,6 +76,7 @@ ul.btns li {
 	line-height: 24px;
 	text-indent: 10px;
 	margin-top: 6px;
+	margin-bottom: 0;
 }
 
 .main-list li.list-item .right-info > p {
@@ -103,8 +91,8 @@ ul.btns li {
 
 .main-list li.list-item .right-info .img-items {
 	display: flex;
-	flex-wrap: wrap;
 	justify-content: flex-start;
+	overflow: auto;
 }
 
 .main-list li.list-item .right-info .img-items li {
