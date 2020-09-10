@@ -101,6 +101,7 @@
 
 .form ul li input {
   text-indent: 8px;
+  margin-right: 30px;
 }
 
 .form ul li > div {

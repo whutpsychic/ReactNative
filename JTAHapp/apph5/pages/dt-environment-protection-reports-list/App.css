@@ -1,0 +1,47 @@
+.app-contents {
+	overflow: auto;
+}
+
+.condition-ul {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	margin: 4px 0;
+}
+
+.condition-ul li {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 6px;
+	flex-basis: 40%;
+}
+
+.condition-ul li .select,
+.condition-ul li .dater {
+	width: 100%;
+	margin: 0 10px;
+}
+
+.condition-ul li label {
+	min-width: 10px;
+	text-align: right;
+	white-space: nowrap;
+}
+
+.condition-ul.withbtns {
+	align-content: flex-end;
+}
+
+.condition-ul.withbtns li {
+	flex-basis: unset;
+	width: auto;
+}
+
+.condition-ul.withbtns li:first-child {
+	width: 257px;
+}
+
+.condition-ul.withbtns li label {
+	min-width: 56px;
+}

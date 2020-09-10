@@ -3,18 +3,18 @@ import {Dimensions} from 'react-native';
 const tool = {};
 
 //获取相对于屏幕的偏差高度
-tool.getHeight = x => {
+tool.getHeight = (x) => {
 	const {height} = Dimensions.get('window');
 	return height + x;
 };
 
 //获取相对于屏幕的偏差宽度
-tool.getWidth = x => {
+tool.getWidth = (x) => {
 	const {width} = Dimensions.get('window');
 	return width + x;
 };
 
-tool.getWidthbyPercent = x => {
+tool.getWidthbyPercent = (x) => {
 	if (typeof x !== 'number') {
 		throw new Error('getWidthbyPercent 方法中x不是一个数字');
 	}
@@ -31,7 +31,7 @@ tool.calcHeight = (per, num) => {
 	return height * per + num;
 };
 
-tool.excuteTimeNumber = t => {
+tool.excuteTimeNumber = (t) => {
 	t = typeof t === 'string' ? parseInt(t, 10) : t;
 	return t < 10 ? '0' + t : t.toString();
 };
@@ -58,7 +58,7 @@ tool.renderTime = (seconds, bool) => {
 };
 
 //显示共有几小时几分钟几秒钟
-tool.calcTime = seconds => {
+tool.calcTime = (seconds) => {
 	const _h = parseInt(seconds / 3600, 10);
 	let _t = seconds - _h * 3600;
 	const _m = parseInt(_t / 60, 10);
@@ -72,11 +72,11 @@ tool.calcTime = seconds => {
 };
 
 //剔除掉关于视频当中.mp4等名称后缀
-tool.calcRealVideoName = str => {
+tool.calcRealVideoName = (str) => {
 	const arr = ['.mp4', '.avi', '.ogg'];
 
 	let _str = str;
-	arr.map(item => {
+	arr.map((item) => {
 		let _reg = new RegExp(item + '$');
 		_str = _str.replace(_reg, '');
 	});
@@ -84,7 +84,7 @@ tool.calcRealVideoName = str => {
 };
 
 //将时间戳转化为日月年
-tool.transDate = str => {
+tool.transDate = (str) => {
 	// if (typeof str === 'string') str = parseInt(str, 10);
 
 	let _Date = new Date(str);
@@ -101,7 +101,7 @@ tool.transDate = str => {
 };
 
 //将大段文字最多限制在15个字以内
-tool.reString = str => {
+tool.reString = (str) => {
 	if (str.length > 15) {
 		let arr = str.split('');
 		arr.length = 15;
@@ -150,6 +150,22 @@ tool.getEndDate = (year, month) => {
 	}
 
 	return endDate;
+};
+
+//
+tool.deepClone = (obj) => {
+	if (!obj || typeof obj !== 'object') {
+		return obj;
+	}
+	let newObj = {};
+	if (Array.isArray(obj)) {
+		newObj = obj.map((item) => tool.deepClone(item));
+	} else {
+		Object.keys(obj).forEach((key) => {
+			return (newObj[key] = tool.deepClone(obj[key]));
+		});
+	}
+	return newObj;
 };
 
 export default tool;

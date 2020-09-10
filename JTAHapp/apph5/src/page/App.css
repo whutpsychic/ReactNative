@@ -1,2 +1,66 @@
 .app-contents {
+	overflow: auto;
+}
+
+ul.condition-ul {
+	display: flex;
+	justify-content: space-between;
+	padding: 0 10px;
+}
+
+.condition-ul li {
+	height: 30px;
+	line-height: 30px;
+	display: flex;
+	flex-wrap: nowrap;
+}
+
+.condition-ul li label {
+	margin-right: 6px;
+	white-space: nowrap;
+}
+
+.condition-ul li .select {
+	outline: none;
+	border: solid 1px #ccc;
+	height: 30px;
+	line-height: 30px;
+	min-width: 110px;
+	max-width: 120px;
+}
+
+/***/
+@media screen and (max-width: 380px) {
+	ul.condition-ul {
+		flex-wrap: wrap;
+	}
+	ul.condition-ul li {
+		flex-basis: 100%;
+		margin-bottom: 8px;
+	}
+	.condition-ul li label {
+		text-align: right;
+		min-width: 72px;
+	}
+
+	.condition-ul li .select {
+		width: 100%;
+		max-width: unset;
+	}
+}
+
+.condition-ul li select option {
+}
+
+.bottom-chart {
+	margin-top: 10px;
+	height: calc(60vw - 10px);
+}
+
+p.chart-title {
+	width: 100%;
+	text-align: center;
+	font-size: 16px;
+	font-weight: bold;
+	margin-bottom: 0;
 }

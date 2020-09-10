@@ -4,10 +4,25 @@
 	line-height: 24px;
 	text-indent: 8px;
 	border: solid 1px #ccc;
+	background-color: #fff;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .select span {
 	font-size: 14px;
+}
+
+.select img {
+	display: block;
+	width: 8px;
+	height: 8px;
+	margin-right: 10px;
+}
+
+.pickerview-container {
+	z-index: 10;
 }
 
 .pickerview-container,
@@ -31,10 +46,9 @@
 	position: relative;
 	width: 100vw;
 	height: 40vh;
-	top: 60vh;
 	background-color: #fff;
-	/*transition: 0.3s;*/
-	/*animation: moveIn;*/
+	bottom: -60vh;
+	animation: moveIn 0.15s;
 }
 
 .top-btns {
@@ -45,13 +59,13 @@
 
 .top-btns span {
 	font-size: 15px;
-	margin: 10px;
+	margin: 6px 16px;
 	margin-bottom: 0;
 }
 
 @keyframes moveIn {
 	from {
-		bottom: 0vh;
+		bottom: -100vh;
 	}
 	to {
 		bottom: -60vh;

@@ -14,6 +14,25 @@ class App extends React.Component {
 		rememberPsw: false
 	};
 
+	componentDidMount() {
+		//告知RN页面已经装载完毕
+		util.traceBack("pageState", "componentDidMount");
+		//监听事件以及时读取RN传回的数据
+		document.addEventListener("message", event => {
+			let res = JSON.parse(event.data);
+			if (res.etype === "data") {
+				let obj = { ...res };
+				delete obj.etype;
+				this.setState({
+					...obj
+				});
+			} else if (res.etype === "event") {
+				let { event, args } = res;
+				if (typeof this[event] === "function") this[event](args);
+			}
+		});
+	}
+
 	render() {
 		const { name, psw, rememberPsw } = this.state;
 		return (

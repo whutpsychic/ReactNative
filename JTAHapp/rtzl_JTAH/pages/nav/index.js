@@ -34,33 +34,45 @@ class Default extends React.Component {
 					<Btn title="主页" nav="main" navigate={navigate} />
 					<Btn
 						title="安全环保目标统计"
-						nav="home"
+						nav="safe_env_target_statistic"
 						navigate={navigate}
-						disabled
 					/>
 					<Btn
 						title="安全环保信息发布"
-						nav="home"
+						nav="safe_env_info_publish"
 						navigate={navigate}
-						disabled
 					/>
 					<Btn
 						title="安环信息发布-新增"
-						nav="home"
+						nav="safe_env_info_publish_adding"
 						navigate={navigate}
 						disabled
 					/>
-					<Btn title="安全生产日历" nav="home" navigate={navigate} disabled />
+					<Btn
+						title="安全生产日历"
+						nav="safe_producing_calendar"
+						navigate={navigate}
+					/>
 					<Btn
 						title="德铜环保报表浏览"
-						nav="home"
+						nav="dt_environment_protection_reports_list"
 						navigate={navigate}
-						disabled
 					/>
-					<Btn title="江铜生态修复信息" nav="stxfxx" navigate={navigate} />
-					<Btn title="江铜消防管理" nav="xfgl" navigate={navigate} />
-					<Btn title="视频检测" nav="home" navigate={navigate} disabled />
-					<Btn title="隐患排查浏览与反馈" nav="yhpczl" navigate={navigate} />
+					<Btn
+						title="江铜生态修复信息"
+						nav="ecology_repair_info"
+						navigate={navigate}
+					/>
+					<Btn
+						title="江铜消防管理"
+						nav="fire_control_manage"
+						navigate={navigate}
+					/>
+					<Btn
+						title="隐患排查浏览与反馈"
+						nav="danger_screening_administer"
+						navigate={navigate}
+					/>
 				</View>
 			</ScrollView>
 		);

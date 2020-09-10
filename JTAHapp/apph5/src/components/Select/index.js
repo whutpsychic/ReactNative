@@ -2,20 +2,29 @@ import React from "react";
 import "./style.css";
 import { PickerView } from "antd-mobile";
 
+import arrow from "../../img/icon-select-arrow.png";
+import arrow_disabled from "../../img/icon-select-arrow-disabled.png";
+
 class Default extends React.Component {
 	static getDerivedStateFromProps(nextProps, prevState) {
-		if (!prevState.value && nextProps.data.length)
+		let et = nextProps.data.filter(item => {
+			return item.label === prevState.text;
+		})[0];
+
+		if (!et)
 			return {
-				text: nextProps.data[0].label,
-				value: [nextProps.data[0].value]
+				text: nextProps.data[0] && nextProps.data[0].label,
+				value: nextProps.data[0] && nextProps.data[0].value
 			};
-		return {};
+
+		return { data: nextProps.data };
 	}
 
 	state = {
 		text: null,
 		value: null,
-		showBox: true
+		showBox: true,
+		data: []
 	};
 
 	componentDidMount() {
@@ -26,12 +35,16 @@ class Default extends React.Component {
 	}
 
 	render() {
-		const { data } = this.props;
-		const { text, value, showBox } = this.state;
+		const { data } = this.state;
+		const { showBox } = this.state;
+		let { text, value } = this.state;
+		if (!text && data.length) text = data[0].label;
+		if (!value && data.length) value = data[0].value;
 		return (
 			<React.Fragment>
 				<div className="select" onClick={this.onOpenBox}>
 					<span>{text ? text : data[0] ? data[0].label : ""}</span>
+					<img alt="" src={arrow} />
 				</div>
 				<div
 					className={
@@ -44,12 +57,14 @@ class Default extends React.Component {
 							<span onClick={this.confirm}>确定</span>
 							<span onClick={this.cancel}>取消</span>
 						</div>
-						<PickerView
-							data={data}
-							value={value}
-							cols={1}
-							onChange={this.onChange}
-						/>
+						{showBox ? (
+							<PickerView
+								data={data}
+								value={value}
+								cols={1}
+								onChange={this.onChange}
+							/>
+						) : null}
 					</div>
 				</div>
 			</React.Fragment>
@@ -64,9 +79,10 @@ class Default extends React.Component {
 		let obj = data.filter(item => {
 			return item.label === text;
 		})[0];
-		this.setState({
-			value: [obj.value]
-		});
+		if (obj)
+			this.setState({
+				value: [obj.value]
+			});
 	};
 
 	onOpenBox = () => {
@@ -100,11 +116,12 @@ class Default extends React.Component {
 		let obj = data.filter(item => {
 			return item.value === value[0];
 		})[0];
-		this.setState({
-			text: obj.label
-		});
+		if (obj)
+			this.setState({
+				text: obj.label
+			});
 		if (typeof onChange === "function") {
-			onChange({ label: text, value });
+			onChange(obj);
 		}
 	};
 

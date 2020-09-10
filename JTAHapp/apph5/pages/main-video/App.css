@@ -1,0 +1,11 @@
+.app-contents {
+	/*max-height: 400px;*/
+}
+
+div[onpositionupdate="return;"] img.csssprite {
+	display: none;
+}
+
+div.smnoprint:nth-child(3) {
+	display: none;
+}

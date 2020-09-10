@@ -3,15 +3,10 @@ import config from '../config/index';
 
 let proxy;
 if (config.mode === 'production') {
-	proxy = 'http://111.59.152.221:18085';
-} else if (config.xcurl) {
-	proxy = 'http://172.24.44.82:18085';
+	proxy = 'http://192.168.0.123:18085';
 } else if (config.mode === 'develop') {
-	proxy = 'http://111.59.152.221:18085';
+	proxy = 'http://192.168.0.123:18085';
 }
-
-// const proxy = 'http://192.168.62.7:18085';
-// const proxy = 'http://172.24.44.82:18085';
 
 function calcFetchObj(headerType, condition) {
 	// console.log(condition);

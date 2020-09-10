@@ -11,16 +11,21 @@ import config from './config/index';
 import Logo from './pages/logo/index';
 import Login from './pages/login/index';
 // -------------------------------------------
-import Home from './pages/main-home/index';
 import Fix from './pages/main-fix/index';
+import Home from './pages/main-home/index';
+import Mine from './pages/main-mine/index';
 import Query from './pages/main-query/index';
 import Video from './pages/main-video/index';
-import Mine from './pages/main-mine/index';
 import Nav from './pages/nav/index';
 // -------------------------------------------
-import Stxfxx from './pages/stxfxx/index';
-import Xfgl from './pages/xfgl/index';
-import Yhpczl from './pages/yhpczl/index';
+import danger_screening_administer from './pages/danger-screening-administer/index';
+import dt_environment_protection_reports_list from './pages/dt-environment-protection-reports-list/index';
+import ecology_repair_info from './pages/ecology-repair-info/index';
+import fire_control_manage from './pages/fire-control-manage/index';
+import safe_env_info_publish from './pages/safe-env-info-publish/index';
+import safe_env_info_publish_adding from './pages/safe-env-info-publish-adding/index';
+import safe_env_target_statistic from './pages/safe-env-target-statistic/index';
+import safe_producing_calendar from './pages/safe-producing-calendar/index';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -106,9 +111,38 @@ class App extends React.Component {
             <Fragment>
               <Stack.Screen name="nav" component={Nav} />
               <Stack.Screen name="main" component={BottomTabs} />
-              <Stack.Screen name="stxfxx" component={Stxfxx} />
-              <Stack.Screen name="xfgl" component={Xfgl} />
-              <Stack.Screen name="yhpczl" component={Yhpczl} />
+              <Stack.Screen
+                name="danger_screening_administer"
+                component={danger_screening_administer}
+              />
+              <Stack.Screen
+                name="dt_environment_protection_reports_list"
+                component={dt_environment_protection_reports_list}
+              />
+              <Stack.Screen
+                name="ecology_repair_info"
+                component={ecology_repair_info}
+              />
+              <Stack.Screen
+                name="fire_control_manage"
+                component={fire_control_manage}
+              />
+              <Stack.Screen
+                name="safe_env_info_publish"
+                component={safe_env_info_publish}
+              />
+              <Stack.Screen
+                name="safe_env_info_publish_adding"
+                component={safe_env_info_publish_adding}
+              />
+              <Stack.Screen
+                name="safe_env_target_statistic"
+                component={safe_env_target_statistic}
+              />
+              <Stack.Screen
+                name="safe_producing_calendar"
+                component={safe_producing_calendar}
+              />
             </Fragment>
           ) : (
             <Stack.Screen name="login" component={Login} />

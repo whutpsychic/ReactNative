@@ -7,14 +7,16 @@ export default class extends React.Component {
 		return (
 			<div className="board-info-container">
 				<p className="board-info-title">{title}</p>
-				{data.map((item, i) => {
-					return (
-						<p key={`text${i}`} onClick={() => onClick(item)}>
-							<span>{item.text}</span>
-							<span>{item.date}</span>
-						</p>
-					);
-				})}
+				<div className="board-info-contents">
+					{data.map((item, i) => {
+						return (
+							<p key={`text${i}`} onClick={() => onClick(item)}>
+								<span>{item.text}</span>
+								<span>{item.date}</span>
+							</p>
+						);
+					})}
+				</div>
 			</div>
 		);
 	}

@@ -20,13 +20,12 @@ ul.condition-ul {
 	white-space: nowrap;
 }
 
-.condition-ul li select {
+.condition-ul li .select {
 	outline: none;
 	border: solid 1px #ccc;
-	background-color: #eee;
 	height: 30px;
 	line-height: 30px;
-	min-width: 100px;
+	min-width: 110px;
 	max-width: 120px;
 }
 
@@ -43,7 +42,8 @@ ul.condition-ul {
 		text-align: right;
 		min-width: 72px;
 	}
-	.condition-ul li select {
+
+	.condition-ul li .select {
 		width: 100%;
 		max-width: unset;
 	}

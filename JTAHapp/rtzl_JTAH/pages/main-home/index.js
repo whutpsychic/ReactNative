@@ -2,14 +2,31 @@ import React from 'react';
 import {View} from 'react-native';
 import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
+import myFetch from '../../core/myFetch.js';
+import util from '../../core/util.js';
 
 const pageUri = 'file:///android_asset/h5/main-home/index.html';
 
+const getOption = (data) => {
+  return {
+    xAxis: data.xAxis,
+    data: [{name: '', type: 'line', data: data.data}],
+  };
+};
+
 class Default extends React.Component {
-  state = {};
+  state = {
+    // 图表的全部选项数据
+    allSelectData: [],
+    // 格式化图表的全部选项之后的数据结构
+    formatData: [],
+
+    s1: null,
+    radio: null,
+    s2: null,
+  };
 
   componentDidMount() {}
-
   postMessage = (obj) => {
     this.refs.webview.postMessage(JSON.stringify(obj));
   };
@@ -26,6 +43,130 @@ class Default extends React.Component {
     );
   }
 
+  //加载单位下拉框数据
+  //仅初始化之后一次
+  loadSelect1Data = () => {
+    const {allSelectData} = this.state;
+    //整理出单位的数据，并归拢其radio数据
+    let clonedArr = util.deepClone(allSelectData);
+    let resArr = [];
+
+    while (clonedArr.length) {
+      //取走第一项同时删除掉了第一个元素
+      let firstItem = clonedArr.shift();
+      resArr.push(firstItem);
+      clonedArr = clonedArr.filter((item) => {
+        return item.institutionid !== firstItem.institutionid;
+      });
+    }
+    resArr = resArr.map((item) => {
+      let arr;
+      arr = allSelectData
+        .filter((_item) => {
+          return item.institutionid === _item.institutionid;
+        })
+        .map((_item) => {
+          return _item.type;
+        });
+      item.type = arr;
+      return item;
+    });
+
+    let selectData1 = resArr.map((item) => {
+      return {label: item.institutionName, value: item.institutionid};
+    });
+
+    this.postMessage({
+      etype: 'data',
+      selectData1,
+    });
+
+    this.setState(
+      {
+        formatData: resArr,
+        s1: selectData1[0].value,
+      },
+      () => {
+        this.loadRadiosData();
+      },
+    );
+
+    return resArr;
+  };
+
+  //加载radio数据
+  //每次改变单位选项后触发
+  loadRadiosData = (x) => {
+    const {allSelectData, formatData, radio} = this.state;
+    if (!x) x = formatData[0].institutionid;
+
+    let data = allSelectData
+      .filter((item) => {
+        return item.institutionid === x;
+      })
+      .map((item) => {
+        switch (item.type) {
+          case 1:
+            return {label: '废水', value: 1};
+          case 2:
+            return {label: '废气', value: 2};
+          default:
+            return {};
+        }
+      });
+
+    //初始化值
+    if (!this.state.radio)
+      this.setState(
+        {
+          radio: data[0].value,
+        },
+        () => {
+          this.loadSelect2Data(null, radio);
+        },
+      );
+    //
+
+    this.postMessage({
+      etype: 'data',
+      radios: data,
+    });
+  };
+
+  //加载监测项目下拉框数据
+  //每当改变下拉框1或radio数据时触发
+  loadSelect2Data = (data1, radio) => {
+    const {allSelectData, formatData} = this.state;
+
+    if (!data1) data1 = formatData[0].institutionid;
+    if (!radio) radio = formatData[0].type[0];
+
+    let data = allSelectData.filter((item) => {
+      return item.institutionid === data1 && item.type === radio;
+    })[0];
+
+    let resArr = [];
+
+    for (let i in data.item) {
+      resArr.push({label: data.item[i], value: i});
+    }
+
+    //默认查询动作
+    this.setState(
+      {
+        s2: resArr[0].value,
+      },
+      () => {
+        this.loadChart();
+      },
+    );
+
+    this.postMessage({
+      etype: 'data',
+      selectData2: resArr,
+    });
+  };
+
   onReceive = (event) => {
     const {
       navigation,
@@ -36,7 +177,130 @@ class Default extends React.Component {
     console.log(receivedData);
     //初始化完成之后互通消息然后放置数据
     if (etype === 'pageState' && receivedData.info === 'componentDidMount') {
-      setTimeout(() => {
+      this.postMessage({
+        etype: 'data',
+        loadingChart: true,
+        chartTitle: '工业废气PH日数据',
+      });
+      // newsPic 顶部图片
+      // newsOne 公司要闻
+      // newsTwo 动态信息
+      // todos 工作提醒
+      // risks 风险提醒
+      // tasks 挂牌督办
+      myFetch('message/mainList', {ofs: 1, ps: 20}, 'get')
+        .then((res) => {
+          console.log(res);
+          const {
+            data: {list},
+          } = res;
+          this.postMessage({
+            etype: 'data',
+            pageLoading: false,
+            // 顶部图片
+            carouselData: list.newsPic.map((item) => {
+              return {href: '', src: item.cover};
+            }),
+            // 公司要闻
+            boardInfoData1: list.newsOne.map((item) => {
+              return {text: item.institutionName, date: item.time};
+            }),
+            // 动态信息
+            boardInfoData2: list.newsTwo.map((item) => {
+              return {text: item.institutionName, date: item.time};
+            }),
+            // 工作提醒
+            boardInfoData3: list.todos.map((item) => {
+              return {text: item.title, date: item.time};
+            }),
+            // 风险提醒
+            boardInfoData4: list.risks.map((item) => {
+              return {text: item.content, date: item.time};
+            }),
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      //下拉框数据
+      myFetch('AqhbEcharts/all', {}, 'get').then((res) => {
+        console.log(res);
+        const {
+          data: {list = []},
+        } = res;
+
+        this.setState(
+          {
+            allSelectData: list,
+          },
+          () => {
+            this.loadSelect1Data();
+          },
+        );
+      });
+    }
+    //改变select1时
+    else if (etype === 'onChangeSelect1') {
+      const {label, value} = receivedData;
+      this.loadRadiosData(value);
+      this.setState(
+        {
+          s1: value,
+        },
+        () => {
+          this.loadChart();
+        },
+      );
+    }
+    //改变radio时
+    else if (etype === 'onChangeRadio') {
+      const {label, value} = receivedData;
+      this.loadSelect2Data(this.state.s1, value);
+      this.setState(
+        {
+          radio: value,
+        },
+        () => {
+          this.loadChart();
+        },
+      );
+    }
+    //改变select2时
+    else if (etype === 'onChangeSelect2') {
+      const {label, value} = receivedData;
+      this.setState(
+        {
+          s2: value,
+        },
+        () => {
+          this.loadChart();
+        },
+      );
+    }
+  };
+
+  loadChart = () => {
+    this.postMessage({
+      etype: 'data',
+      loadingChart: true,
+    });
+    const {s1, s2} = this.state;
+    myFetch('AqhbEcharts/list', {institutionId: s1, code: s2}, 'get')
+      .then((res) => {
+        const {
+          data: {list},
+        } = res;
+
+        let op = getOption({
+          xAxis: list.map((item) => {
+            return item.xData;
+          }),
+          data: list.map((item) => {
+            return item.yData;
+          }),
+        });
+
         this.postMessage({
           etype: 'data',
           loadingChart: false,
@@ -44,59 +308,12 @@ class Default extends React.Component {
         this.postMessage({
           etype: 'event',
           event: 'setChart',
-          args: {
-            legend: ['废水', '废气'],
-            xAxis: ['10-16', '10-17', '10-18', '10-19'],
-            data: [
-              {name: '废水', type: 'line', data: [20, 92, 10, 84]},
-              {name: '废气', type: 'line', data: [70, 32, 50, 34]},
-            ],
-          },
+          args: op,
         });
-      }, 1500);
-
-      this.postMessage({
-        etype: 'data',
-        loadingChart: true,
-        chartTitle: '工业废气PH日数据',
-        boardInfoData: [
-          {
-            text: '开启智慧链新时代，全新智慧链震撼新智慧链震撼',
-            date: '2019-06-12',
-          },
-          {text: '如何发布高质量五星级产品信息？', date: '2019-06-14'},
-          {
-            text: '询盘量和流量——秘密在商机里如何做新智慧链震撼',
-            date: '2019-06-15',
-          },
-        ],
-        selectData1: [
-          {text: 'option1', value: 1},
-          {text: 'option2dsssssssssdddd', value: 2},
-          {text: 'option3d', value: 3},
-          {text: 'option4', value: 4},
-          {text: 'option5', value: 5},
-          {text: 'option6', value: 6},
-          {text: 'option7', value: 7},
-          {text: 'option8', value: 8},
-          {text: 'option9', value: 9},
-        ],
-        selectData2: [
-          {text: 'option1', value: 1},
-          {text: 'option2dsssssssssdddd', value: 2},
-          {text: 'option3', value: 3},
-          {text: 'option4', value: 4},
-          {text: 'option5', value: 5},
-          {text: 'option6', value: 6},
-          {text: 'option7', value: 7},
-          {text: 'option8', value: 8},
-          {text: 'option9', value: 9},
-        ],
+      })
+      .catch((err) => {
+        Toast.show('图表数据获取有误');
       });
-    }
-    //
-    else if (etype === 'xxxxxxxxxx') {
-    }
   };
 }
 

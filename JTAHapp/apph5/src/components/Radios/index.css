@@ -1,0 +1,25 @@
+.radios-container {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	align-content: flex-start;
+	flex-wrap: wrap;
+}
+
+.radios-container li {
+	display: flex;
+	align-items: center;
+	margin-left: 10px;
+}
+
+.radios-container li img {
+	display: block;
+	width: 18px;
+	height: 18px;
+}
+
+.radios-container li span {
+	display: block;
+	font-size: 14px;
+	margin: 0 8px;
+}
