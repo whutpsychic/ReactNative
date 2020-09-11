@@ -1,0 +1,90 @@
+一、RN简介
+  1.背景
+  2.理念
+  3.工作原理
+  4.React基础
+二、RN入门
+【android】
+  1.搭建开发环境
+  2.模拟器调试与真机调试
+  3.调试-控制台信息查看
+  4.调试-快速刷新
+【ios】略
+三、开发模式
+  1.使用模拟原生组件
+    a.使用官网发布的组件
+    b.样式控制，模拟css
+    c.使用开源发布的第三方组件
+  2.内嵌网页
+    a.模拟手机端的原生体验，ui设计
+    b.使用开源发布的第三方组件
+=========================
+四、UI
+  1.样式
+  2.布局
+  3.颜色
+  4.思维
+五、基础需求实现
+  1.路由
+  2.网络通讯
+  3.app权限配置
+  4.调用摄像头、录音器
+  x.音乐播放(提示音等)
+  x.视频播放
+  5.访问相册
+  6、推送消息
+  7、本地存储
+  8、打包apk
+六、进阶
+  1.手势事件：摇晃、横竖屏、滑动、长按
+  2.Java原生组件套接
+  3.后台任务
+  4.redux
+  5.应用状态(在后台/正在使用)
+  6.android默认后退事件
+  7.设备振动
+七、代码管理
+  1.可复用核心组件
+  2.不可复用的项目组件
+  3.可配置部分提取与接口预留
+  4.UI部分与数据处理部分分离(黑盒模式)
+八、坑
+  1.java.io.IOException: Unable to delete directory...
+  这是由于缓存导致
+  【解决方法】
+  ```
+  cd android && gradlew clean
+  ```
+  2.node_modules发生缓存而不读取新安装的包或者新版本
+  这是由yarn cache 缓存导致
+  【解决方法】
+  ```
+  yarn --reset-cache
+  ```
+  3.emulator-5554 cannot be found
+  这是由于当前 RN Node服端口被占用，导致连接不到模拟器
+  【解决方法】
+  ```
+  adb kill-serrver && adb start-server
+  ```
+  如果仍然找不到，你需要上网搜索当前版本RN调起Node服务器所使用的端口，然后在任务管理器里面杀掉占用此端口的不必要应用程序的进程
+  4.Command run-android unrecognized. Make sure that you have run npm install and that you are inside a react-native project.
+  发生这种错误可能是因为你在代码迁移时，node_modules 内的文件发生变化。
+  【解决方法】
+  如果你运行 npm install 之后依然报此错误，可能是因为 package.json 发生变化，请确保其内容然后运行 npm install 。之后便可正常运行 react-native run-android。
+  5.Unable to install ---- app-debug.apk com.android.builder.testing.api.DeviceException: com.android.ddmlib.InstallException: INSTALL_FAILED_UPDATE_INCOMPATIBLE
+  这是由于你的设备上已经有一个与此程序相同签名的另外一个应用程序。
+  【解决方法】
+  你需要卸载旧的才能安装新的，两者不能共存
+  6.debugger 卡顿/卡死
+  这是由于 RN 内部事件监听原理的错误。
+  【解决方法】
+  将你手机的时间调至比你的电脑慢1分钟即可。
+
+
+
+
+
+
+  
+  
