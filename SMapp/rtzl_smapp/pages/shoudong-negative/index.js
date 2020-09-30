@@ -146,6 +146,7 @@ class Default extends React.MyPage {
                 checkIfExist(existDatabar, databar).then((exist) => {
                   if (!exist) {
                     //回退至结果页并告知新条目
+                    console.log(databar)
                     navigate('scan-result', {newDatabar: databar});
                     return;
                   } else if (exist) {

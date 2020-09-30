@@ -1,8 +1,6 @@
 import React from "react";
 import "./index.css";
 import "./App.css";
-
-// import { Table } from "antd";
 import util from "./util/index";
 import { TopNavigator, DateRangePicker, Btns, Table } from "./components";
 
@@ -48,6 +46,11 @@ class App extends React.Component {
         title: "秤房",
         dataIndex: "chengfang",
         key: "chengfang"
+      },
+      {
+        title: "皮重",
+        dataIndex: "pizhong",
+        key: "pizhong"
       }
     ];
 

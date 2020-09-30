@@ -25,7 +25,7 @@ const getTabArr = (xml, strArr) => {
 	dataArr.pop();
 	let arr = dataArr.map((item, i) => {
 		let result = {};
-		strArr.forEach(_item => {
+		strArr.forEach((_item) => {
 			let __item__ = item;
 			let _res = __item__.split(`<${_item}>`)[1];
 			if (_res) {
@@ -59,8 +59,8 @@ const transPortArr = (arr, arr1, arr2) => {
 // ===============================================================
 
 //登录
-api.login = condition => {
-	return soap('GetUser', condition).then(res => {
+api.login = (condition) => {
+	return soap('GetUser', condition).then((res) => {
 		const {_response} = res;
 		let result = arrange(_response, ['USER_ID', 'USER_NAME']);
 		return result;
@@ -68,8 +68,8 @@ api.login = condition => {
 };
 
 //获取拣配单
-api.getJIANPEIDAN = condition => {
-	return soap('GetPickHeadData', condition).then(res => {
+api.getJIANPEIDAN = (condition) => {
+	return soap('GetPickHeadData', condition).then((res) => {
 		let result = getTabArr(res._response, [
 			'拣配日期',
 			'车号',
@@ -132,7 +132,7 @@ api.getJIANPEIDAN = condition => {
 		);
 
 		//额外处理：拣配日期只匹配到YYYY-MM-DD
-		result = result.map(item => {
+		result = result.map((item) => {
 			let reg = /^[0-9]+-[0-9]+-[0-9]+/;
 			let res = reg.exec(item.date);
 			item.date = res[0];
@@ -144,9 +144,9 @@ api.getJIANPEIDAN = condition => {
 };
 
 //获取拣配单明细
-api.getJianpeidanDetail = condition => {
+api.getJianpeidanDetail = (condition) => {
 	return soap('GetPickListData', condition)
-		.then(res => {
+		.then((res) => {
 			const {_response} = res;
 			let result = getTabArr(_response, [
 				'拣配单号',
@@ -164,15 +164,15 @@ api.getJianpeidanDetail = condition => {
 			);
 			return result;
 		})
-		.catch(err => {
+		.catch((err) => {
 			console.log(err);
 			Toast.show('请求发生错误，请检查您的网络连接');
 		});
 };
 
 //查询出库单
-api.getCHUKUDAN = condition => {
-	return soap('GetPlanMain', condition).then(res => {
+api.getCHUKUDAN = (condition) => {
+	return soap('GetPlanMain', condition).then((res) => {
 		//重新整理该条数据的必要信息
 		//发货单号、收货单位、计划重量、已发数量、发货单日期、计划日期、订单号、序号、产品编码、产品名称、批次号、计量单位、库房名称、运输区分、车号、计划类型
 		let result = getTabArr(res._response, [
@@ -238,22 +238,28 @@ api.getCHUKUDAN = condition => {
 };
 
 //查询选择车号
-api.chooseCHEHAO = condition => {
+api.chooseCHEHAO = (condition) => {
 	condition.strTruckNo = ``;
-	return soap('GetTruckNo', condition).then(res => {
-		let result = getTabArr(res._response, ['车号', '单据号', '秤房']);
+	return soap('GetTruckNo', condition).then((res) => {
+		let result = getTabArr(res._response, ['车号', '单据号', '秤房', '皮重']);
+
+		result = result.map((item) => {
+			item['皮重'] = parseFloat(item['皮重']).toFixed(4);
+			return item;
+		});
+
 		result = transPortArr(
 			result,
-			['车号', '单据号', '秤房'],
-			['number', 'danjuhao', 'chengfang'],
+			['车号', '单据号', '秤房', '皮重'],
+			['number', 'danjuhao', 'chengfang', 'pizhong'],
 		);
 		return result;
 	});
 };
 
 //验证条码是否已拣配
-api.checkBatchNo = condition => {
-	return soap('CheckBatchNo', condition).then(res => {
+api.checkBatchNo = (condition) => {
+	return soap('CheckBatchNo', condition).then((res) => {
 		const {_response} = res;
 		let result = arrange(_response, ['CheckBatchNoResult']);
 		result.CheckBatchNoResult === 'false'
@@ -264,9 +270,9 @@ api.checkBatchNo = condition => {
 };
 
 //将扫描记录存储到数据库
-api.uploadBarcodes = condition => {
+api.uploadBarcodes = (condition) => {
 	return soap('ScanConfirm3', condition)
-		.then(res => {
+		.then((res) => {
 			const {_response} = res;
 			let result = arrange(_response, ['ScanConfirm3Result', 'strMsg']);
 			result.ScanConfirm3Result === 'false'
@@ -274,29 +280,29 @@ api.uploadBarcodes = condition => {
 				: (result.result = true);
 			return result;
 		})
-		.catch(err => {
+		.catch((err) => {
 			Toast.show('请求发生错误，请检查您的网络连接');
 		});
 };
 
 //根据批次号和编号查询条码
-api.getBarcodeByPB = condition => {
+api.getBarcodeByPB = (condition) => {
 	return soap('GetBarcode', condition)
-		.then(res => {
+		.then((res) => {
 			const {_response} = res;
 			let result = arrange(_response, ['F_BARCODE']);
 			return result['F_BARCODE'];
 		})
-		.catch(err => {
+		.catch((err) => {
 			console.log(err);
 			Toast.show('请求发生错误，请检查您的网络连接');
 		});
 };
 
 //删除拣配单查询结果中的一条数据
-api.deletePickNo = condition => {
+api.deletePickNo = (condition) => {
 	return soap('DeletePickNo', condition)
-		.then(res => {
+		.then((res) => {
 			const {_response} = res;
 			let result = arrange(_response, ['DeletePickNoResult', 'strError']);
 			result['DeletePickNoResult'] === 'false'
@@ -304,7 +310,7 @@ api.deletePickNo = condition => {
 				: (result['DeletePickNoResult'] = true);
 			return result;
 		})
-		.catch(err => {
+		.catch((err) => {
 			console.log(err);
 			Toast.show('请求发生错误，请检查您的网络连接');
 		});

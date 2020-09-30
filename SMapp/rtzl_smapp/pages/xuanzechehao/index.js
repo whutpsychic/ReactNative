@@ -86,12 +86,14 @@ class Default extends React.MyPage {
         //传回选择的车号
         const {
           currentLine,
-          currentLine: {danjuhao, chengfang},
+          currentLine: {danjuhao, chengfang, pizhong},
         } = receivedData;
+        console.log(pizhong);
         navigation.navigate('chukudan-detail', {
           chehao: currentLine.number,
           danjuhao,
           chengfang,
+          pizhong,
         });
       }
     }
@@ -106,6 +108,7 @@ class Default extends React.MyPage {
           chehao: inputValue,
           danjuhao: '',
           chengfang: '',
+          pizhong: '',
         });
       }
     } else if (receivedData.etype === 'backbtn') {

@@ -17,7 +17,7 @@ const uri = 'file:///android_asset/h5/chukudan-detail/index.html';
 class Default extends React.MyPage {
   onLoad() {
     const {navigation} = this.props;
-    navigation.addListener('focus', e => {
+    navigation.addListener('focus', (e) => {
       // Prevent default action
       if (e.preventDefault) e.preventDefault();
       const {
@@ -53,11 +53,11 @@ class Default extends React.MyPage {
     );
   }
 
-  postMessage = obj => {
+  postMessage = (obj) => {
     this.refs.webview.postMessage(JSON.stringify(obj));
   };
 
-  onReceive = event => {
+  onReceive = (event) => {
     const {
       navigation,
       navigation: {navigate},
@@ -99,7 +99,7 @@ class Default extends React.MyPage {
     if (receivedData.etype === 'scanBtn') {
       const {
         route: {
-          params: {data, chehao, danjuhao, chengfang},
+          params: {data, chehao, danjuhao, chengfang, pizhong},
         },
       } = this.props;
 
@@ -115,6 +115,7 @@ class Default extends React.MyPage {
         chehao,
         chengfang,
         danjuhao,
+        pizhong,
       });
     } else if (receivedData.etype === 'backBtn') {
       navigation.goBack();
@@ -166,4 +167,3 @@ const mapDispatchToProps = (dispatch, props) => {
 };
 
 export default connect(null, mapDispatchToProps)(Default);
-

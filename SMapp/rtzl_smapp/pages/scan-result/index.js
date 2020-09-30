@@ -186,7 +186,7 @@ class Default extends React.Component {
           //
           _this.arrangeBarcode(existDatabar, data).then((databar) => {
             if (databar) {
-              let newDataArr = [...existDatabar, databar];
+              let newDataArr = [databar, ...existDatabar];
               _this.calcData(newDataArr);
             }
           });
@@ -212,7 +212,7 @@ class Default extends React.Component {
           } = this.props;
           //如果有新扫描到的有效数据时
           if (newDatabar) {
-            let newDataArr = [...existDatabar, newDatabar];
+            let newDataArr = [newDatabar, ...existDatabar];
             this.calcData(newDataArr);
           }
         }
@@ -294,7 +294,7 @@ class Default extends React.Component {
   calcData = (dataArr) => {
     const {
       route: {
-        params: {yingjian},
+        params: {yingjian, pizhong},
       },
     } = this.props;
     //记录
@@ -315,6 +315,7 @@ class Default extends React.Component {
       : 0;
 
     let ques = (parseFloat(yingjian) - yij1).toFixed(4);
+    let pz = (parseFloat(yij1) + parseFloat(pizhong)).toFixed(4);
 
     if (ques < 0) {
       Toast.show('请求数量过多！');
@@ -334,6 +335,7 @@ class Default extends React.Component {
           yij1,
           yij2: dataArr.length || 0,
           ques,
+          pz,
         });
       },
     );
@@ -428,9 +430,10 @@ class Default extends React.Component {
     ) {
       const {
         route: {
-          params: {yingjian},
+          params: {yingjian, pizhong},
         },
       } = this.props;
+      let pz = parseFloat(pizhong).toFixed(4);
       //初始仅一次
       this.postMessage({
         etype: 'data',
@@ -438,6 +441,7 @@ class Default extends React.Component {
         yij1: 0,
         yij2: 0,
         ques: yingjian,
+        pz,
       });
     }
     //确认按钮
