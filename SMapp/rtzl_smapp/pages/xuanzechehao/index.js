@@ -108,7 +108,7 @@ class Default extends React.MyPage {
           chehao: inputValue,
           danjuhao: '',
           chengfang: '',
-          pizhong: '',
+          pizhong: 0,
         });
       }
     } else if (receivedData.etype === 'backbtn') {

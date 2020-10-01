@@ -336,6 +336,7 @@ class Default extends React.Component {
           yij2: dataArr.length || 0,
           ques,
           pz,
+          pizhong,
         });
       },
     );
@@ -442,6 +443,7 @@ class Default extends React.Component {
         yij2: 0,
         ques: yingjian,
         pz,
+        pizhong,
       });
     }
     //确认按钮

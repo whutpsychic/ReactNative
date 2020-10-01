@@ -16,7 +16,8 @@ class App extends React.Component {
     yij1: "",
     yij2: "",
     ques: "",
-    pz: ""
+    pz: "",
+    pizhong: ""
   };
 
   componentDidMount() {
@@ -66,7 +67,7 @@ class App extends React.Component {
     });
 
     const { tableloading, data } = this.state;
-    const { yingj, yij1, yij2, ques, pz } = this.state;
+    const { yingj, yij1, yij2, ques, pz, pizhong } = this.state;
     return (
       <div className="app-container">
         <div className="app-contents jpsmjg">
@@ -106,7 +107,10 @@ class App extends React.Component {
             <span>{yingj}</span>
             <span>{yij1}</span>
             <span>{ques}</span>
-            <span></span>
+            <span className="title">皮重</span>
+            <span className="title">捆数</span>
+            <span className="title">合计</span>
+            <span>{pizhong}</span>
             <span>{yij2}</span>
             <span>{pz}</span>
           </div>

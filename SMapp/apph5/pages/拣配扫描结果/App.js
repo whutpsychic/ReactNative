@@ -1,8 +1,6 @@
 import React from "react";
 import "./index.css";
 import "./App.css";
-
-// import { Table } from "antd";
 import util from "./util/index";
 import { TopNavigator, Btns, Table } from "./components";
 
@@ -17,7 +15,9 @@ class App extends React.Component {
     yingj: "",
     yij1: "",
     yij2: "",
-    ques: ""
+    ques: "",
+    pz: "",
+    pizhong: ""
   };
 
   componentDidMount() {
@@ -67,7 +67,7 @@ class App extends React.Component {
     });
 
     const { tableloading, data } = this.state;
-    const { yingj, yij1, yij2, ques } = this.state;
+    const { yingj, yij1, yij2, ques, pz, pizhong } = this.state;
     return (
       <div className="app-container">
         <div className="app-contents jpsmjg">
@@ -107,9 +107,12 @@ class App extends React.Component {
             <span>{yingj}</span>
             <span>{yij1}</span>
             <span>{ques}</span>
-            <span></span>
+            <span className="title">皮重</span>
+            <span className="title">捆数</span>
+            <span className="title">合计</span>
+            <span>{pizhong}</span>
             <span>{yij2}</span>
-            <span></span>
+            <span>{pz}</span>
           </div>
           <Btns suffix>
             <Btn title={"确认"} type={"btn2"} onPress={this.onPressConfirm} />
