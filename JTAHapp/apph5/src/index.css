@@ -40,6 +40,10 @@ input {
 	background-color: #000;
 }
 
+.app-container p {
+	margin: 0;
+}
+
 .app-contents {
 	max-width: 480px;
 	min-width: 260px;

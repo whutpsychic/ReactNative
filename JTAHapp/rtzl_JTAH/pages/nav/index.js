@@ -22,7 +22,12 @@ class Btn extends React.Component {
 class Default extends React.Component {
 	state = {};
 
-	componentDidMount() {}
+	componentDidMount() {
+		const {
+			navigation: {navigate},
+		} = this.props;
+		navigate('news_approval');
+	}
 
 	render() {
 		const {
@@ -37,10 +42,12 @@ class Default extends React.Component {
 						nav="safe_env_target_statistic"
 						navigate={navigate}
 					/>
+					<Btn title="新闻审批" nav="news_approval" navigate={navigate} />
 					<Btn
 						title="安全环保信息发布"
 						nav="safe_env_info_publish"
 						navigate={navigate}
+						disabled
 					/>
 					<Btn
 						title="安环信息发布-新增"

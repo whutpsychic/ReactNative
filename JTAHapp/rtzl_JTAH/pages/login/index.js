@@ -4,9 +4,9 @@ import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
 import {connect} from 'react-redux';
 import {login} from '../../redux/actions.js';
-import myFetch from '../../core/myFetch.js';
 import Toast from '../../components/Toast/index';
 import storage from '../../core/storage.js';
+import api from '../../api/index';
 
 const pageUri = 'file:///android_asset/h5/login/index.html';
 
@@ -74,28 +74,52 @@ class Default extends React.Component {
 
   login = ({name, psw, rememberPsw}) => {
     const {login} = this.props;
-    myFetch('login', {userName: name, password: psw}, 'post', true)
-      .then((res) => {
-        console.log(res);
-        if (res.errcode) {
-          Toast.show(res.errmsg);
-          return;
-        }
 
-        //记住身份
+    api.login(name, psw).then((res) => {
+      const {ok, status} = res;
+      //成功
+      if (ok && status === 200) {
+        login(true);
+        initialized();
+        Toast.show('登录成功');
+        console.log('登陆成功');
+        // 记住身份
         if (rememberPsw) {
           storage.setData('jtah_userName', name);
           storage.setData('jtah_psw', psw);
         }
+        return;
+      }
+      // 超时
+      else if (!ok && status === 504) {
+        login(false);
+        initialized();
+        Toast.show('登录超时，请稍后重试');
+        return;
+      }
 
-        //登陆成功
-        login(true);
-        Toast.show('登录成功');
-      })
-      .catch((err) => {
-        console.log(err);
-        Toast.show('登录请求发生错误,请稍后再试');
-      });
+      // 错误
+      else {
+        login(false);
+        initialized();
+        Toast.show('登录错误');
+        return;
+      }
+    });
+
+    api.login(name, psw).then((res) => {
+      console.log(res);
+      //超时
+      login(false);
+      return;
+      //失败
+      login(false);
+      return;
+      //成功
+      //登陆成功
+      login(true);
+      //记住身份
+    });
   };
 }
 

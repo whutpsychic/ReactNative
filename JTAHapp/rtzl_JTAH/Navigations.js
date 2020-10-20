@@ -21,11 +21,14 @@ import Nav from './pages/nav/index';
 import danger_screening_administer from './pages/danger-screening-administer/index';
 import dt_environment_protection_reports_list from './pages/dt-environment-protection-reports-list/index';
 import ecology_repair_info from './pages/ecology-repair-info/index';
+import fire_control_data_list from './pages/fire-control-data-list/index';
 import fire_control_manage from './pages/fire-control-manage/index';
 import safe_env_info_publish from './pages/safe-env-info-publish/index';
 import safe_env_info_publish_adding from './pages/safe-env-info-publish-adding/index';
 import safe_env_target_statistic from './pages/safe-env-target-statistic/index';
 import safe_producing_calendar from './pages/safe-producing-calendar/index';
+import news_approval from './pages/news-approval/index';
+import news_overview from './pages/news-overview/index';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -124,6 +127,10 @@ class App extends React.Component {
                 component={ecology_repair_info}
               />
               <Stack.Screen
+                name="fire_control_data_list"
+                component={fire_control_data_list}
+              />
+              <Stack.Screen
                 name="fire_control_manage"
                 component={fire_control_manage}
               />
@@ -143,6 +150,8 @@ class App extends React.Component {
                 name="safe_producing_calendar"
                 component={safe_producing_calendar}
               />
+              <Stack.Screen name="news_approval" component={news_approval} />
+              <Stack.Screen name="news_overview" component={news_overview} />
             </Fragment>
           ) : (
             <Stack.Screen name="login" component={Login} />

@@ -2,6 +2,7 @@ import React from 'react';
 import {View, Text} from 'react-native';
 import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
+import api from '../../api/index';
 
 const pageUri = 'file:///android_asset/h5/fire-control-manage/index.html';
 
@@ -36,123 +37,66 @@ class Default extends React.Component {
     console.log(receivedData);
     //初始化完成之后互通消息然后放置数据
     if (etype === 'pageState' && receivedData.info === 'componentDidMount') {
-      this.postMessage({
-        etype: 'data',
-        selectData1: [
-          {label: '全部', value: 0},
-          {label: '名称1', value: 1},
-          {label: '名称2', value: 2},
-          {label: '名称3', value: 3},
-          {label: '名称4', value: 4},
-          {label: '名称5', value: 5},
-        ],
-        mainData: [
-          {
-            img: '',
-            title: '银山矿业',
-            data: [
-              {text: '设计审查', active: false},
-              {text: '竣工验收', active: true},
-              {text: '消防检查', active: false},
-              {text: '设计维护', active: false},
-              {text: '培训演练', active: false},
-              {text: '其他', active: false},
-            ],
-          },
-          {
-            img: '',
-            title: '永平铜矿',
-            data: [
-              {text: '设计审查', active: false},
-              {text: '竣工验收', active: false},
-              {text: '消防检查', active: false},
-              {text: '设计维护', active: false},
-              {text: '培训演练', active: false},
-              {text: '其他', active: false},
-            ],
-          },
-          {
-            img: '',
-            title: '银山矿业',
-            data: [
-              {text: '设计审查', active: false},
-              {text: '竣工验收', active: true},
-              {text: '消防检查', active: false},
-              {text: '设计维护', active: false},
-              {text: '培训演练', active: false},
-              {text: '其他', active: false},
-            ],
-          },
-          {
-            img: '',
-            title: '永平铜矿',
-            data: [
-              {text: '设计审查', active: false},
-              {text: '竣工验收', active: false},
-              {text: '消防检查', active: false},
-              {text: '设计维护', active: false},
-              {text: '培训演练', active: false},
-              {text: '其他', active: false},
-            ],
-          },
-          {
-            img: '',
-            title: '银山矿业',
-            data: [
-              {text: '设计审查', active: false},
-              {text: '竣工验收', active: true},
-              {text: '消防检查', active: false},
-              {text: '设计维护', active: false},
-              {text: '培训演练', active: false},
-              {text: '其他', active: false},
-            ],
-          },
-          {
-            img: '',
-            title: '永平铜矿',
-            data: [
-              {text: '设计审查', active: false},
-              {text: '竣工验收', active: false},
-              {text: '消防检查', active: false},
-              {text: '设计维护', active: false},
-              {text: '培训演练', active: false},
-              {text: '其他', active: false},
-            ],
-          },
-          {
-            img: '',
-            title: '银山矿业',
-            data: [
-              {text: '设计审查', active: false},
-              {text: '竣工验收', active: true},
-              {text: '消防检查', active: false},
-              {text: '设计维护', active: false},
-              {text: '培训演练', active: false},
-              {text: '其他', active: false},
-            ],
-          },
-          {
-            img: '',
-            title: '永平铜矿',
-            data: [
-              {text: '设计审查', active: false},
-              {text: '竣工验收', active: false},
-              {text: '消防检查', active: false},
-              {text: '设计维护', active: false},
-              {text: '培训演练', active: false},
-              {text: '其他', active: false},
-            ],
-          },
-        ],
-      });
+      this.query();
     }
     //
-    else if (etype === 'xxxxxxxxxx') {
+    else if (etype === 'onClickItem') {
+      const {i, item} = receivedData;
+      console.log(i);
+      console.log(item);
+
+      navigate('fire_control_data_list', {i, item, unit: item.title});
     }
     //
     else if (etype === 'back-btn') {
       navigation.goBack();
     }
+  };
+
+  query = () => {
+    this.postMessage({
+      etype: 'data',
+      pageLoading: true,
+    });
+    api.getFireControlMainData().then((res) => {
+      console.log(res);
+      const {errcode, errmsg, data} = res;
+      // 超时
+      if (errcode === 504) {
+        Toast.show('请求超时！');
+        this.postMessage({
+          etype: 'data',
+          pageLoading: false,
+        });
+        return;
+      }
+      // 成功
+      else if (!errcode) {
+        let mainData = data.map((item) => {
+          return {
+            img: item.imgUrl,
+            title: item.label,
+            id: '',
+            institution_id: item.identity,
+          };
+        });
+        this.postMessage({
+          etype: 'data',
+          pageLoading: false,
+          mainData,
+        });
+        return;
+      }
+      // 失败
+      else {
+        Toast.show(`请求超时！${errmsg}`);
+        this.postMessage({
+          etype: 'data',
+          pageLoading: false,
+        });
+        return;
+      }
+    });
   };
 }
 

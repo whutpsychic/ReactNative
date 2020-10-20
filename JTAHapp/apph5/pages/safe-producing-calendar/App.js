@@ -4,6 +4,7 @@ import util from "../util/index";
 import TopTitle from "../components/TopTitle/index";
 import DatePicker from "../components/DatePicker/index";
 import moment from "moment";
+import PageLoading from "../components/PageLoading/index";
 
 const { MonthPicker } = DatePicker;
 
@@ -134,9 +135,9 @@ class Calendar extends React.Component {
 			case 0:
 				return null;
 			case 1:
-				return <ExtraSign text="伤" color={"orange"} />;
+				return <ExtraSign text="伤" color={"orange"} inner />;
 			case 2:
-				return <ExtraSign text="亡" color={"red"} />;
+				return <ExtraSign text="亡" color={"red"} inner />;
 			default:
 				return null;
 		}
@@ -223,14 +224,25 @@ class Calendar extends React.Component {
 
 class ExtraSign extends React.Component {
 	render() {
-		const { text, color } = this.props;
-		return <span className={`calendar-extra-sign ${color}`}>{text}</span>;
+		const { text, color, inner } = this.props;
+		return (
+			<span className={`calendar-extra-sign ${color}${inner ? " inner" : ""}`}>
+				{text}
+			</span>
+		);
 	}
 }
 
 class App extends React.Component {
 	state = {
+		pageLoading: false,
 		monthText: switchMonthToStr(new Date().getMonth()),
+		//state:0-无 state:1-伤 state:2-亡
+		// 		{
+		// 			date: "2020-09-01",
+		// 			state: 0,
+		// 			info: "xxxx事故，发生了这样这样很糟糕的事故1"
+		// 		}
 		data: [],
 		info: "",
 		year: moment().year(),
@@ -255,92 +267,14 @@ class App extends React.Component {
 			}
 		});
 		// ==================================
-		//state:0-无 state:1-伤 state:2-亡
-		this.setState({
-			data: [
-				{
-					date: "2020-09-01",
-					state: 0,
-					info: "xxxx事故，发生了这样这样很糟糕的事故1"
-				},
-				{
-					date: "2020-09-02",
-					state: 0,
-					info: "xxxx事故，发生了这样这样很糟糕的事故2"
-				},
-				{
-					date: "2020-09-03",
-					state: 0,
-					info: "xxxx事故，发生了这样这样很糟糕的事故3"
-				},
-				{
-					date: "2020-09-04",
-					state: 1,
-					info: "xxxx事故，发生了这样这样很糟糕的事故4"
-				},
-				{
-					date: "2020-09-05",
-					state: 0,
-					info: "xxxx事故，发生了这样这样很糟糕的事故5"
-				},
-				{
-					date: "2020-09-06",
-					state: 0,
-					info: "xxxx事故，发生了这样这样很糟糕的事故6"
-				},
-				{
-					date: "2020-09-07",
-					state: 0,
-					info: "xxxx事故，发生了这样这样很糟糕的事故7"
-				},
-				{
-					date: "2020-09-08",
-					state: 0,
-					info: "xxxx事故，发生了这样这样很糟糕的事故8"
-				},
-				{
-					date: "2020-09-09",
-					state: 1,
-					info: "xxxx事故，发生了这样这样很糟糕的事故9"
-				},
-				{
-					date: "2020-09-10",
-					state: 2,
-					info: "xxxx事故，发生了这样这样很糟糕的事故10"
-				},
-				{
-					date: "2020-09-11",
-					state: 0,
-					info: "xxxx事故，发生了这样这样很糟糕的事故11"
-				},
-				{
-					date: "2020-09-12",
-					state: 0,
-					info: "xxxx事故，发生了这样这样很糟糕的事故12"
-				},
-				{
-					date: "2020-09-13",
-					state: 0,
-					info: "xxxx事故，发生了这样这样很糟糕的事故13"
-				},
-				{
-					date: "2020-09-14",
-					state: 2,
-					info: "xxxx事故，发生了这样这样很糟糕的事故14"
-				},
-				{
-					date: "2020-09-15",
-					state: 0,
-					info: "xxxx事故，发生了这样这样很糟糕的事故15"
-				}
-			]
-		});
 	}
 
 	render() {
+		const { pageLoading } = this.state;
 		const { monthText, data, info, year, month } = this.state;
 		return (
 			<div className="app-container">
+				{pageLoading ? <PageLoading /> : null}
 				<div className="app-contents">
 					<TopTitle title="安全生产日历" canBack />
 					<MonthPicker onChange={this.onChangeDate} />
@@ -377,6 +311,7 @@ class App extends React.Component {
 	onChangeDate = x => {
 		let year = x.year();
 		let month = x.month();
+		util.traceBack("onChangeDate", { year, month });
 		this.setState({
 			year,
 			month: month + 1,
@@ -385,6 +320,7 @@ class App extends React.Component {
 	};
 
 	onClickCalendar = dataItem => {
+		util.traceBack("onClickItem", { dataItem });
 		if (dataItem) {
 			this.setState({
 				info: dataItem.info

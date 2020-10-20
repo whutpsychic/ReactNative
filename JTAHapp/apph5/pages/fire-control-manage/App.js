@@ -2,14 +2,25 @@ import React from "react";
 import "./App.css";
 import util from "../util/index";
 import TopTitle from "../components/TopTitle/index";
+import PageLoading from "../components/PageLoading/index";
 
-import Button from "../components/Button/index";
-import Select from "../components/Select/index";
-import DatePicker from "../components/DatePicker/index";
+const data = [
+	"设计审查",
+	"竣工验收",
+	"消防检查",
+	"设施维护",
+	"培训演练",
+	"其他"
+];
 
 class ListItem extends React.Component {
+	state = {
+		curr: null
+	};
+
 	render() {
-		const { img, title, data } = this.props.item;
+		const { img, title } = this.props.item;
+		const { curr } = this.state;
 		return (
 			<li className="list-item">
 				<img alt={"tp"} src={img} className="left-img" />
@@ -17,15 +28,15 @@ class ListItem extends React.Component {
 					<p>{title}</p>
 					<ul className="text-items">
 						{data.map((item, i) => {
-							if (item.active)
+							if (curr === i)
 								return (
-									<li>
-										<span className="active">{item.text}</span>
+									<li key={`itemk${i}`} onClick={() => this.onClickItem(i)}>
+										<span className="active">{item}</span>
 									</li>
 								);
 							return (
-								<li>
-									<span>{item.text}</span>
+								<li key={`itemk${i}`} onClick={() => this.onClickItem(i)}>
+									<span>{item}</span>
 								</li>
 							);
 						})}
@@ -34,11 +45,19 @@ class ListItem extends React.Component {
 			</li>
 		);
 	}
+
+	onClickItem = i => {
+		const { item } = this.props;
+		this.setState({
+			curr: i
+		});
+		util.traceBack("onClickItem", { i, item });
+	};
 }
 
 class App extends React.Component {
 	state = {
-		selectData1: [],
+		pageLoading: false,
 		mainData: []
 	};
 
@@ -61,133 +80,15 @@ class App extends React.Component {
 		});
 
 		// ***************************************************
-		// this.setState({
-		// 	mainData: [
-		// 		{
-		// 			img: "",
-		// 			title: "银山矿业",
-		// 			data: [
-		// 				{ text: "设计审查", active: false },
-		// 				{ text: "竣工验收", active: true },
-		// 				{ text: "消防检查", active: false },
-		// 				{ text: "设计维护", active: false },
-		// 				{ text: "培训演练", active: false },
-		// 				{ text: "其他", active: false }
-		// 			]
-		// 		},
-		// 		{
-		// 			img: "",
-		// 			title: "永平铜矿",
-		// 			data: [
-		// 				{ text: "设计审查", active: false },
-		// 				{ text: "竣工验收", active: false },
-		// 				{ text: "消防检查", active: false },
-		// 				{ text: "设计维护", active: false },
-		// 				{ text: "培训演练", active: false },
-		// 				{ text: "其他", active: false }
-		// 			]
-		// 		},
-		// 		{
-		// 			img: "",
-		// 			title: "银山矿业",
-		// 			data: [
-		// 				{ text: "设计审查", active: false },
-		// 				{ text: "竣工验收", active: true },
-		// 				{ text: "消防检查", active: false },
-		// 				{ text: "设计维护", active: false },
-		// 				{ text: "培训演练", active: false },
-		// 				{ text: "其他", active: false }
-		// 			]
-		// 		},
-		// 		{
-		// 			img: "",
-		// 			title: "永平铜矿",
-		// 			data: [
-		// 				{ text: "设计审查", active: false },
-		// 				{ text: "竣工验收", active: false },
-		// 				{ text: "消防检查", active: false },
-		// 				{ text: "设计维护", active: false },
-		// 				{ text: "培训演练", active: false },
-		// 				{ text: "其他", active: false }
-		// 			]
-		// 		},
-		// 		{
-		// 			img: "",
-		// 			title: "银山矿业",
-		// 			data: [
-		// 				{ text: "设计审查", active: false },
-		// 				{ text: "竣工验收", active: true },
-		// 				{ text: "消防检查", active: false },
-		// 				{ text: "设计维护", active: false },
-		// 				{ text: "培训演练", active: false },
-		// 				{ text: "其他", active: false }
-		// 			]
-		// 		},
-		// 		{
-		// 			img: "",
-		// 			title: "永平铜矿",
-		// 			data: [
-		// 				{ text: "设计审查", active: false },
-		// 				{ text: "竣工验收", active: false },
-		// 				{ text: "消防检查", active: false },
-		// 				{ text: "设计维护", active: false },
-		// 				{ text: "培训演练", active: false },
-		// 				{ text: "其他", active: false }
-		// 			]
-		// 		},
-		// 		{
-		// 			img: "",
-		// 			title: "银山矿业",
-		// 			data: [
-		// 				{ text: "设计审查", active: false },
-		// 				{ text: "竣工验收", active: true },
-		// 				{ text: "消防检查", active: false },
-		// 				{ text: "设计维护", active: false },
-		// 				{ text: "培训演练", active: false },
-		// 				{ text: "其他", active: false }
-		// 			]
-		// 		},
-		// 		{
-		// 			img: "",
-		// 			title: "永平铜矿",
-		// 			data: [
-		// 				{ text: "设计审查", active: false },
-		// 				{ text: "竣工验收", active: false },
-		// 				{ text: "消防检查", active: false },
-		// 				{ text: "设计维护", active: false },
-		// 				{ text: "培训演练", active: false },
-		// 				{ text: "其他", active: false }
-		// 			]
-		// 		}
-		// 	]
-		// });
 	}
 
 	render() {
-		const { selectData1, mainData } = this.state;
+		const { mainData, pageLoading } = this.state;
 		return (
 			<div className="app-container">
+				{pageLoading ? <PageLoading /> : null}
 				<div className="app-contents">
 					<TopTitle title="消防管理" canBack />
-					<ul className="condition-ul">
-						<li>
-							<label>检查项目名称</label>
-							<Select
-								ref="s1"
-								data={selectData1}
-								onChange={this.onChangeSelect1}
-							/>
-						</li>
-						<li>
-							<label>排查截止时间</label>
-							<DatePicker ref="d" onChange={this.onChangeDate} />
-						</li>
-					</ul>
-					<ul className="btns">
-						<li>
-							<Button text="查询" onClick={this.onClickQuery} />
-						</li>
-					</ul>
 					<ul className="main-list">
 						{mainData.map((item, i) => {
 							return <ListItem key={`item${i}`} item={item} />;
@@ -197,38 +98,6 @@ class App extends React.Component {
 			</div>
 		);
 	}
-
-	onClickQuery = () => {
-		const condition = {
-			s1: this.refs.s1.getValue(),
-			d: this.refs.d.getValue().format("YYYY-MM-DD")
-		};
-		util.traceBack("btn-query", condition);
-	};
-
-	onClickAdd = () => {
-		util.traceBack("btn-add", {});
-	};
-
-	onClickOutput = () => {
-		util.traceBack("btn-output", {});
-	};
-
-	onClickInput = () => {
-		util.traceBack("btn-input", {});
-	};
-
-	onChangeSelect1 = obj => {
-		util.traceBack("s1", obj);
-	};
-
-	onChangeSelect2 = obj => {
-		util.traceBack("s2", obj);
-	};
-
-	onChangeDate = v => {
-		util.traceBack("date", v);
-	};
 }
 
 export default App;

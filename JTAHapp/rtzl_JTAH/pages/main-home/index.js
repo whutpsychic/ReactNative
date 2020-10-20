@@ -2,8 +2,8 @@ import React from 'react';
 import {View} from 'react-native';
 import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
-import myFetch from '../../core/myFetch.js';
 import util from '../../core/util.js';
+import api from '../../api/index';
 
 const pageUri = 'file:///android_asset/h5/main-home/index.html';
 
@@ -188,12 +188,14 @@ class Default extends React.Component {
       // todos 工作提醒
       // risks 风险提醒
       // tasks 挂牌督办
-      myFetch('message/mainList', {ofs: 1, ps: 20}, 'get')
-        .then((res) => {
-          console.log(res);
+      api.getHomeMainData().then((res) => {
+        const {errcode, errmsg} = res;
+        //成功
+        if (!errcode) {
           const {
             data: {list},
           } = res;
+
           this.postMessage({
             etype: 'data',
             pageLoading: false,
@@ -218,14 +220,47 @@ class Default extends React.Component {
               return {text: item.content, date: item.time};
             }),
           });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+        }
+        //超时
+        else if (errcode === 504) {
+          Toast.show('请求主数据超时!');
+          this.postMessage({
+            etype: 'data',
+            pageLoading: false,
+            // 顶部图片
+            carouselData: [],
+            // 公司要闻
+            boardInfoData1: [],
+            // 动态信息
+            boardInfoData2: [],
+            // 工作提醒
+            boardInfoData3: [],
+            // 风险提醒
+            boardInfoData4: [],
+          });
+        }
+        // 失败
+        else {
+          Toast.show('请求主数据失败!');
+          this.postMessage({
+            etype: 'data',
+            pageLoading: false,
+            // 顶部图片
+            carouselData: [],
+            // 公司要闻
+            boardInfoData1: [],
+            // 动态信息
+            boardInfoData2: [],
+            // 工作提醒
+            boardInfoData3: [],
+            // 风险提醒
+            boardInfoData4: [],
+          });
+        }
+      });
 
       //下拉框数据
-      myFetch('AqhbEcharts/all', {}, 'get').then((res) => {
-        console.log(res);
+      api.getHomeSelectors().then((res) => {
         const {
           data: {list = []},
         } = res;
@@ -286,7 +321,9 @@ class Default extends React.Component {
       loadingChart: true,
     });
     const {s1, s2} = this.state;
-    myFetch('AqhbEcharts/list', {institutionId: s1, code: s2}, 'get')
+
+    api
+      .getMainChart({institutionId: s1, code: s2})
       .then((res) => {
         const {
           data: {list},

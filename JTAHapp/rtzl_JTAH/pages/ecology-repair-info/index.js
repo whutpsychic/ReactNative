@@ -3,8 +3,8 @@ import {View, Text} from 'react-native';
 import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
 import Toast from '../../components/Toast/index';
-import myFetch from '../../core/myFetch.js';
 import moment from 'moment';
+import api from '../../api/index';
 
 const pageUri = 'file:///android_asset/h5/ecology-repair-info/index.html';
 
@@ -48,13 +48,21 @@ class Default extends React.Component {
         pageLoading: true,
       });
 
-      myFetch('institutions/imgUrlList', {}, 'get')
+      api
+        .getEcologyRepairImgs()
         .then((res) => {
           console.log(res);
-          const {data} = res;
+          const {errcode, errmsg, data} = res;
           //如果没数据
           if (!data || !data.length) {
             Toast.show('没有任何数据');
+            this.postMessage({
+              etype: 'data',
+              pageLoading: false,
+            });
+            return;
+          } else if (errcode) {
+            Toast.show('主数据查询失败了');
             this.postMessage({
               etype: 'data',
               pageLoading: false,
@@ -67,33 +75,12 @@ class Default extends React.Component {
           });
           return data;
         })
-        .catch((err) => {
-          Toast.show('主数据查询失败了');
-          this.postMessage({
-            etype: 'data',
-            pageLoading: false,
-          });
-        })
         .then((data) => {
           if (!data) {
             return;
           }
           this.query();
         });
-
-      // this.postMessage({
-      //   etype: 'data',
-      //   pageLoading: false,
-      //   title: '江铜集团有限公司2019年生态修复总面积：xxxx(公顷)',
-      //   mainData: [
-      //     {
-      //       img: '',
-      //       title: '银山矿业',
-      //       subtitle: '修复面积:XXXX(公顷)',
-      //       data: [{img: ''}, {img: ''}, {img: ''}],
-      //     },
-      //   ],
-      // });
     }
     //
     else if (etype === 'onChangeDate') {
@@ -120,47 +107,46 @@ class Default extends React.Component {
     });
 
     let data = this.state.mainData;
-    myFetch(
-      'Repair/list',
-      {year: this.state.year, ofs: 0, ps: 999},
-      'get',
-    ).then((res) => {
-      console.log(res);
-      const {
-        data: {list},
-      } = res;
-      let totalArea = 0;
-      let totalCost = 0;
 
-      list.forEach((item) => {
-        totalArea += item.restoreArea;
-        totalCost += item.cost;
-      });
-      let mainData = data.map((item) => {
-        let dyobj =
-          list.filter((_item) => {
-            return _item.institutionId === item.identity;
-          })[0] || {};
+    api
+      .getEcologyRepairList({year: this.state.year, ofs: 0, ps: 999})
+      .then((res) => {
+        console.log(res);
+        const {
+          data: {list},
+        } = res;
+        let totalArea = 0;
+        let totalCost = 0;
 
-        let obj = {};
-        obj.img = item.imgUrl;
-        obj.title = item.title;
-        obj.subtitle = `修复面积${dyobj.restoreArea || ''}(公顷)`;
-        obj.data = dyobj.fileList
-          ? dyobj.fileList.map((item) => {
-              return {img: item.url};
-            })
-          : [];
-        return obj;
-      });
+        list.forEach((item) => {
+          totalArea += item.restoreArea;
+          totalCost += item.cost;
+        });
+        let mainData = data.map((item) => {
+          let dyobj =
+            list.filter((_item) => {
+              return _item.institutionId === item.identity;
+            })[0] || {};
 
-      this.postMessage({
-        etype: 'data',
-        pageLoading: false,
-        title: `江铜集团有限公司${this.state.year}年生态修复总面积：${totalArea}(公顷)  生态修复总金额：${totalCost}(万元)`,
-        mainData: mainData,
+          let obj = {};
+          obj.img = item.imgUrl;
+          obj.title = item.title;
+          obj.subtitle = `修复面积${dyobj.restoreArea || ''}(公顷)`;
+          obj.data = dyobj.fileList
+            ? dyobj.fileList.map((item) => {
+                return {img: item.url};
+              })
+            : [];
+          return obj;
+        });
+
+        this.postMessage({
+          etype: 'data',
+          pageLoading: false,
+          title: `江铜集团有限公司${this.state.year}年生态修复总面积：${totalArea}(公顷)  生态修复总金额：${totalCost}(万元)`,
+          mainData: mainData,
+        });
       });
-    });
   };
 }
 
