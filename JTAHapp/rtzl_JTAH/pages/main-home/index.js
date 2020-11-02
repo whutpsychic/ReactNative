@@ -26,7 +26,13 @@ class Default extends React.Component {
     s2: null,
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    const {
+      navigation: {navigate},
+    } = this.props;
+    navigate('home-query');
+  }
+
   postMessage = (obj) => {
     this.refs.webview.postMessage(JSON.stringify(obj));
   };

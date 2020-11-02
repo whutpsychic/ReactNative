@@ -14,15 +14,15 @@ class Default extends React.Component {
 		if (!et)
 			return {
 				text: nextProps.data[0] && nextProps.data[0].label,
-				value: nextProps.data[0] && nextProps.data[0].value
+				value: nextProps.data[0] && [nextProps.data[0].value]
 			};
 
 		return { data: nextProps.data };
 	}
 
 	state = {
-		text: null,
-		value: null,
+		text: undefined,
+		value: undefined,
 		showBox: true,
 		data: []
 	};
@@ -35,8 +35,7 @@ class Default extends React.Component {
 	}
 
 	render() {
-		const { data } = this.state;
-		const { showBox } = this.state;
+		const { data, showBox } = this.state;
 		let { text, value } = this.state;
 		if (!text && data.length) text = data[0].label;
 		if (!value && data.length) value = data[0].value;

@@ -26,11 +26,21 @@ export default class extends React.Component {
             showLoading={loadingChart}
             loadingOption={{ text: "" }}
             style={{ width: "100%", height: "100%" }}
+            onEvents={{
+              click: this.onClick
+            }}
           />
         )}
       </div>
     );
   }
+
+  onClick = e => {
+    const { onClick } = this.props;
+    if (typeof onClick === "function") {
+      onClick(e);
+    }
+  };
 
   setOption = option => {
     this.setState({ option: option });

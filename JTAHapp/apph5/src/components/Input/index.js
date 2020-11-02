@@ -7,12 +7,7 @@ class Default extends React.Component {
 		text: ""
 	};
 
-	componentDidMount() {
-		//修复那个蜜汁bug
-		this.setState({
-			showBox: false
-		});
-	}
+	componentDidMount() {}
 
 	render() {
 		const { text } = this.state;
@@ -31,7 +26,7 @@ class Default extends React.Component {
 	}
 
 	getValue = () => {
-		return this.state.value;
+		return this.state.text;
 	};
 }
 

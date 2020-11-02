@@ -1,0 +1,18 @@
+.rtmcc-rnweb-input,
+.rtmcc-rnweb-select,
+.rtmcc-rnweb-select-tree,
+.rtmcc-rnweb-date-picker,
+.rtmcc-rnweb-month-picker,
+.rtmcc-rnweb-year-picker {
+	flex-basis: 100%;
+	width: 100%;
+	height: 30px;
+	line-height: 30px;
+	border: solid 1px #ccc;
+	background-color: #fff;
+}
+
+.rtmcc-rnweb-input,
+.rtmcc-rnweb-select {
+	text-indent: 8px;
+}

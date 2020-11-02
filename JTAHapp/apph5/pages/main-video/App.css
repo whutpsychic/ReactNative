@@ -1,11 +1,10 @@
 .app-contents {
-	/*max-height: 400px;*/
+	overflow: auto;
 }
 
-div[onpositionupdate="return;"] img.csssprite {
-	display: none;
-}
-
-div.smnoprint:nth-child(3) {
-	display: none;
+.app-contents .map-container {
+	width: 100%;
+	height: calc(100% - 50px);
+	background-image: url("../img/main-video-bg.png");
+	background-position: right;
 }

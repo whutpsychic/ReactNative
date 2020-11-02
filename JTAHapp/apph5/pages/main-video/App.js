@@ -2,12 +2,17 @@ import React from "react";
 import "./App.css";
 import util from "../util/index";
 import TopTitle from "../components/TopTitle/index";
-import { QMap, HeatMap, Marker, MarkerList, Info } from "react-tmap";
+import PageLoading from "../components/PageLoading/index";
+import Chart from "../components/Chart/index";
+import "echarts/map/js/china";
+import buildChartOption from "./buildChartOption.js";
+import PickerView from "../core/components/PickerView/index";
 
 class App extends React.Component {
 	state = {
-		positions: [],
-		info: []
+		pageLoading: false,
+		selectData: [],
+		data: []
 	};
 
 	componentDidMount() {
@@ -29,73 +34,49 @@ class App extends React.Component {
 		});
 
 		// ***************************************************
-		// setTimeout(() => {
-		// 	this.setState({
-		// 		positions: [
-		// 			{ lat: 39.984104, lng: 116.307503, text: "10" },
-		// 			{ lat: 40.984104, lng: 117.307503, text: "12" },
-		// 			{ lat: 41.984104, lng: 118.307503, text: "16" },
-		// 			{ lat: 42.984104, lng: 119.307503, text: "8" },
-		// 			{ lat: 43.984104, lng: 120.307503, text: "9" },
-		// 			{ lat: 44.984104, lng: 121.307503, text: "17" }
-		// 		],
-		// 		info: [
-		// 			{ lat: 39.984104, lng: 116.307503, text: "文字1" },
-		// 			{ lat: 40.984104, lng: 117.307503, text: "文字2" },
-		// 			{ lat: 41.984104, lng: 118.307503, text: "文字3" },
-		// 			{ lat: 42.984104, lng: 119.307503, text: "文字4" }
-		// 		]
-		// 	});
-		// }, 4000);
 	}
 
 	render() {
-		const { positions, info } = this.state;
+		const { pageLoading, data, selectData } = this.state;
+		const options = buildChartOption(data);
 		return (
-			<div className="app-container">
-				<div className="app-contents">
-					<TopTitle title="视频监测" />
-					<div className="map-container">
-						<QMap
-							center={{ lat: 39.984104, lng: 116.307503 }}
-							style={{ height: "800px" }}
-							// events={{
-							// 	idle: map => this.handleMapIdle(map)
-							// }}
-						>
-							{positions.map((item, i) => {
-								return (
-									<Marker
-										key={`mk${i}`}
-										position={{ lat: item.lat, lng: item.lng }}
-										visible
-										// 标记提示文案
-										decoration={item.text}
-										// events={{
-										// 	click: this.handleMarkerClick
-										// }}
-									/>
-								);
-							})}
-							{info.map((item, i) => {
-								return (
-									<Info
-										key={`info${i}`}
-										content={item.text}
-										visible={true}
-										position={{ lat: item.lat, lng: item.lng }}
-									/>
-								);
-							})}
-						</QMap>
+			<React.Fragment>
+				<div className="app-container">
+					<div className="app-contents">
+						{pageLoading ? <PageLoading /> : null}
+						<TopTitle title="视频监控" />
+						<div className="map-container">
+							<Chart option={options} onClick={this.onClickChart} />
+						</div>
 					</div>
 				</div>
-			</div>
+				<PickerView
+					ref="pickerview"
+					data={selectData}
+					onSelect={this.onSelectPicker}
+				/>
+			</React.Fragment>
 		);
 	}
 
-	handleMarkerClick = () => {
-		alert("hell");
+	select = () => {
+		this.refs.pickerview.open();
+	};
+
+	onSelectPicker = obj => {
+		util.traceBack("selectPicker", { ...obj });
+	};
+
+	onClickChart = x => {
+		const { name, value } = x;
+		const { data } = this.state;
+		this.select();
+
+		let result = data.find(item => {
+			return item.name === name && item.x === value[0] && item.y === value[1];
+		});
+
+		util.traceBack("onClickPoint", { result });
 	};
 }
 

@@ -1,6 +1,12 @@
 import postData from '../core/myFetch2.js';
 import config from '../config/index';
 import Toast from '../components/Toast/index';
+import mockData from './mockData.js';
+
+// main-query
+const {mainQueryData} = mockData;
+
+// =================================================
 
 let proxy;
 if (config.mode === 'production') {
@@ -74,49 +80,385 @@ api.login = (userName, password) => {
 	return Promise.race([fetchPromise, timeoutPromise]);
 };
 
+// ==========================公用接口================================
+// 获取机构树形数据
+api.getInstitutionsDepartment = () => {
+	return buildFetcher(commonPrefix + 'institutions/department', {}).then(
+		(res) => {
+			const {errcode, errmsg, data} = res;
+			// 超时
+			if (errcode === 504) {
+				Toast.show(`机构数据查询超时！`);
+				return;
+			}
+			// 默认成功
+			else if (!errcode) {
+				// 没数据
+				if (!data || !(data instanceof Object)) {
+					Toast.show('查询机构竟没有任何数据！');
+					return;
+				}
+				// 有数据
+				else {
+					return [data];
+				}
+			}
+			// 失败
+			else {
+				Toast.show(`机构数据查询失败,原因：${errmsg}`);
+				return;
+			}
+		},
+	);
+};
+// ==========================公用接口================================
+
 // main-home
+// 【首页】
 // 获取主数据
 api.getHomeMainData = () => {
 	return buildFetcher(commonPrefix + 'message/mainList', {ofs: 1, ps: 20});
 };
 
 // main-home
+// 【首页】
 // 获取下拉框数据
 api.getHomeSelectors = () => {
 	return buildFetcher(commonPrefix + 'AqhbEcharts/all');
 };
 
 // main-home
+// 【首页】
 // 获取图表数据
 api.getMainChart = (conditions) => {
 	return buildFetcher(commonPrefix + 'AqhbEcharts/list', conditions);
 };
 
+// main-query
+// 【首页-信息管理】
+// 获取菜单
+api.getMainQueryMenuList = () => {
+	return new Promise((resolve) => {
+		resolve(mainQueryData);
+	});
+};
+// =============================================================
+// risk-grade-control
+// 【风险分级管控】
+// 获取主列表数据
+api.getRiskGradeControlList = () => {
+	return buildFetcher(commonPrefix + 'institutions/imgUrlList');
+};
+
+// risk-grade-control-list
+// 【风险分级管控数据列表】
+// 获取列表数据
+api.getRiskGradeControlDataList = (conditions) => {
+	const {page, ps} = conditions;
+	return buildFetcher(commonPrefix + 'riskMain/list', {
+		ofs: page,
+		ps,
+		id: '',
+		...conditions,
+	});
+};
+
+// emergency-reserve-plan
+// 【应急预案】
+// 获取数据列表
+api.getEmergencyReservePlanList = (conditions) => {
+	const {page, ps} = conditions;
+	return buildFetcher(commonPrefix + 'contingencyMain/list', {
+		ofs: page,
+		ps,
+		...conditions,
+	});
+};
+
+// rescue-drill
+// 【救援演练与评估】
+// 获取单位列表
+api.getResecueDrillList = api.getRiskGradeControlList;
+
+// rescue-drill-list
+// 【救援演练与评估】
+// 获取主数据列表
+api.getResecueDrillDataList = (conditions) => {
+	const {page, ps} = conditions;
+	return buildFetcher(commonPrefix + 'rescueMain/list', {
+		ofs: page,
+		ps,
+		id: '',
+		...conditions,
+	});
+};
+
+// accident-quick-report
+// 【事故快报】
+// 获取列表主数据
+api.getAccidentQuickReport = (conditions) => {
+	const {page, ps} = conditions;
+	return buildFetcher(commonPrefix + 'Accident/list', {
+		ofs: page,
+		ps,
+		...conditions,
+	});
+};
+
+// accident-query
+// 【事故查询】
+// 获取事故数据主列表
+api.getAccidentQueryList = (conditions) => {
+	const {page, ps} = conditions;
+	return buildFetcher(commonPrefix + 'AccidentAnalyse/list', {
+		ofs: page,
+		ps,
+		...conditions,
+	});
+};
+
+// acidic-reservoir-info
+// 【酸性水库信息查询】
+// 获取主数据列表
+api.getAcidicReservoirInfoList = (conditions) => {
+	const {page, ps} = conditions;
+	return buildFetcher(commonPrefix + 'keyAreas/recordViewList', {
+		ofs: page,
+		ps,
+		...conditions,
+	});
+};
+
+// rain-info
+// 【降雨量信息】
+// 获取主数据列表
+api.getRainInfoList = (conditions) => {
+	const {page, ps} = conditions;
+	return buildFetcher(commonPrefix + 'rain/recordViewList', {
+		ofs: page,
+		ps,
+		...conditions,
+	});
+};
+
+// waste-water
+// 【废水处理量】
+// 获取主数据列表
+api.getWasteWaterList = (conditions) => {
+	const {page, ps} = conditions;
+	return buildFetcher(commonPrefix + 'waste/recordViewList', {
+		ofs: page,
+		ps,
+		...conditions,
+	});
+};
+
+// safe-env-certificates
+// 【安环证照管理】
+// 获取主数据列表
+api.getSafeEnvCertificatesList = (conditions) => {
+	const {page, ps} = conditions;
+	return buildFetcher(commonPrefix + 'safecardMain/list', {
+		ofs: page,
+		ps,
+		...conditions,
+		isUpload: 1,
+	});
+};
+
+// educating-stand-book
+// 【教育培训台账】
+// 获取主数据列表
+api.getEducatingStandBook = (conditions) => {
+	const {page, ps} = conditions;
+	return buildFetcher(commonPrefix + 'HseEduTraining/list', {
+		ofs: page,
+		ps,
+		...conditions,
+		isUpload: 1,
+	});
+};
+
+// relationship-info
+// 【相关方信息】
+// 获取主数据列表
+api.getRelationshipInfoList = (conditions) => {
+	const {page, ps} = conditions;
+	return buildFetcher(commonPrefix + 'thirdMain/list', {
+		ofs: page,
+		ps,
+		...conditions,
+	});
+};
+
+// danger-chemical
+// 【危险化学品管理】
+// 获取主数据列表
+api.getDangerChemicalList = (conditions) => {
+	const {page, ps} = conditions;
+	return buildFetcher(commonPrefix + 'DangerousChemicals/list', {
+		ofs: page,
+		ps,
+		...conditions,
+	});
+};
+
+// law-standard
+// 【法律法规标准】
+// 获取主数据列表
+api.getLawStandardList = (conditions) => {
+	const {page, ps} = conditions;
+	return buildFetcher(commonPrefix + 'RecordLaw/list', {
+		ofs: page,
+		ps,
+		...conditions,
+	});
+};
+
+// duties-report
+// 【履职报告】
+// 获取主数据列表
+api.getDutiesReportList = (conditions) => {
+	const {page, ps} = conditions;
+	return buildFetcher(commonPrefix + 'DutiesReport/list', {
+		ofs: page,
+		ps,
+		...conditions,
+	});
+};
+
+// file-notice
+// 【文件通知】
+// 获取主数据列表
+api.getFileNoticeList = (conditions) => {
+	const {page, ps} = conditions;
+	return buildFetcher(commonPrefix + 'RecordNotice/list', {
+		ofs: page,
+		ps,
+		...conditions,
+	});
+};
+
+// abnormal-info-group
+// 【异常信息（集团）】
+// 获取主数据列表
+api.getAbnormalInfoGroupList = (conditions) => {
+	const {page, ps} = conditions;
+	return buildFetcher(commonPrefix + 'exception/list', {
+		ofs: page,
+		ps,
+		...conditions,
+	});
+};
+
+// archives-safe
+// 【安全档案资料】
+// 获取主数据列表
+api.getArchivesSafeList = (conditions) => {
+	const {page, ps} = conditions;
+	let conditionObj = {
+		ofs: page,
+		ps,
+		classify: 1,
+		category: 1,
+		...conditions,
+	};
+	console.log(conditionObj);
+	return buildFetcher(commonPrefix + 'HseArchive/list', conditionObj);
+};
+
+// archives-env
+// 【环保档案资料】
+// 获取主数据列表
+api.getArchivesEnvList = (conditions) => {
+	const {page, ps} = conditions;
+	let conditionObj = {
+		ofs: page,
+		ps,
+		classify: 2,
+		category: 1,
+		...conditions,
+	};
+	console.log(conditionObj);
+	return buildFetcher(commonPrefix + 'HseArchive/list', conditionObj);
+};
+
+// archives-occupation
+// 【职业卫生档案资料】
+// 获取主数据列表
+api.getArchivesOccupationList = (conditions) => {
+	const {page, ps} = conditions;
+	let conditionObj = {
+		ofs: page,
+		ps,
+		classify: 3,
+		category: 1,
+		...conditions,
+	};
+	console.log(conditionObj);
+	return buildFetcher(commonPrefix + 'HseArchive/list', conditionObj);
+};
+
+// archives-rules
+// 【规章制度资料】
+// 获取主数据列表
+api.getArchivesRulesList = (conditions) => {
+	const {page, ps} = conditions;
+	let conditionObj = {
+		ofs: page,
+		ps,
+		category: 2,
+		...conditions,
+	};
+	console.log(conditionObj);
+	return buildFetcher(commonPrefix + 'HseArchive/list', conditionObj);
+};
+
+// archives-others
+// 【其他档案资料】
+// 获取主数据列表
+api.getArchivesOthersList = (conditions) => {
+	const {page, ps} = conditions;
+	let conditionObj = {
+		ofs: page,
+		ps,
+		category: 3,
+		...conditions,
+	};
+	console.log(conditionObj);
+	return buildFetcher(commonPrefix + 'HseArchive/list', conditionObj);
+};
+
 // ecology-repair-info
+// 【生态修复信息】
 // 获取生态修复信息主图片列表
 api.getEcologyRepairImgs = () => {
 	return buildFetcher(commonPrefix + 'institutions/imgUrlList');
 };
 
 // ecology-repair-info
+// 【生态修复信息】
 // 获取生态修复信息主数据列表
 api.getEcologyRepairList = (conditions) => {
 	return buildFetcher(commonPrefix + 'Repair/list', conditions);
 };
 
 // safe-producting-calendar
+// 【安全生产日历】
 // 获取安全生产日历数据
 api.getSafeCalendarData = (conditions) => {
 	return buildFetcher(commonPrefix + 'AccidentAnalyse/queryByYear', conditions);
 };
 
 // fire-control-manage
+// 【消防管理】
 // 获取主列表数据
 api.getFireControlMainData = () => {
 	return buildFetcher(commonPrefix + 'institutions/imgUrlList');
 };
 
 // fire-control-data-list
+// 【消防资料查询】
 // 获取消防资料列表
 api.getFireControlDataList = (conditions) => {
 	return buildFetcher(commonPrefix + 'firecontrolMain/list', {
@@ -127,6 +469,7 @@ api.getFireControlDataList = (conditions) => {
 };
 
 // news-approval
+// 【新闻审批】
 // 获取审批列表
 api.getNewsApprovalList = (conditions) => {
 	console.log(conditions);
@@ -139,39 +482,119 @@ api.getNewsApprovalList = (conditions) => {
 };
 
 // news-approval
+// 【新闻审批】
 // 获取机构树形数据
-api.getInstitutions = () => {
-	return buildFetcher(commonPrefix + 'institutions/department', {});
-};
+api.getInstitutions = api.getInstitutionsDepartment;
 
 // news-approval
+// 【新闻审批】
 // 点击单条新闻
 api.getNewsDetail = (id) => {
 	return buildFetcher(commonPrefix + `News/${id}`);
 };
 
 // news-approval
+// 【新闻审批】
 // 查看此条的流程
 api.viewNewsApprovalProccess = (condtions) => {
 	return buildFetcher(commonPrefix + 'FlowInfoRuns/steps', condtions);
 };
 
 // news-approval
+// 【新闻审批】
 // 审核通过
 api.newsApprovalPass = (condtions) => {
 	return buildFetcher(commonPrefix + 'FlowInfoRuns/approve', condtions);
 };
 
 // news-approval
+// 【新闻审核】
 // 驳回审核
 api.newsApprovalReject = () => {
 	return buildFetcher(commonPrefix + 'FlowInfoRuns/reject', condtions);
 };
 
 // news-overview
+// 【新闻预览】
 // 查看具体内容
 api.viewNewsDetail = (id) => {
 	return buildFetcher(commonPrefix + `News/${id}`);
+};
+
+// danger-screening-administer
+// 【隐患排查治理】
+// 获取整改公示内容列表
+api.getDangerRectificationList = () => {
+	return buildFetcher(commonPrefix + 'HiddenTroubleNotice/list', {
+		type: 2,
+		ofs: 0,
+		ps: 999,
+	});
+};
+
+// danger-screening-administer
+// 【隐患排查治理】
+// 获取树形数据责任单位
+api.getTreeUnit = api.getInstitutionsDepartment;
+
+// danger-screening-administer
+// 【隐患排查治理】
+// 获取表格数据
+api.queryDangerTable = (condition) => {
+	return buildFetcher(commonPrefix + 'HiddenTrouble/list', {
+		...condition,
+		ofs: 0,
+		ps: 9999,
+	});
+};
+
+// danger-screening-administer
+// 【隐患排查治理】
+// 点击表格更多
+api.queryMoreInfo = (id) => {
+	return buildFetcher(commonPrefix + 'HiddenTrouble/listDetailFile', {
+		id,
+		ofs: 0,
+		ps: 1,
+	});
+};
+
+// danger-screening-administer
+// 【隐患排查治理】
+// 获取检查公示内容列表
+api.getDangerCheckList = () => {
+	return buildFetcher(commonPrefix + 'HiddenTroubleNotice/list', {
+		type: 1,
+		ofs: 0,
+		ps: 999,
+	});
+};
+
+// main-video
+// 【视频监控】
+// 获取map数据
+api.getMapData = () => {
+	return buildFetcher(
+		commonPrefix + 'message/mainList',
+		{ofs: 1, ps: 20},
+		'get',
+	);
+};
+
+// monitor-oldata-list
+// 【实时监控数据】
+// 获取住列表
+api.getMonitorOlDataList = (conditions) => {
+	const {page, ps, type = 1, avgType = 1} = conditions;
+	let conditionObj = {
+		ofs: page,
+		ps,
+		type,
+		avgType,
+		...conditions,
+	};
+	console.log(conditionObj);
+	return buildFetcher(commonPrefix + 'AqhbAdataAuto/list', conditionObj);
 };
 
 export default api;

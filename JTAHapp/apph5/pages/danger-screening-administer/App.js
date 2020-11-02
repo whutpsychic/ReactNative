@@ -7,41 +7,153 @@ import Panel from "../components/Panel/index";
 
 import Button from "../components/Button/index";
 import Table from "../components/Table/index";
-import Select from "../components/Select/index";
+import Input from "../components/Input/index";
+import SelectTree from "../components/SelectTree/index";
 import DatePicker from "../components/DatePicker/index";
+import PageLoading from "../components/PageLoading/index";
+
+class Tips extends React.Component {
+	state = {
+		show: false,
+		loading: false
+	};
+
+	render() {
+		const { data } = this.props;
+		const { loading, show } = this.state;
+		return show ? (
+			<div className="tips-container-outer">
+				<div className="tips-msk" onClick={this.hide}></div>
+				{loading ? <PageLoading /> : null}
+				<div className="tips-container">
+					<span>通知内容：{data.content}</span>
+					<span>发布时间：{data.date}</span>
+					<span>
+						附件列表：
+						{data.files &&
+							data.files.length &&
+							data.files.map((item, i) => {
+								return <a key={`${i}`}>{item.name}</a>;
+							})}
+					</span>
+				</div>
+			</div>
+		) : null;
+	}
+
+	show = () => {
+		this.setState({
+			show: true
+		});
+	};
+
+	hide = () => {
+		this.setState({
+			show: false
+		});
+	};
+
+	loading = () => {
+		this.setState({
+			loading: true
+		});
+	};
+
+	loaded = () => {
+		this.setState({
+			loading: false
+		});
+	};
+}
+
+class Detail extends React.Component {
+	state = {
+		show: false,
+		loading: false
+	};
+
+	render() {
+		const { data } = this.props;
+		const { loading, show } = this.state;
+		return show ? (
+			<div className="detail-container-outer">
+				<div className="detail-msk" onClick={this.hide}></div>
+				{loading ? <PageLoading /> : null}
+				<div className="detail-container">
+					<p>事故隐患与整改意见表</p>
+					<span>检查项目名称:{data.name}</span>
+					<span>责任单位:{data.unit}</span>
+					<span>排查时间:{data.date}</span>
+					<span>责任人:{data.person}</span>
+					<span>整改期限:{data.time}</span>
+					<span>复核时间:{data.recheckTime}</span>
+					<span>复核状态:{data.recheckState}</span>
+					<span>存在问题:{data.question}</span>
+					<span>整改措施:{data.solution}</span>
+					<span>
+						问题附件：
+						{data.files1 &&
+							data.files1.length &&
+							data.files1.map(item => {
+								return <a>{item.name}</a>;
+							})}
+					</span>
+					<p>整改反馈</p>
+					<span>完成时间:{data.checkDate}</span>
+					<span>反馈人:{data.fbPerson}</span>
+					<span>完成情况:{data.completed}</span>
+					<span>
+						反馈附件：
+						{data.files2 &&
+							data.files2.length &&
+							data.files2.map(item => {
+								return <a>{item.name}</a>;
+							})}
+					</span>
+				</div>
+			</div>
+		) : null;
+	}
+
+	show = () => {
+		this.setState({
+			show: true
+		});
+	};
+
+	hide = () => {
+		this.setState({
+			show: false
+		});
+	};
+
+	loading = () => {
+		this.setState({
+			loading: true
+		});
+	};
+
+	loaded = () => {
+		this.setState({
+			loading: false
+		});
+	};
+}
 
 class App extends React.Component {
 	state = {
+		pageLoading: false,
+
 		boardData: [],
 		boardData2: [],
 
-		selectData1: [],
-		selectData2: [],
-		columns: [
-			{
-				title: "序号",
-				dataIndex: "string0",
-				key: "string0",
-				className: "string0"
-			},
-			{
-				title: "责任单位",
-				dataIndex: "string1",
-				key: "string1",
-				className: "string1"
-			},
-			{
-				title: "检查项目名称",
-				dataIndex: "string2",
-				key: "string2",
-				className: "string2"
-			}
-		].map(item => {
-			item.align = "center";
-			return item;
-		}),
+		selectData: [],
+		columns: [],
 		tableData: [],
-		tableLoading: false
+		tableLoading: false,
+
+		tipsData: {},
+		detailData: {}
 	};
 
 	componentDidMount() {
@@ -63,85 +175,18 @@ class App extends React.Component {
 		});
 
 		// ***************************************************
-		// this.setState({
-		// 	boardData: [
-		// 		{
-		// 			text: "国庆节前专项检查通知",
-		// 			date: "2019-06-12"
-		// 		},
-		// 		{ text: "高温酷暑专项检查通知", date: "2019-06-14" },
-		// 		{
-		// 			text: "危险化学品专项检查通知",
-		// 			date: "2019-06-15"
-		// 		},
-		// 		{
-		// 			text: "年终专项检查通知",
-		// 			date: "2019-06-15"
-		// 		}
-		// 	],
-		// 	boardData2: [
-		// 		{
-		// 			text: "国庆节前专项检查通知",
-		// 			date: "2019-06-12"
-		// 		},
-		// 		{ text: "高温酷暑专项检查通知", date: "2019-06-14" },
-		// 		{
-		// 			text: "危险化学品专项检查通知",
-		// 			date: "2019-06-15"
-		// 		},
-		// 		{
-		// 			text: "年终专项检查通知",
-		// 			date: "2019-06-15"
-		// 		}
-		// 	],
-		// 	selectData1: [
-		// 		{ label: "项目名1", value: 1 },
-		// 		{ label: "项目名2", value: 2 },
-		// 		{ label: "项目名3", value: 3 },
-		// 		{ label: "项目名4", value: 4 },
-		// 		{ label: "项目名5", value: 5 },
-		// 		{ label: "项目名6", value: 6 },
-		// 		{ label: "项目名7", value: 7 },
-		// 		{ label: "项目名8", value: 8 },
-		// 		{ label: "项目名9", value: 9 }
-		// 	],
-		// 	selectData2: [
-		// 		{ label: "单位1", value: 1 },
-		// 		{ label: "单位2", value: 2 },
-		// 		{ label: "单位3", value: 3 },
-		// 		{ label: "单位4", value: 4 },
-		// 		{ label: "单位5", value: 5 },
-		// 		{ label: "单位6", value: 6 },
-		// 		{ label: "单位7", value: 7 },
-		// 		{ label: "单位8", value: 8 },
-		// 		{ label: "单位9", value: 9 }
-		// 	],
-		// 	tableData: [
-		// 		{ string0: 1, string1: "德钢", string2: "" },
-		// 		{ string0: 2, string1: "银山", string2: "" },
-		// 		{ string0: 3, string1: "东同", string2: "" },
-		// 		{ string0: 4, string1: "武钢", string2: "" },
-		// 		{ string0: 5, string1: "德钢", string2: "" },
-		// 		{ string0: 6, string1: "银山", string2: "" },
-		// 		{ string0: 7, string1: "东同", string2: "" },
-		// 		{ string0: 8, string1: "武钢", string2: "" }
-		// 	]
-		// });
 	}
 
 	render() {
-		const {
-			boardData,
-			boardData2,
-			selectData1,
-			selectData2,
-			columns,
-			tableData,
-			tableLoading
-		} = this.state;
+		const { pageLoading, boardData, boardData2 } = this.state;
+		const { selectData, columns, tableData, tableLoading } = this.state;
+		const { tipsData, detailData } = this.state;
 		return (
 			<div className="app-container">
 				<div className="app-contents">
+					{pageLoading ? <PageLoading /> : null}
+					{<Tips ref="tips" data={tipsData} />}
+					{<Detail ref="detail" data={detailData} />}
 					<TopTitle title="隐患排查治理" canBack />
 					<BoardInfo
 						title="检查公示"
@@ -157,37 +202,29 @@ class App extends React.Component {
 						<ul className="condition-ul">
 							<li>
 								<label>检查项目名称</label>
-								<Select
-									ref="s1"
-									data={selectData1}
-									onChange={this.onChangeSelect1}
-								/>
+								<Input ref="input" onChange={this.onChangeInput} />
 							</li>
 							<li>
 								<label>责任单位</label>
-								<Select
-									ref="s2"
-									data={selectData2}
-									onChange={this.onChangeSelect2}
+								<SelectTree
+									ref="select"
+									data={selectData}
+									placeholder={"选择责任单位"}
+									onChange={this.onChangeSelect}
 								/>
 							</li>
 							<li>
-								<label>排查截止时间</label>
-								<DatePicker ref="d" onChange={this.onChangeDate} />
+								<label>开始时间</label>
+								<DatePicker ref="date" onChange={this.onChangeDate} />
+							</li>
+							<li>
+								<label>结束时间</label>
+								<DatePicker ref="date2" onChange={this.onChangeDate2} />
 							</li>
 						</ul>
 						<ul className="btns">
 							<li>
 								<Button text="查询" onClick={this.onClickQuery} />
-							</li>
-							<li>
-								<Button text="添加" onClick={this.onClickAdd} />
-							</li>
-							<li>
-								<Button text="导出" onClick={this.onClickOutput} />
-							</li>
-							<li>
-								<Button text="导入" onClick={this.onClickInput} />
 							</li>
 						</ul>
 						<div className="table-container">
@@ -198,13 +235,15 @@ class App extends React.Component {
 								pagination={false}
 								onRow={record => {
 									return {
+										// 点击行
 										onClick: event => {
 											event.preventDefault();
 											util.setItUp(
 												event.target.parentNode,
 												event.target.parentNode.parentNode
 											);
-										} // 点击行
+											this.onClickTableRow(record);
+										}
 									};
 								}}
 							/>
@@ -215,34 +254,41 @@ class App extends React.Component {
 		);
 	}
 
+	onClickBoard1 = item => {
+		util.traceBack("board1", { ...item });
+		this.refs.tips.show();
+	};
+
+	onClickBoard2 = item => {
+		util.traceBack("board2", { ...item });
+		this.refs.tips.show();
+	};
+
 	onClickQuery = () => {
 		const condition = {
-			s1: this.refs.s1.getValue(),
-			s2: this.refs.s2.getValue(),
-			d: this.refs.d.getValue().format("YYYY-MM-DD")
+			input: this.refs.input.getValue(),
+			select: this.refs.select.getValue(),
+			startDate: this.refs.date.getValue().format("YYYY-MM-DD"),
+			endDate: this.refs.date2.getValue().format("YYYY-MM-DD")
 		};
 		util.traceBack("btn-query", condition);
 	};
-	onClickAdd = () => {
-		util.traceBack("btn-add", {});
-	};
-	onClickOutput = () => {
-		util.traceBack("btn-output", {});
-	};
-	onClickInput = () => {
-		util.traceBack("btn-input", {});
-	};
 
-	onChangeSelect1 = obj => {
-		util.traceBack("s1", obj);
-	};
-
-	onChangeSelect2 = obj => {
-		util.traceBack("s2", obj);
+	onChangeSelect = obj => {
+		util.traceBack("onChangeSelect", obj);
 	};
 
 	onChangeDate = v => {
 		util.traceBack("date", v);
+	};
+
+	onChangeDate2 = v => {
+		util.traceBack("date2", v);
+	};
+
+	onClickTableRow = record => {
+		util.traceBack("onClickTableRow", { ...record });
+		this.refs.detail.show();
 	};
 }
 

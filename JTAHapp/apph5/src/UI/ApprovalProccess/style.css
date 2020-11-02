@@ -1,0 +1,77 @@
+.approval-proccess-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: fixed;
+	width: 100vw;
+	height: 100vh;
+	top: 0;
+	left: 0;
+	z-index: 9;
+}
+
+.approval-proccess-container .msk {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.3);
+}
+
+.approval-proccess-container .spin-container-outer {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 9;
+}
+
+.approval-proccess-container .spin-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 90vw;
+	height: 70vh;
+	background: rgba(255, 255, 255, 0.7);
+}
+
+.approval-proccess-container .main-container {
+	background-color: #fff;
+	display: block;
+	width: 90vw;
+	height: 70vh;
+	padding: 20px;
+	z-index: 2;
+	overflow: auto;
+	animation: goIn 0.2s;
+}
+
+.approval-proccess-container .main-container > p {
+	font-size: 18px;
+	font-weight: bold;
+	text-align: center;
+	margin-bottom: 24px;
+}
+
+.approval-proccess-container .main-container .step-title {
+	margin-bottom: 8px;
+}
+
+.approval-proccess-container .main-container .step-blocker {
+	font-size: 13px;
+	margin-bottom: 8px;
+}
+
+@keyframes goIn {
+	from {
+		height: 0;
+	}
+	to {
+		height: 70vh;
+	}
+}

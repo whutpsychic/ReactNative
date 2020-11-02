@@ -2,8 +2,11 @@ import React from 'react';
 import {View, Text} from 'react-native';
 import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
+import api from '../../api/index';
+import Toast from '../../components/Toast';
 
-const pageUri = 'file:///android_asset/h5/danger-screening-administer/index.html';
+const pageUri =
+  'file:///android_asset/h5/danger-screening-administer/index.html';
 
 class Default extends React.Component {
   state = {};
@@ -38,74 +41,192 @@ class Default extends React.Component {
     if (etype === 'pageState' && receivedData.info === 'componentDidMount') {
       this.postMessage({
         etype: 'data',
-        boardData: [
+        pageLoading: true,
+        columns: [
           {
-            text: '国庆节前专项检查通知',
-            date: '2019-06-12',
-          },
-          {text: '高温酷暑专项检查通知', date: '2019-06-14'},
-          {
-            text: '危险化学品专项检查通知',
-            date: '2019-06-15',
+            title: '序号',
+            dataIndex: 'string0',
+            key: 'string0',
+            className: 'string0',
           },
           {
-            text: '年终专项检查通知',
-            date: '2019-06-15',
-          },
-        ],
-        boardData2: [
-          {
-            text: '国庆节前专项检查通知',
-            date: '2019-06-12',
-          },
-          {text: '高温酷暑专项检查通知', date: '2019-06-14'},
-          {
-            text: '危险化学品专项检查通知',
-            date: '2019-06-15',
+            title: '责任单位',
+            dataIndex: 'string1',
+            key: 'string1',
+            className: 'string1',
           },
           {
-            text: '年终专项检查通知',
-            date: '2019-06-15',
+            title: '检查项目名称',
+            dataIndex: 'string2',
+            key: 'string2',
+            className: 'string2',
           },
-        ],
-        selectData1: [
-          {label: '项目名1', value: 1},
-          {label: '项目名2', value: 2},
-          {label: '项目名3', value: 3},
-          {label: '项目名4', value: 4},
-          {label: '项目名5', value: 5},
-          {label: '项目名6', value: 6},
-          {label: '项目名7', value: 7},
-          {label: '项目名8', value: 8},
-          {label: '项目名9', value: 9},
-        ],
-        selectData2: [
-          {label: '单位1', value: 1},
-          {label: '单位2', value: 2},
-          {label: '单位3', value: 3},
-          {label: '单位4', value: 4},
-          {label: '单位5', value: 5},
-          {label: '单位6', value: 6},
-          {label: '单位7', value: 7},
-          {label: '单位8', value: 8},
-          {label: '单位9', value: 9},
-        ],
-        tableData: [
-          {string0: 1, string1: '德钢', string2: ''},
-          {string0: 2, string1: '银山', string2: ''},
-          {string0: 3, string1: '东同', string2: ''},
-          {string0: 4, string1: '武钢', string2: ''},
-          {string0: 5, string1: '德钢', string2: ''},
-          {string0: 6, string1: '银山', string2: ''},
-          {string0: 7, string1: '东同', string2: ''},
-          {string0: 8, string1: '武钢', string2: ''},
-        ],
+        ].map((item) => {
+          item.align = 'center';
+          return item;
+        }),
+      });
+
+      //查询检查公示
+      let p1 = api.getDangerCheckList().then((res) => {
+        console.log(res);
+        const {data} = res;
+        if (!data || !data.list) {
+          Toast.show('对不起，检查公示没有查到任何数据');
+          return;
+        }
+
+        const {list} = data;
+        this.postMessage({
+          etype: 'data',
+          boardData: list.map((item) => {
+            return {
+              text: item.notice,
+              date: item.noticeTime,
+              files: item.fileList,
+            };
+          }),
+        });
+      });
+
+      //查询整改公示
+      let p2 = api.getDangerRectificationList().then((res) => {
+        console.log(res);
+        const {data} = res;
+        if (!data || !data.list) {
+          Toast.show('对不起，整改公示没有查到任何数据');
+          return;
+        }
+
+        const {list} = data;
+        this.postMessage({
+          etype: 'data',
+          boardData2: list.map((item) => {
+            return {
+              text: item.notice,
+              date: item.noticeTime,
+              files: item.fileList,
+            };
+          }),
+        });
+      });
+
+      //责任单位数据查询
+      let p3 = api.getTreeUnit().then((res) => {
+        console.log(res);
+        const {errcode, data} = res;
+        if (!errcode && data) {
+          this.postMessage({
+            etype: 'data',
+            selectData: [data],
+          });
+        }
+      });
+
+      let p4 = this.query({});
+
+      Promise.all([p1, p2, p3, p4]).then((resArr) => {
+        this.postMessage({
+          etype: 'data',
+          pageLoading: false,
+        });
+      });
+    } else if (etype === 'board1' || etype === 'board2') {
+      const {text, date, files} = receivedData;
+      this.postMessage({
+        etype: 'data',
+        tipsData: {
+          content: text,
+          date,
+          files,
+        },
+      });
+    } else if (etype === 'btn-query') {
+      const {input, select, startDate, endDate} = receivedData;
+
+      const condition = {};
+
+      if (input) condition.projectName = input;
+      if (select && select[0]) condition.institutionId = select[0];
+      if (startDate) condition.startTime = startDate;
+      if (endDate) condition.endTime = endDate;
+
+      console.log(condition);
+      this.query(condition);
+    }
+    //点击table行
+    else if (etype === 'onClickTableRow') {
+      const {id} = receivedData;
+      //查询更多细节
+      api.queryMoreInfo(id).then((res) => {
+        console.log(res);
+        const {
+          data: {list},
+        } = res;
+        const data = {
+          name: list.projectName || '',
+          unit: list.institutionName || '',
+          date: list.startTime || '',
+          person: list.userName || '',
+          time: list.deadline || '',
+          recheckTime: list.feedbackTime || '',
+          recheckState: list.checkType || '',
+          question: list.trouble || '',
+          solution: list.measure || '',
+          files1: list.fatherPo || '',
+
+          checkDate: list.checkTime || '',
+          fbPerson: list.feedbackUserName || '',
+          completed: undefined || '',
+          files2: list.sonPo || '',
+        };
+        console.log(data);
+
+        this.postMessage({
+          etype: 'data',
+          detailData: {
+            ...data,
+          },
+        });
       });
     }
     //
     else if (etype === 'back-btn') {
       navigation.goBack();
     }
+  };
+
+  query = (condition) => {
+    this.postMessage({
+      etype: 'data',
+      tableLoading: true,
+    });
+    return api.queryDangerTable(condition).then((res) => {
+      console.log(res);
+      const {data} = res;
+      if (!data.list) {
+        Toast.show('表格没查询到任何数据');
+        this.postMessage({
+          etype: 'data',
+          tableLoading: false,
+          tableData: [],
+        });
+        return;
+      }
+
+      this.postMessage({
+        etype: 'data',
+        tableLoading: false,
+        tableData: data.list.map((item, i) => {
+          return {
+            id: item.id,
+            string0: `${i + 1}`,
+            string1: item.institutionName,
+            string2: item.projectName,
+          };
+        }),
+      });
+    });
   };
 }
 

@@ -1,0 +1,32 @@
+隐患排查 hidden/group （已做）
+风险分级管控 hidden/riskmaster
+应急预案管理 contingency/master
+救援演练与评估查询  contingency/recusemaster
+事故快报 accident/account
+安全生产日历 accident/analysemaster/resources1（已做）
+事故查询 accident/analysemaster/resources2 
+酸性水库记录维护(带录入) area/record
+酸性水库记录(查看) area/view
+降雨量记录维护(带录入) area/rainrecord
+降雨量记录(查看) area/rainview
+废水处理量记录维护(带录入) area/wasterecord
+废水处理量记录 area/wasteview
+安全环保证照维护 safecard/master
+教育培训 edu/master
+相关方信息检索 third/master
+危险化学用品信息 dangerous/master
+生态修复信息 repair/master （已做）
+生态修复信息(浏览) repair/view
+消防资料管理 firecontrol/check（已做）
+新闻审批 news/accountapprove （已做）
+风险提示审批 news/riskapprove
+法律法规 record/lawmaster
+档案管理-档案管理-所有 record/view/[environmentalRecordView1...]
+履职报告 record/resumptionmaster
+文件通知 record/masternotice
+
+
+
+
+
+

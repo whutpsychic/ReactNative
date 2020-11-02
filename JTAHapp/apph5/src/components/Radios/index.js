@@ -32,4 +32,10 @@ export default class extends React.Component {
 			onChange(item);
 		}
 	};
+
+	getValue = () => {
+		const { active } = this.state;
+		const { data } = this.props;
+		return data[active].value;
+	};
 }

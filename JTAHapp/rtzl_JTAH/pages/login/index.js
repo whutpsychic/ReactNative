@@ -87,6 +87,9 @@ class Default extends React.Component {
         if (rememberPsw) {
           storage.setData('jtah_userName', name);
           storage.setData('jtah_psw', psw);
+        } else {
+          storage.setData('jtah_userName', null);
+          storage.setData('jtah_psw', null);
         }
         return;
       }
@@ -105,20 +108,6 @@ class Default extends React.Component {
         Toast.show('登录错误');
         return;
       }
-    });
-
-    api.login(name, psw).then((res) => {
-      console.log(res);
-      //超时
-      login(false);
-      return;
-      //失败
-      login(false);
-      return;
-      //成功
-      //登陆成功
-      login(true);
-      //记住身份
     });
   };
 }
