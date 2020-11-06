@@ -1,9 +1,10 @@
-import React from "react";
+import React, { Fragment } from "react";
 import "./style.css";
 
 import arrow from "../../../img/icon-select-arrow.png";
 import arrow_disabled from "../../../img/icon-select-arrow-disabled.png";
 
+import { FolderOpenOutlined } from "@ant-design/icons";
 import { Tree } from "antd";
 import "antd/es/tree/style/index.css";
 
@@ -70,6 +71,12 @@ class Default extends React.Component {
 							{showBox ? (
 								<Tree onSelect={this.onSelect} treeData={data} />
 							) : null}
+							{data instanceof Array && data.length > 0 ? null : (
+								<Fragment>
+									<FolderOpenOutlined />
+									<span style={{ margin: "0 10px" }}>没有数据</span>
+								</Fragment>
+							)}
 						</div>
 					</div>
 				</div>

@@ -22,3 +22,16 @@
 	width: 100%;
 	height: 100%;
 }
+
+.top-title span[role="img"] {
+	width: 30px;
+	height: 30px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top: 10px;
+	margin-right: 10px;
+	position: absolute;
+	top: 0;
+	right: 0;
+}

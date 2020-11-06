@@ -38,7 +38,7 @@
 酸性水库记录维护(带录入) area/record
 降雨量记录维护(带录入) area/rainrecord
 废水处理量记录维护(带录入) area/wasterecord
-风险提示审批 news/riskapprove
+风险提示审批 news/riskapprove（未对接）
 ---------------------------------------------------------
 在线监测管理 
 	监测数据查询&历史数据 rtdata/autolist （未对接）

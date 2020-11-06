@@ -29,15 +29,17 @@ export default class extends React.Component {
 				<div className="main-container">
 					<p className="detail-title">{title}</p>
 					<ul>
-						{fieldContents.map((item, i) => {
-							const { multiLines, label, content } = item;
-							return (
-								<li key={`i${i}`} className={calcCls(multiLines)}>
-									<label>{label}</label>
-									<span>{item["content"]}</span>
-								</li>
-							);
-						})}
+						{fieldContents instanceof Array && fieldContents.length > 0
+							? fieldContents.map((item, i) => {
+									const { multiLines, label, content } = item;
+									return (
+										<li key={`i${i}`} className={calcCls(multiLines)}>
+											<label>{label}</label>
+											<span>{item["content"]}</span>
+										</li>
+									);
+							  })
+							: null}
 						{files instanceof Array && (
 							<li className="multi-lines">
 								<label>附件</label>

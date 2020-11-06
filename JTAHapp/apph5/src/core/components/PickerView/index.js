@@ -1,94 +1,127 @@
-//单选视图
-import React from "react";
+// props:
+// data
+// onShowBox
+// onConfirm
+// ====================
+// 方法：
+// show
+// hide
+// getValue
+// setValue
+// clear
+
+import React, { Fragment } from "react";
 import "./style.css";
+
 import { PickerView } from "antd-mobile";
 
+// 从数据源当中拿出当前这个obj
+const getItemFromDataSource = (data, value) => {
+	if (!value) return;
+	let obj = data.filter(item => {
+		return item.value === value;
+	});
+	return obj[0];
+};
+
 class Default extends React.Component {
+	static getDerivedStateFromProps(nextProps, prevState) {
+		return {};
+	}
+
 	state = {
-		showBox: false,
-		value: undefined
+		value: null,
+		showBox: true
 	};
 
 	componentDidMount() {
-		const { data = [] } = this.props;
-		if (data[0])
-			this.setState({
-				value: [data[0].value]
-			});
+		//修复那个蜜汁bug
+		this.setState({
+			showBox: false
+		});
 	}
 
 	render() {
-		const { data } = this.props;
+		const { data, loading } = this.props;
 		const { showBox, value } = this.state;
+
+		const onConfirm = e => {
+			const { data, onConfirm } = this.props;
+			const { value } = this.state;
+			let obj = getItemFromDataSource(data, value);
+			// 默认第一项矫正
+			if (!obj) obj = data[0];
+			if (typeof onConfirm === "function") {
+				onConfirm(obj);
+			}
+			this.hide(e);
+		};
+
 		return (
 			<div
 				className={
 					showBox
-						? "rtzl-zbc-pickerview-container"
-						: "rtzl-zbc-pickerview-container hide"
+						? "rtmcc-rnweb-pickerview-container"
+						: "rtmcc-rnweb-pickerview-container hide"
 				}
 			>
-				<div className="msk" />
-				<div className="rtzl-zbc-pickerview">
+				<div className="msk" onClick={this.hide} />
+				<div className="pickerview">
 					<div className="top-btns">
-						<span onClick={this.confirm}>确定</span>
-						<span onClick={this.cancel}>取消</span>
+						<span onClick={onConfirm}>确定</span>
+						<span onClick={this.hide}>取消</span>
 					</div>
-					{showBox ? (
-						<PickerView
-							data={data}
-							value={value}
-							cols={1}
-							onChange={this.onChange}
-						/>
-					) : null}
+					<div className="tree-box">
+						{showBox ? (
+							<PickerView
+								data={data}
+								value={[value]}
+								cols={1}
+								onChange={value =>
+									this.setState({
+										value: value[0]
+									})
+								}
+							/>
+						) : null}
+					</div>
 				</div>
 			</div>
 		);
 	}
 
-	open = () => {
+	show = () => {
+		const { onShowBox } = this.props;
+		if (typeof onShowBox === "function") onShowBox();
 		this.setState({
 			showBox: true
 		});
 	};
 
 	hide = e => {
+		if (e && e.stopPropagation) e.stopPropagation();
 		this.setState({
 			showBox: false
 		});
 	};
 
-	onChange = v => {
-		const { data } = this.props;
-		let obj = data.filter(item => {
-			return item.value === v[0];
-		})[0];
-		this.setState({
-			value: [obj.value]
-		});
-	};
-
-	confirm = () => {
-		const { data, onSelect } = this.props;
-		const { value } = this.state;
-		this.hide();
-		let obj = data.filter(item => {
-			return item.value === value[0];
-		})[0];
-
-		if (typeof onSelect === "function") {
-			onSelect(obj);
-		}
-	};
-
-	cancel = () => {
-		this.hide();
-	};
-
 	getValue = () => {
 		return this.state.value;
 	};
+
+	setValue = ({ value }) => {
+		this.setState({
+			value: value
+		});
+	};
+
+	clear = () => {
+		this.setState({
+			value: null
+		});
+	};
 }
+
+Default.getItemFromDataSource = getItemFromDataSource;
 
 export default Default;

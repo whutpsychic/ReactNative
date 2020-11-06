@@ -1,7 +1,7 @@
 import React from "react";
 import "./App.css";
 import util from "../util/index";
-import TopTitle from "../components/TopTitle/index";
+import TopTitle from "../UI/TopTitle/index";
 import PageLoading from "../components/PageLoading/index";
 import ListView from "../components/ListView/index";
 import imgs from "../img/img.js";
@@ -394,7 +394,12 @@ class App extends React.Component {
 							institutions={institutions}
 						/>
 					}
-					<TopTitle title={`酸性水库信息`} canBack />
+					<TopTitle
+						title={`酸性水库信息`}
+						canBack
+						add
+						onAdd={this.onClickAdd}
+					/>
 					<div className="top-searcher">
 						<div className="main-input">
 							<input onChange={this.onChangeText} placeholder="查询名称" />
@@ -418,6 +423,10 @@ class App extends React.Component {
 			</div>
 		);
 	}
+
+	onClickAdd = () => {
+		util.traceBack("onAdd");
+	};
 
 	onQuery = () => {
 		const { name, conditions } = this.state;

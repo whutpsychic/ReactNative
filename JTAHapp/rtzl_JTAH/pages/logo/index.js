@@ -6,12 +6,19 @@ import {initializing, login} from '../../redux/actions.js';
 import Toast from '../../components/Toast/index';
 import storage from '../../core/storage.js';
 import api from '../../api/index.js';
+import config from '../../config/index.js';
 
 class Default extends React.Component {
 	state = {};
 
 	componentDidMount() {
 		const {login, initialized} = this.props;
+
+		if (config.mode === 'develop') {
+			login(true);
+			initialized(true);
+			return;
+		}
 
 		//如果有记住密码，自动登录
 		let p1 = storage.getData('jtah_userName');

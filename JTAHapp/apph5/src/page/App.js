@@ -1,17 +1,24 @@
 import React from "react";
 import "./App.css";
 import util from "../util/index";
-// ====================================
-import TopTitle from "../components/TopTitle/index";
+import TopTitle from "../UI/TopTitle/index";
 import PageLoading from "../components/PageLoading/index";
-import TopSearcher from "../UI/TopSearcher/index";
-import ApprovalProccess from "../UI/ApprovalProccess/index";
-import Details from "../UI/Details/index";
-// ====================================
 import ListView from "../components/ListView/index";
-import { renderImgIcon } from "../common/index";
+import imgs from "../img/img.js";
+import { SearchOutlined, MenuOutlined } from "@ant-design/icons";
 import { Button } from "antd-mobile";
+import DatePicker from "../components/DatePicker/index";
+import SelectTree from "../components/SelectTree/index";
 
+const {
+	fileIcon_xlsx,
+	fileIcon_pdf,
+	fileIcon_txt,
+	fileIcon_jpg,
+	fileIcon_defaulti
+} = imgs;
+
+// debug模式
 const debugging = false;
 
 // 渲染分割元素
@@ -54,41 +61,178 @@ const renderListItem = ({
 			<p className="remarks">{obj.remarks}</p>
 			<div className="spliter"></div>
 			<p className="detail">
-				<span>发布人：{obj.person}</span>
-				<span>当前状态：{obj.status}</span>
+				<span>日期：{obj.date}</span>
 			</p>
 		</div>
 	);
 };
 
+class Detail extends React.Component {
+	state = {
+		show: false
+	};
+	render() {
+		const { show } = this.state;
+		const { data = {}, loading } = this.props;
+		const { name, unit, date, distance, height, remarks } = data;
+		return show ? (
+			<div className="detail-container">
+				<div className="msk" onClick={this.hide} />
+				{loading ? <PageLoading /> : null}
+				<div className="main-container">
+					<p className="detail-title">{name}</p>
+					<ul>
+						<li>
+							<label>{`上报单位`}</label>
+							<span>{unit}</span>
+						</li>
+						<li>
+							<label>{`水位/m`}</label>
+							<span>{height}</span>
+						</li>
+						<li>
+							<label>{`距溢口/m`}</label>
+							<span>{distance}</span>
+						</li>
+						<li>
+							<label>{`日期`}</label>
+							<span>{date}</span>
+						</li>
+						<li>
+							<label>{`备注`}</label>
+						</li>
+						<li className="multi-lines">
+							<p>{remarks}</p>
+						</li>
+					</ul>
+				</div>
+			</div>
+		) : null;
+	}
+
+	show = () => {
+		this.setState({
+			show: true
+		});
+	};
+
+	hide = () => {
+		this.setState({
+			show: false
+		});
+	};
+
+	renderImgIcon = item => {
+		const { type } = item;
+		switch (type) {
+			case "xlsx":
+				return <img alt={""} src={fileIcon_xlsx} className={"icon"} />;
+			case "pdf":
+				return <img alt={""} src={fileIcon_pdf} className={"icon"} />;
+			case "txt":
+				return <img alt={""} src={fileIcon_txt} className={"icon"} />;
+			case "png":
+				return <img alt={""} src={fileIcon_defaulti} className={"icon"} />;
+			case "jpg":
+				return <img alt={""} src={fileIcon_jpg} className={"icon"} />;
+			case "jpeg":
+				return <img alt={""} src={fileIcon_defaulti} className={"icon"} />;
+			default:
+				return <img alt={""} src={fileIcon_defaulti} className={"icon"} />;
+		}
+	};
+}
+
+// 筛选抽屉
+class Drawer extends React.Component {
+	state = {
+		showDrawer: false,
+		status: 0
+	};
+
+	render() {
+		const { showDrawer } = this.state;
+		const { institutions } = this.props;
+		return showDrawer ? (
+			<div className="right-drawer-container">
+				<div className="msk" onClick={this.onClickMsk} />
+				<div className="main-container">
+					<ul>
+						<li>
+							<label>机构名称</label>
+							<SelectTree ref="ins" data={institutions} />
+						</li>
+						<li>
+							<label>开始日期</label>
+							<DatePicker ref="date1" placeholder="请选择开始日期" clearable />
+						</li>
+						<li>
+							<label>结束日期</label>
+							<DatePicker ref="date2" placeholder="请选择结束日期" clearable />
+						</li>
+					</ul>
+					<div className="drawer-btns">
+						<Button type="primary" size="small" onClick={this.onConfirm}>
+							确定
+						</Button>
+						<Button type="primary" size="small" onClick={this.hide}>
+							取消
+						</Button>
+					</div>
+				</div>
+			</div>
+		) : null;
+	}
+
+	getConditions = () => {
+		let institution = this.refs.ins.getValue();
+		let date1 = this.refs.date1.getValue();
+		let date2 = this.refs.date2.getValue();
+
+		return { institution, date1, date2 };
+	};
+
+	onConfirm = () => {
+		let conditions = this.getConditions();
+		const { onChange } = this.props;
+		if (typeof onChange === "function") onChange(conditions);
+		this.hide();
+	};
+
+	hide = () => {
+		this.setState({
+			showDrawer: false
+		});
+	};
+
+	onChangeRadio = e => {
+		const { value } = e.target;
+		this.setState({
+			status: value
+		});
+	};
+
+	onClickMsk = () => {
+		this.setState({
+			showDrawer: false
+		});
+	};
+
+	show = () => {
+		this.setState({
+			showDrawer: true
+		});
+	};
+}
+
 class App extends React.Component {
 	state = {
-		// 页面加载中
 		pageLoading: false,
-		// 本页面特有数据
-		pageData: {},
-		// ========
-		// 是否可审批
-		approvalable: false,
-		// 细节数据
 		detail: {},
-		// 流程数据
-		proccessData: [],
-		// 审批意见数据
-		comments: "",
-		// 机构树形数据
-		institutions: [],
-
-		typeData: [
-			{ label: "全部", value: 0 },
-			{ label: "历史今天", value: 1 },
-			{ label: "风险提示", value: 2 }
-		],
-		statusData: [
-			{ label: "全部", value: 0 },
-			{ label: "待办", value: 1 },
-			{ label: "已办", value: 2 }
-		]
+		loadingDetail: false,
+		name: "",
+		conditions: {},
+		institutions: []
 	};
 
 	componentDidMount() {
@@ -113,162 +257,159 @@ class App extends React.Component {
 		if (debugging) {
 			this.loadListData([
 				{
-					name: "抗洪抢险，江铜在行动 4",
-					unit: "江西铜业集团有限公司",
-					type: "安全",
+					name: "文件名test0",
+					unit: "德兴铜矿",
 					person: "admin",
-					orgDate: "2020-07-21 09:07:02",
-					publishDate: "2020-07-21 09:07:02",
-					status: "已发布"
+					date: "2020-06-07",
+					remarks:
+						"djslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkj",
+					files: [
+						{
+							id: 1,
+							name: "f1",
+							type: "xlsx",
+							url: "xxxxxx1"
+						},
+						{
+							id: 2,
+							name: "f2",
+							type: "pdf",
+							url: "xxxxxx2"
+						},
+						{
+							id: 3,
+							name: "f3",
+							type: "txt",
+							url: "xxxxxx3"
+						}
+					]
 				},
 				{
-					name: "抗洪抢险，江铜在行动 5",
-					unit: "江西铜业集团有限公司",
-					type: "安全",
+					name: "文件名test1",
+					unit: "德兴铜矿",
 					person: "admin",
-					orgDate: "2020-07-21 09:07:02",
-					publishDate: "2020-07-21 09:07:02",
-					status: "待审批"
+					date: "2020-06-07",
+					remarks:
+						"djslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkj",
+					files: [
+						{
+							id: 1,
+							name: "f1",
+							type: "xlsx",
+							url: "xxxxxx1"
+						},
+						{
+							id: 2,
+							name: "f2",
+							type: "pdf",
+							url: "xxxxxx2"
+						},
+						{
+							id: 3,
+							name: "f3",
+							type: "txt",
+							url: "xxxxxx3"
+						}
+					]
 				}
 			]);
-			this.setState({
-				institutions: [
-					{ title: "全部", key: "all" },
+
+			setTimeout(() => {
+				console.log(233);
+				// this.loadListData([])
+
+				this.loadListData([
 					{
-						title: "根节点",
-						key: "gjd",
-						children: [
+						name: "文件名test2",
+						unit: "德兴铜矿",
+						person: "admin",
+						date: "2020-06-07",
+						remarks:
+							"djslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkj",
+						files: [
 							{
-								title: "子节点1",
-								key: "z1",
-								children: [
-									{ title: "叶子结点1", key: "yz1" },
-									{ title: "叶子结点2", key: "yz2" },
-									{ title: "叶子结点3", key: "yz3" },
-									{ title: "叶子结点4", key: "yz4" }
-								]
+								id: 1,
+								name: "f1",
+								type: "xlsx",
+								url: "xxxxxx1"
+							},
+							{
+								id: 2,
+								name: "f2",
+								type: "pdf",
+								url: "xxxxxx2"
+							},
+							{
+								id: 3,
+								name: "f3",
+								type: "txt",
+								url: "xxxxxx3"
+							}
+						]
+					},
+					{
+						name: "文件名test3",
+						unit: "德兴铜矿",
+						person: "admin",
+						date: "2020-06-07",
+						remarks:
+							"djslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkj",
+						files: [
+							{
+								id: 1,
+								name: "f1",
+								type: "xlsx",
+								url: "xxxxxx1"
+							},
+							{
+								id: 2,
+								name: "f2",
+								type: "pdf",
+								url: "xxxxxx2"
+							},
+							{
+								id: 3,
+								name: "f3",
+								type: "txt",
+								url: "xxxxxx3"
 							}
 						]
 					}
-				],
-				types: [
-					{ label: "类型1", value: "lx1" },
-					{ label: "类型2", value: "lx2" },
-					{ label: "类型3", value: "lx3" },
-					{ label: "类型4", value: "lx4" },
-					{ label: "类型5", value: "lx5" }
-				]
-			});
+				]);
+			}, 1000);
 		}
 	}
 
 	render() {
-		const conditionList = [
-			{
-				label: "单位名称",
-				field: "institutions",
-				type: "selecttree",
-				placeholder: "请选择单位",
-				data: this.state.institutions
-			},
-			{
-				label: "分类",
-				field: "type",
-				type: "select",
-				placeholder: "请选择分类",
-				data: this.state.typeData
-			},
-			{
-				label: "状态",
-				field: "status",
-				type: "select",
-				placeholder: "请选择状态",
-				data: this.state.statusData
-			},
-			{
-				label: "时间",
-				field: "time",
-				type: "date",
-				placeholder: "请选择时间",
-				clearable: true
-			}
-		];
-
-		const renderStepItem = item => (
-			<div className="step-blocker">
-				<p className="status">{`${item.status}`}</p>
-				<p className="opinion">{`${item.opinion}`}</p>
-				<p className="cost">{`耗时：${item.cost}`}</p>
-				<p className="person">{`处理人：${item.person}`}</p>
-				<p className="date">{`${item.date}`}</p>
-			</div>
-		);
-
-		const { pageLoading, pageData } = this.state;
-		const { proccessData, comments, detail, approvalable } = this.state;
+		const { pageLoading, detail, loadingDetail, institutions } = this.state;
 		return (
 			<div className="app-container">
-				{pageLoading ? <PageLoading /> : null}
-				<Details
-					ref="detail"
-					data={detail}
-					extra={() => (
-						<React.Fragment>
-							<a onClick={() => this.onViewProccess(pageData)}>查看审核流程</a>
-							<a
-								onClick={() => {
-									util.traceBack("onOverview", { ...pageData });
-								}}
-							>
-								预览
-							</a>
-							{approvalable ? (
-								<React.Fragment>
-									<textarea
-										placeholder={"意见"}
-										onChange={e => {
-											const { value } = e.target;
-											this.setState({
-												comments: value
-											});
-										}}
-									></textarea>
-									<Button
-										className="approval-btn agree"
-										onClick={() => {
-											util.traceBack("pass", { ...pageData, comments });
-											this.onClickMsk();
-										}}
-									>
-										通过
-									</Button>
-									<Button
-										className="approval-btn reject"
-										onClick={() => {
-											util.traceBack("reject", { ...pageData, comments });
-											this.onClickMsk();
-										}}
-									>
-										驳回
-									</Button>
-								</React.Fragment>
-							) : null}
-						</React.Fragment>
-					)}
-				/>
-				<ApprovalProccess
-					ref="proccess"
-					title="审批进度"
-					data={proccessData}
-					renderStepItem={renderStepItem}
-				/>
 				<div className="app-contents">
-					<TopTitle title={`风险提示审批`} canBack />
-					<TopSearcher
-						placeholder="请输入名称"
-						onClickQuery={this.onQuery}
-						conditionList={conditionList}
+					{<Detail ref="detail" data={detail} loading={loadingDetail} />}
+					{pageLoading ? <PageLoading /> : null}
+					{
+						<Drawer
+							ref="drawer"
+							onChange={this.onPressConfirmButton}
+							institutions={institutions}
+						/>
+					}
+					<TopTitle
+						title={`酸性水库信息`}
+						canBack
+						add
+						onAdd={this.onClickAdd}
 					/>
+					<div className="top-searcher">
+						<div className="main-input">
+							<input onChange={this.onChangeText} placeholder="查询名称" />
+							<SearchOutlined onClick={this.onQuery} />
+						</div>
+						<div className="right-screen" onClick={this.onOpenDrawer}>
+							<span>筛选</span>
+							<MenuOutlined />
+						</div>
+					</div>
 					<ListView
 						ref="lv"
 						height={document.documentElement.clientHeight}
@@ -283,82 +424,51 @@ class App extends React.Component {
 		);
 	}
 
-	onViewProccess = pageData => {
-		this.refs.proccess.show();
-		util.traceBack("onViewProccess", { ...pageData });
-
-		if (debugging) {
-			this.setState({
-				proccessData: [
-					{
-						title: "编制测试",
-						status: "提交",
-						opinion: "未填写意见",
-						date: "2020-07-21 09:05:40",
-						cost: 0,
-						person: "集团测试"
-					},
-					{
-						title: "审批测试",
-						status: "同意",
-						opinion: "未填写意见",
-						date: "2020-07-21 09:05:40",
-						cost: 0,
-						person: "admin"
-					},
-					{
-						title: "完成测试",
-						status: "同意",
-						opinion: "未填写意见",
-						date: "2020-07-21 09:05:40",
-						cost: 0,
-						person: "admin"
-					}
-				]
-			});
-		}
+	onClickAdd = () => {
+		util.traceBack("onAdd");
 	};
 
-	onClickItem = item => {
-		this.refs.detail.show();
-		util.traceBack("onClickItem", { ...item });
-
-		if (debugging) {
-			this.setState({
-				detail: {
-					fieldContents: [
-						{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
-						{
-							label: "名称",
-							content: "抗洪抢险，江铜在行动 4",
-							multiLines: true
-						},
-						{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
-						{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
-						{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
-						{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
-						{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
-						{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
-						{ label: "名称", content: "抗洪抢险，江铜在行动 4" }
-					],
-					files: []
-				}
-			});
-		}
-	};
-
-	proccessLoading = () => {
-		this.refs.proccess.loading();
-	};
-
-	proccessLoaded = () => {
-		this.refs.proccess.loaded();
-	};
-
-	onQuery = conditions => {
-		console.log(conditions);
-		const { name } = this.state;
+	onQuery = () => {
+		const { name, conditions } = this.state;
 		util.traceBack("onChangeConditions", { name, ...conditions });
+	};
+
+	onPressConfirmButton = conditions => {
+		const { name } = this.state;
+		this.setState({
+			conditions
+		});
+		util.traceBack("onChangeConditions", { name, ...conditions });
+	};
+
+	onChangeText = e => {
+		const { value } = e.target;
+		this.setState({ name: value });
+	};
+
+	onOpenDrawer = () => {
+		this.refs.drawer.show();
+	};
+
+	onClickItem = x => {
+		this.refs.detail.show();
+		this.setState({
+			loadingDetail: true
+		});
+		if (debugging) {
+			setTimeout(() => {
+				this.setState(
+					{
+						detail: x
+					},
+					() => {
+						this.setState({
+							loadingDetail: false
+						});
+					}
+				);
+			}, 1000);
+		}
 	};
 
 	listLoading = () => {
@@ -413,6 +523,9 @@ class App extends React.Component {
 						]
 					}
 				]);
+				this.setState({
+					loadingDetail: false
+				});
 			}, 1500);
 		}
 
@@ -450,6 +563,9 @@ class App extends React.Component {
 						]
 					}
 				]);
+				this.setState({
+					loadingDetail: false
+				});
 			}, 1500);
 		}
 		util.traceBack("onEndReached", { ps });

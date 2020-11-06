@@ -10,10 +10,54 @@ const pageUri = 'file:///android_asset/h5/acidic-reservoir-info/index.html';
 let currPage = 0;
 const ps = 20;
 
+const buildListItems = ({values = [], dataSourceArr = []}) => {
+  return [
+    {
+      label: '单位名称',
+      type: 'tree-select',
+      disabled: true,
+      data: dataSourceArr[0] || [],
+      defaultValue: values[0] || {text: '江西铜业有限公司', value: 1},
+    },
+    {
+      label: '日期',
+      type: 'date',
+    },
+    {
+      label: '水库名称',
+      type: 'select',
+      disabled: true,
+      data: [],
+      defaultValue: values[1] || {text: '风格五', value: 1},
+    },
+    {
+      label: '水库水位/m',
+      type: 'number',
+    },
+    {
+      label: '水库名称',
+      type: 'select',
+      disabled: true,
+      data: [],
+      defaultValue: values[1] || {text: '水库3', value: 1},
+    },
+    {
+      label: '水库水位/m',
+      type: 'number',
+    },
+    {
+      label: '备注',
+      type: 'text-area',
+      defaultValue: '',
+    },
+  ];
+};
+
 class Default extends React.Component {
   state = {
     conditions: {},
     nomore: false,
+    institutions: [],
   };
 
   componentDidMount() {}
@@ -55,11 +99,12 @@ class Default extends React.Component {
       // 加载一次树形结构数据
       api.getInstitutionsDepartment().then((data) => {
         console.log(data);
-        if (data)
+        if (data) {
           this.postMessage({
             etype: 'data',
             institutions: data,
           });
+        }
       });
 
       this.postMessage({
@@ -110,9 +155,16 @@ class Default extends React.Component {
         },
         loadingDetail: false,
       });
-    }
-
-     else if (etype === 'back-btn') {
+    } else if (etype === 'onAdd') {
+      // 加载一次树形结构数据
+      api.getInstitutionsDepartment().then((data) => {
+        console.log(data);
+        if (data) {
+        }
+      });
+      let ListItems = buildListItems({values: [], dataSourceArr: []});
+      navigate('common_list_edit', {title: '酸性水库记录-新增', ListItems});
+    } else if (etype === 'back-btn') {
       navigation.goBack();
     }
   };

@@ -1,9 +1,9 @@
-.rtzl-zbc-pickerview-container {
+.rtmcc-rnweb-pickerview-container {
 	z-index: 10;
 }
 
-.rtzl-zbc-pickerview-container,
-.rtzl-zbc-pickerview-container .msk {
+.rtmcc-rnweb-pickerview-container,
+.rtmcc-rnweb-pickerview-container .msk {
 	display: block;
 	width: 100vw;
 	height: 100vh;
@@ -12,16 +12,16 @@
 	left: 0;
 }
 
-.rtzl-zbc-pickerview-container .msk {
+.rtmcc-rnweb-pickerview-container .msk {
 	background-color: rgba(0, 0, 0, 0.3);
 	/*z-index: 9;*/
 }
 
-.rtzl-zbc-pickerview-container.hide {
+.rtmcc-rnweb-pickerview-container.hide {
 	display: none;
 }
 
-.rtzl-zbc-pickerview-container .rtzl-zbc-pickerview {
+.rtmcc-rnweb-pickerview-container .pickerview {
 	position: relative;
 	width: 100vw;
 	height: 40vh;
@@ -31,16 +31,18 @@
 	z-index: 2;
 }
 
-.rtzl-zbc-pickerview-container .rtzl-zbc-pickerview .top-btns {
+.rtmcc-rnweb-pickerview-container .pickerview .top-btns {
 	color: #389edc;
 	display: flex;
 	justify-content: space-between;
 }
 
-.rtzl-zbc-pickerview-container .rtzl-zbc-pickerview .top-btns span {
+.rtmcc-rnweb-pickerview-container .pickerview .top-btns span {
 	font-size: 15px;
 	margin: 6px 16px;
 	margin-bottom: 0;
+	height: 32px;
+	line-height: 32px;
 }
 
 @keyframes moveIn {

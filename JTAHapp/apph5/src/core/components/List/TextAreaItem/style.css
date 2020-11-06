@@ -1,0 +1,10 @@
+ul.rtmcc-rnweb-list > li.textarea-item {
+	flex-wrap: wrap;
+	height: auto;
+}
+
+ul.rtmcc-rnweb-list > li.textarea-item > textarea {
+	margin-bottom: 16px;
+	height: 200px;
+	line-height: 24px;
+}

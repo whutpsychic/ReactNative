@@ -14,19 +14,6 @@ import { Button } from "antd-mobile";
 
 const debugging = false;
 
-// 渲染分割元素
-const separator = (sectionID, rowID) => (
-	<div
-		key={`${sectionID}-${rowID}`}
-		style={{
-			backgroundColor: "#F5F5F9",
-			height: 10,
-			borderTop: "1px solid #ECECED",
-			borderBottom: "1px solid #ECECED"
-		}}
-	/>
-);
-
 // 渲染每一项
 const renderListItem = ({
 	data,
@@ -47,7 +34,6 @@ const renderListItem = ({
 			className="item-outer"
 			onClick={() => {
 				if (typeof onClick === "function") onClick(obj);
-				util.traceBack("clickItem", obj);
 			}}
 		>
 			<p className="title">{obj.name}</p>
@@ -215,13 +201,6 @@ class App extends React.Component {
 					extra={() => (
 						<React.Fragment>
 							<a onClick={() => this.onViewProccess(pageData)}>查看审核流程</a>
-							<a
-								onClick={() => {
-									util.traceBack("onOverview", { ...pageData });
-								}}
-							>
-								预览
-							</a>
 							{approvalable ? (
 								<React.Fragment>
 									<textarea
@@ -268,6 +247,7 @@ class App extends React.Component {
 						placeholder="请输入名称"
 						onClickQuery={this.onQuery}
 						conditionList={conditionList}
+						noinput
 					/>
 					<ListView
 						ref="lv"

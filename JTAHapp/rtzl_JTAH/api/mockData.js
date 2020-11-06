@@ -14,7 +14,7 @@ data.mainQueryData = [
 		title: '信息发布',
 		children: [
 			{label: '新闻审批', position: 'news_approval'},
-			{label: '风险审批', position: 'hell'},
+			{label: '风险审批', position: 'risk_tips_approval'},
 		],
 	},
 	{

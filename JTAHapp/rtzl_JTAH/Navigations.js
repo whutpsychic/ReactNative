@@ -17,6 +17,10 @@ import Query from './pages/main-query/index';
 import Video from './pages/main-video/index';
 import Fix from './pages/main-fix/index';
 // -------------------------------------------
+// 通用列表编辑/新增页面
+import common_list_edit from './pages/common-list-edit';
+
+// -------------------------------------------
 // 隐患排查
 import danger_screening_administer from './pages/danger-screening-administer/index';
 // 风险分级管控
@@ -55,14 +59,12 @@ import duties_report from './pages/duties-report/index';
 import file_notice from './pages/file-notice/index';
 // 异常信息（集团）
 import abnormal_info_group from './pages/abnormal-info-group/index';
-
 // 安全档案资料
 import archives_safe from './pages/archives-safe/index';
 // 环保档案资料
 import archives_env from './pages/archives-env/index';
 // 职业卫生档案资料
 import archives_occupation from './pages/archives-occupation/index';
-
 // 规章制度
 import archives_rules from './pages/archives-rules/index';
 // 其他
@@ -71,6 +73,7 @@ import archives_others from './pages/archives-others/index';
 import monitor_oldata_list from './pages/monitor-oldata-list/index';
 // 在线监测实时数据（历史数据）
 import monitor_oldata_history from './pages/monitor-oldata-history/index';
+
 // 生态信息修复
 import ecology_repair_info from './pages/ecology-repair-info/index';
 // 消防资料列表
@@ -87,6 +90,8 @@ import safe_producing_calendar from './pages/safe-producing-calendar/index';
 import news_approval from './pages/news-approval/index';
 // 新闻预览
 import news_overview from './pages/news-overview/index';
+// 风险提示审批
+import risk_tips_approval from './pages/risk-tips-approval/index';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -160,7 +165,12 @@ class App extends React.Component {
             <Stack.Screen name="logo" component={Logo} />
           ) : isLogin ? (
             <Fragment>
+              <Stack.Screen
+                name="common_list_edit"
+                component={common_list_edit}
+              />
               <Stack.Screen name="main" component={BottomTabs} />
+
               <Stack.Screen
                 name="danger_screening_administer"
                 component={danger_screening_administer}
@@ -234,6 +244,10 @@ class App extends React.Component {
               <Stack.Screen
                 name="monitor_oldata_history"
                 component={monitor_oldata_history}
+              />
+              <Stack.Screen
+                name="risk_tips_approval"
+                component={risk_tips_approval}
               />
 
               <Stack.Screen

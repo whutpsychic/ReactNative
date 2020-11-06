@@ -597,4 +597,41 @@ api.getMonitorOlDataList = (conditions) => {
 	return buildFetcher(commonPrefix + 'AqhbAdataAuto/list', conditionObj);
 };
 
+// risk-tips-approval
+// 【风险提示审批】
+// 获取主数据列表
+api.getRiskTipsApproval = (conditions) => {
+	const {page, ps} = conditions;
+	let conditionObj = {
+		ofs: 0,
+		ps: 20,
+		nodeState: 2,
+		typeValue: 1,
+		...conditions,
+	};
+	console.log(conditionObj);
+	return buildFetcher(commonPrefix + 'riskPoint/list', conditionObj);
+};
+
+// risk-tips-approval
+// 【风险提示审批】
+// 获取流程细节
+api.viewRiskTipsApprovalProccess = (condtions) => {
+	return buildFetcher(commonPrefix + 'FlowInfoRuns/steps', condtions);
+};
+
+// risk-tips-approval
+// 【风险提示审批】
+// 审核通过
+api.riskTipsApprovalPass = (condtions) => {
+	return buildFetcher(commonPrefix + 'FlowInfoRuns/approve', condtions);
+};
+
+// risk-tips-approval
+// 【风险提示审批】
+// 驳回审核
+api.riskTipsApprovalReject = () => {
+	return buildFetcher(commonPrefix + 'FlowInfoRuns/reject', condtions);
+};
+
 export default api;
