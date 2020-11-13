@@ -1,0 +1,79 @@
+.app-contents {
+	overflow: auto;
+}
+
+.app-contents .am-list-body,
+.list-view-section-body {
+	background-color: transparent;
+}
+
+.item-outer {
+	margin: 12px;
+	margin-top: 0;
+	padding: 10px 16px;
+	background-color: #fff;
+	position: relative;
+}
+
+.item-outer > .editor {
+	display: block;
+	text-decoration: underline;
+	color: #389edc;
+	position: absolute;
+	top: 12px;
+	right: 86px;
+}
+
+.item-outer > .title {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.item-outer > .remarks {
+	width: calc(100vw - 56px);
+	height: 50px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.item-outer > .spliter {
+	height: 1px;
+	background-color: #ddd;
+	margin: 8px 0;
+}
+
+.item-outer > .detail {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
+.item-outer > .detail span {
+	flex-basis: 100%;
+	color: #aaa;
+}
+
+.item-outer .status {
+	font-size: 13px;
+	height: 30px;
+	padding: 4px 10px;
+	border-radius: 2px;
+	position: absolute;
+
+	top: 8px;
+	right: 10px;
+}
+
+.item-outer .status.already {
+	background-color: green;
+	border: solid 1px darkgreen;
+	color: #eee;
+}
+
+.item-outer .status.notyet {
+	background-color: red;
+	border: solid 1px darkred;
+	color: #eee;
+}
+/*-------------------------------------------*/

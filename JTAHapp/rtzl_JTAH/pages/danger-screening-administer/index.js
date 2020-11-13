@@ -112,7 +112,7 @@ class Default extends React.Component {
       });
 
       //责任单位数据查询
-      let p3 = api.getTreeUnit().then((res) => {
+      let p3 = api.getInstitutionsDepartment().then((res) => {
         console.log(res);
         const {errcode, data} = res;
         if (!errcode && data) {

@@ -56,6 +56,13 @@ class Default extends React.Component {
         title,
         ListItems,
       });
+    } else if (etype === 'submit') {
+      const {
+        route: {
+          params: {parent},
+        },
+      } = this.props;
+      navigate(parent, {submit: receivedData});
     } else if (etype === 'back-btn') {
       navigation.goBack();
     }

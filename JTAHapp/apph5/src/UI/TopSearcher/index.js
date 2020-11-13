@@ -5,7 +5,8 @@ import RightDrawer from "../RightDrawer/index";
 
 // 外接组件 RightDrawer 获取数据方法
 const getConditions = classInstance => {
-	const conditions = classInstance.refs.rd.getConditions;
+	let conditions = {};
+	if (classInstance.refs.rd) conditions = classInstance.refs.rd.getConditions;
 	return conditions;
 };
 

@@ -61,6 +61,18 @@ class Default extends React.Component {
       });
       this.query();
     }
+
+    // 当改变查询条件的时候
+    else if (etype === 'onChangeConditions') {
+      this.postMessage({
+        etype: 'data',
+        pageLoading: true,
+      });
+      const {searchText} = receivedData;
+      let condition = {risk_type: searchText};
+      this.query(0, condition);
+    }
+
     //下拉刷新
     else if (etype === 'onRefreshList') {
       this.query();
@@ -73,28 +85,50 @@ class Default extends React.Component {
 
     // 点击更多
     else if (etype === 'clickItem') {
-      const {date, files, id, person, remarks, unit, name} = receivedData;
+      const {
+        date,
+        files,
+        person,
+        remarks,
+        unit,
+        name,
+        dataSource,
+      } = receivedData;
       this.postMessage({
         etype: 'data',
         detail: {
-          name,
-          date,
-          files,
-          id,
-          person,
-          remarks,
-          unit,
+          fieldContents: [
+            {label: '上报单位', content: unit},
+            {label: '文件名称', content: name},
+            {label: '上传日期', content: date},
+            {label: '上传人', content: person},
+            {label: '备注', content: remarks},
+          ],
+          files:
+            dataSource.fileList instanceof Array
+              ? dataSource.fileList.map((_item) => {
+                  return {
+                    title: _item.name,
+                    type: _item.file_type,
+                    url: _item.url_pdf,
+                  };
+                })
+              : [],
         },
-        loadingDetail: false,
       });
     }
-
-     else if (etype === 'back-btn') {
+    // 点击预览附件(pdf)
+    else if (etype === 'onClickFileItem') {
+      navigate('pdf', {url: receivedData.url});
+    } else if (etype === 'back-btn') {
       navigation.goBack();
     }
   };
 
-  query = (page = 0) => {
+  query = (page = 0, conditions = {}) => {
+    this.setState({
+      conditions,
+    });
     if (!page) currPage = 0;
     const {
       route: {
@@ -102,7 +136,12 @@ class Default extends React.Component {
       },
     } = this.props;
     api
-      .getRiskGradeControlDataList({page, ps, institution_id: identity})
+      .getRiskGradeControlDataList({
+        page,
+        ps,
+        institution_id: identity,
+        ...conditions,
+      })
       .then((res) => {
         console.log(res);
         const {errcode, errmsg, data} = res;
@@ -116,6 +155,11 @@ class Default extends React.Component {
           // 没数据
           if (!data || !data.list || !data.list.length) {
             this.error('没有任何数据');
+            this.postMessage({
+              etype: 'event',
+              event: 'loadListData',
+              args: [],
+            });
             return;
           }
 
@@ -146,17 +190,8 @@ class Default extends React.Component {
                 remarks: item.remark,
                 person: item.creater_user_name,
                 date: item.creater_time,
-                files:
-                  item.fileList instanceof Array
-                    ? item.fileList.map((_item) => {
-                        return {
-                          title: _item.name,
-                          type: _item.file_type,
-                          url: _item.url_pdf,
-                        };
-                      })
-                    : [],
-                id: item.id,
+
+                dataSource: item,
               };
             }),
           });
@@ -170,7 +205,8 @@ class Default extends React.Component {
 
   //
   getMore = () => {
-    this.query(++currPage);
+    const {conditions} = this.state;
+    this.query(++currPage, conditions);
   };
 }
 

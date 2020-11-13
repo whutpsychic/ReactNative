@@ -8,6 +8,8 @@ import "echarts/map/js/china";
 import buildChartOption from "./buildChartOption.js";
 import PickerView from "../core/components/PickerView/index";
 
+const debugging = false;
+
 class App extends React.Component {
 	state = {
 		pageLoading: false,
@@ -34,6 +36,18 @@ class App extends React.Component {
 		});
 
 		// ***************************************************
+		if (debugging) {
+			this.setState({
+				data: [{ name: "银山矿业", x: 117.592154, y: 28.963425 }],
+				selectData: [
+					{ label: "标签1", value: 1 },
+					{ label: "标签2", value: 2 },
+					{ label: "标签3", value: 3 },
+					{ label: "标签4", value: 4 },
+					{ label: "标签5", value: 5 }
+				]
+			});
+		}
 	}
 
 	render() {
@@ -51,26 +65,22 @@ class App extends React.Component {
 					</div>
 				</div>
 				<PickerView
-					ref="pickerview"
+					ref="picker"
 					data={selectData}
-					onSelect={this.onSelectPicker}
+					onConfirm={this.onSelectPicker}
 				/>
 			</React.Fragment>
 		);
 	}
 
-	select = () => {
-		this.refs.pickerview.open();
-	};
-
 	onSelectPicker = obj => {
-		util.traceBack("selectPicker", { ...obj });
+		util.traceBack("selectPicker", { result: obj });
 	};
 
 	onClickChart = x => {
 		const { name, value } = x;
 		const { data } = this.state;
-		this.select();
+		this.refs.picker.show();
 
 		let result = data.find(item => {
 			return item.name === name && item.x === value[0] && item.y === value[1];

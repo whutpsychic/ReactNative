@@ -14,6 +14,10 @@ import util from "../../../util/index";
 import calendar from "../../../img/icon-calendar.png";
 import { CloseOutlined } from "@ant-design/icons";
 
+const formatter = x => {
+	return x.format("YYYY-MM-DD");
+};
+
 const getDateStr = date => {
 	let d;
 	if (!date) d = new Date();
@@ -52,10 +56,13 @@ class DatePicker extends React.Component {
 
 	render() {
 		const { text, comValue, value, showBox } = this.state;
-		const { clearable, placeholder = "" } = this.props;
+		const { disabled, clearable, placeholder = "请选择时间" } = this.props;
 		return (
 			<React.Fragment>
-				<div className="rtmcc-rnweb-date-picker" onClick={this.onOpenBox}>
+				<div
+					className={`rtmcc-rnweb-date-picker${disabled ? " disabled" : ""}`}
+					onClick={this.onOpenBox}
+				>
 					<img alt="" src={calendar} />
 					<span>{text || placeholder}</span>
 					{clearable && value ? <CloseOutlined onClick={this.clear} /> : null}
@@ -102,6 +109,8 @@ class DatePicker extends React.Component {
 	};
 
 	onOpenBox = () => {
+		const { disabled } = this.props;
+		if (disabled) return;
 		this.setState({
 			showBox: true
 		});
@@ -142,7 +151,7 @@ class DatePicker extends React.Component {
 	};
 
 	getValue = () => {
-		if (this.state.value) return moment(this.state.value);
+		if (this.state.value) return formatter(moment(this.state.value));
 		return undefined;
 	};
 }

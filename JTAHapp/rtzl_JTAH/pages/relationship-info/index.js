@@ -4,41 +4,12 @@ import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
 import api from '../../api/index';
 import Toast from '../../components/Toast';
+import {putupData, run} from '../../core/common.js';
 
 const pageUri = 'file:///android_asset/h5/relationship-info/index.html';
 
 let currPage = 0;
 const ps = 20;
-
-const transTypeToText = (x) => {
-  switch (x) {
-    case 1:
-      return '新员工安全培训';
-    case 2:
-      return '特种作业人员';
-    case 3:
-      return '安管员/主负责人取证';
-    case 4:
-      return '安环消防专项培训';
-    case 5:
-      return '其他培训';
-    default:
-      return '未知类型';
-  }
-};
-
-const transDateToTag = (date) => {
-  let now = new Date().getTime();
-  let limit = Date.parse(date);
-
-  if (now > limit) {
-    return '已过期';
-  } else if (now >= limit - 90 * 24 * 60 * 60 * 1000) {
-    return '即将到期';
-  } else {
-    return '期限内';
-  }
-};
 
 class Default extends React.Component {
   state = {
@@ -47,16 +18,9 @@ class Default extends React.Component {
 
   componentDidMount() {}
 
-  postMessage = (obj) => {
-    this.refs.webview.postMessage(JSON.stringify(obj));
-  };
-
   error = (msg) => {
     Toast.show(msg);
-    this.postMessage({
-      etype: 'data',
-      pageLoading: false,
-    });
+    putupData(this, {pageLoading: false});
   };
 
   render() {
@@ -81,18 +45,15 @@ class Default extends React.Component {
     console.log(receivedData);
     //初始化完成之后互通消息然后放置数据
     if (etype === 'pageState' && receivedData.info === 'componentDidMount') {
-      this.postMessage({
-        etype: 'data',
+      putupData(this, {
         pageLoading: true,
       });
       this.query();
     }
     //下拉刷新
     else if (etype === 'onRefreshList') {
-      this.setState({
-        conditions: {},
-      });
-      this.query(0, {});
+      const {conditions} = this.state;
+      this.query(0, conditions);
     }
 
     // 底部加载更多
@@ -102,113 +63,108 @@ class Default extends React.Component {
 
     // 当改变查询条件的时候
     else if (etype === 'onChangeConditions') {
-      this.postMessage({
-        etype: 'data',
-        pageLoading: true,
-      });
-      const {name} = receivedData;
-      let condition = {party_name: name};
+      putupData(this, {pageLoading: true});
+      const {searchText, type, date, date2, institution} = receivedData;
+      let condition = {
+        party_name: searchText,
+      };
+
       this.query(0, condition);
     }
 
     // 点击更多
     else if (etype === 'clickItem') {
-      const {name, unit, content, person, date, remarks, id} = receivedData;
-      this.postMessage({
-        etype: 'data',
+      const {name, remarks, person, date, dataSource} = receivedData;
+      putupData(this, {
         detail: {
-          name,
-          unit,
-          content,
-          person,
-          date,
-          remarks,
-          id,
+          fieldContents: [
+            {label: '单位', content: dataSource.institution_unit},
+            {label: '相关方名称', content: dataSource.party_name},
+            {label: '主要承接内容', content: dataSource.party_duty},
+            {label: '上传人', content: dataSource.creater_user_name},
+            {label: '上传时间', content: dataSource.creater_time},
+            {label: '备注', content: dataSource.remark, multiLines: true},
+          ],
+          files:
+            dataSource.fileList instanceof Array
+              ? dataSource.fileList.map((_item) => {
+                  return {
+                    title: _item.name,
+                    type: _item.file_type,
+                    url: _item.url_pdf,
+                  };
+                })
+              : [],
         },
-        loadingDetail: false,
       });
+    }
+    // 点击浏览文件
+    else if (etype === 'onClickFileItem') {
+      const {title, url} = receivedData;
+      navigate('pdf', {url, title});
     } else if (etype === 'back-btn') {
       navigation.goBack();
     }
   };
 
-  query = (page = 0, conditions = {}, bool) => {
+  query = (page = 0, conditions = {}) => {
     if (!page) currPage = 0;
-
-    api.getRelationshipInfoList({page, ps, ...conditions}).then((res) => {
-      console.log(res);
-      const {errcode, errmsg, data} = res;
-      // 超时
-      if (errcode === 504) {
-        this.error('请求超时!');
-        return;
-      }
-      // 成功
-      else if (!errcode) {
-        // 没数据
-        if (!data || !data.list || !data.list.length) {
-          this.postMessage({
-            etype: 'event',
-            event: 'loadListData',
-            args: [],
-          });
-          this.error('没有任何数据');
+    this.setState({conditions});
+    api
+      .getRelationshipInfoList({
+        page,
+        ps,
+        ...conditions,
+      })
+      .then((res) => {
+        console.log(res);
+        const {errcode, errmsg, data} = res;
+        // 超时
+        if (errcode === 504) {
+          this.error('请求超时!');
           return;
         }
+        // 成功
+        else if (!errcode) {
+          // 没数据
+          if (!data || !data.list || !data.list.length) {
+            this.error('没有任何数据');
+            run(this, 'loadListData', []);
+            return;
+          }
 
-        if (data.list.length < ps) {
-          this.postMessage({
-            etype: 'event',
-            event: 'noMoreItem',
-          });
+          if (data.list.length < ps) {
+            run(this, 'noMoreItem');
+          }
+
+          putupData(this, {pageLoading: false});
+          run(this, 'listLoaded');
+
+          let dataArr = data.list
+            .map((item) => {
+              return {
+                remarks: item.remark,
+                name: item.party_name,
+                person: item.creater_user_name,
+                time: item.creater_time,
+                dataSource: item,
+              };
+            })
+            .reverse();
+
+          run(this, 'loadListData', dataArr);
         }
-
-        this.postMessage({
-          etype: 'data',
-          pageLoading: false,
-        });
-        this.postMessage({
-          etype: 'event',
-          event: 'listLoaded',
-        });
-
-        let dataArr = data.list.map((item) => {
-          return {
-            name: item.party_name,
-            unit: item.institution_unit,
-            content: item.party_duty,
-            person: item.creater_user_name,
-            date: item.creater_time,
-            remarks: item.remark,
-            id: item.id,
-          };
-        });
-        if (bool) {
-          this.postMessage({
-            etype: 'event',
-            event: 'setListData',
-            args: dataArr,
-          });
-          return;
+        // 错误
+        else {
+          this.error('请求出错了！');
         }
-        console.log(dataArr);
-        this.postMessage({
-          etype: 'event',
-          event: 'loadListData',
-          args: dataArr,
-        });
-      }
-      // 错误
-      else {
-        this.error('请求出错了！');
-      }
-    });
+      });
   };
 
   //
   getMore = () => {
     const {conditions} = this.state;
-    this.query(++currPage, conditions, true);
+    this.query(++currPage, conditions);
   };
 }
 

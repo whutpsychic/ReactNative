@@ -14,9 +14,9 @@ class Default extends React.Component {
 	componentDidMount() {
 		const {login, initialized} = this.props;
 
-		if (config.mode === 'develop') {
+		if (config.mode === 'preview') {
 			login(true);
-			initialized(true);
+			initialized();
 			return;
 		}
 
@@ -24,6 +24,7 @@ class Default extends React.Component {
 		let p1 = storage.getData('jtah_userName');
 		let p2 = storage.getData('jtah_psw');
 		let P = Promise.all([p1, p2]).then((resArr) => {
+			console.log(resArr)
 			// 如果有记住用户名和密码
 			if (resArr[0] && resArr[1]) {
 				api.login(resArr[0], resArr[1]).then((res) => {
@@ -33,7 +34,6 @@ class Default extends React.Component {
 						login(true);
 						initialized();
 						Toast.show('登录成功');
-						console.log('登陆成功');
 						return;
 					}
 					// 超时

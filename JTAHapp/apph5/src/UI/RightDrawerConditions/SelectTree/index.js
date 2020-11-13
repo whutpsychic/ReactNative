@@ -27,13 +27,21 @@ const spreadTreeData = data => {
 
 class Default extends React.Component {
 	static getDerivedStateFromProps(nextProps, prevState) {
+		const { defaultValue } = nextProps;
+		if (defaultValue) {
+			return {
+				text: defaultValue.text || "",
+				prevalue: defaultValue.value,
+				value: defaultValue.value
+			};
+		}
 		return {};
 	}
 
 	state = {
 		text: <span style={{ color: "#ddd" }}>请选择</span>,
-		prevalue: null,
-		value: null,
+		prevalue: [undefined],
+		value: [undefined],
 		showBox: true
 	};
 
@@ -45,14 +53,23 @@ class Default extends React.Component {
 	}
 
 	render() {
-		const { data } = this.props;
+		const { data, disabled } = this.props;
 		const { showBox } = this.state;
 		let { text, value } = this.state;
 		if (!text && data.length) text = data[0].label;
 		if (!value && data.length) value = data[0].value;
+
+		// 计算默认展开节点
+		let d = data.filter(item => {
+			return item.children && item.children.length;
+		});
+		d = d && d[0] ? d[0].key : undefined;
 		return (
 			<React.Fragment>
-				<div className="rtmcc-rnweb-select-tree" onClick={this.onOpenBox}>
+				<div
+					className={`rtmcc-rnweb-select-tree ${disabled ? "disabled" : ""}`}
+					onClick={this.onOpenBox}
+				>
 					<span>{text ? text : data[0] ? data[0].label : ""}</span>
 					<img alt="" src={arrow} />
 				</div>
@@ -69,7 +86,12 @@ class Default extends React.Component {
 						</div>
 						<div className="tree-box">
 							{showBox ? (
-								<Tree onSelect={this.onSelect} treeData={data} />
+								<Tree
+									onSelect={this.onSelect}
+									treeData={data}
+									// 默认展开的节点，
+									defaultExpandedKeys={[d]}
+								/>
 							) : null}
 							{data instanceof Array && data.length > 0 ? null : (
 								<Fragment>
@@ -91,6 +113,8 @@ class Default extends React.Component {
 	};
 
 	onOpenBox = () => {
+		const { disabled } = this.props;
+		if (disabled) return;
 		this.setState({
 			showBox: true
 		});
@@ -109,9 +133,12 @@ class Default extends React.Component {
 		let obj = spreadedData.filter(item => {
 			return item.key === value[0];
 		});
-		this.setState({
-			text: obj[0].title
-		});
+
+		if (obj && obj[0]) {
+			this.setState({
+				text: obj[0].title
+			});
+		}
 		if (typeof onChange === "function") {
 			onChange(obj);
 		}

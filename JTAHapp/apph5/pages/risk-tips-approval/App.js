@@ -37,11 +37,12 @@ const renderListItem = ({
 			}}
 		>
 			<p className="title">{obj.name}</p>
+			<span className="status">{obj.status}</span>
 			<p className="remarks">{obj.remarks}</p>
 			<div className="spliter"></div>
 			<p className="detail">
-				<span>发布人：{obj.person}</span>
-				<span>当前状态：{obj.status}</span>
+				<span>编制人：{obj.person}</span>
+				<span>编制时间：{obj.time}</span>
 			</p>
 		</div>
 	);
@@ -51,11 +52,9 @@ class App extends React.Component {
 	state = {
 		// 页面加载中
 		pageLoading: false,
-		// 本页面特有数据
-		pageData: {},
 		// ========
 		// 是否可审批
-		approvalable: false,
+		approvalable: true,
 		// 细节数据
 		detail: {},
 		// 流程数据
@@ -66,12 +65,12 @@ class App extends React.Component {
 		institutions: [],
 
 		typeData: [
-			{ label: "全部", value: 0 },
+			{ label: "全部", value: undefined },
 			{ label: "历史今天", value: 1 },
 			{ label: "风险提示", value: 2 }
 		],
 		statusData: [
-			{ label: "全部", value: 0 },
+			{ label: "全部", value: undefined },
 			{ label: "待办", value: 1 },
 			{ label: "已办", value: 2 }
 		]
@@ -161,15 +160,7 @@ class App extends React.Component {
 				label: "分类",
 				field: "type",
 				type: "select",
-				placeholder: "请选择分类",
 				data: this.state.typeData
-			},
-			{
-				label: "状态",
-				field: "status",
-				type: "select",
-				placeholder: "请选择状态",
-				data: this.state.statusData
 			},
 			{
 				label: "时间",
@@ -177,6 +168,12 @@ class App extends React.Component {
 				type: "date",
 				placeholder: "请选择时间",
 				clearable: true
+			},
+			{
+				label: "状态",
+				field: "status",
+				type: "radios",
+				data: this.state.statusData
 			}
 		];
 
@@ -200,7 +197,8 @@ class App extends React.Component {
 					data={detail}
 					extra={() => (
 						<React.Fragment>
-							<a onClick={() => this.onViewProccess(pageData)}>查看审核流程</a>
+							<a onClick={() => util.traceBack("onPreview")}>预览</a>
+							<a onClick={() => this.onViewProccess()}>查看审核流程</a>
 							{approvalable ? (
 								<React.Fragment>
 									<textarea
@@ -215,8 +213,7 @@ class App extends React.Component {
 									<Button
 										className="approval-btn agree"
 										onClick={() => {
-											util.traceBack("pass", { ...pageData, comments });
-											this.onClickMsk();
+											util.traceBack("pass", { comments });
 										}}
 									>
 										通过
@@ -224,8 +221,7 @@ class App extends React.Component {
 									<Button
 										className="approval-btn reject"
 										onClick={() => {
-											util.traceBack("reject", { ...pageData, comments });
-											this.onClickMsk();
+											util.traceBack("reject", { comments });
 										}}
 									>
 										驳回
@@ -244,7 +240,6 @@ class App extends React.Component {
 				<div className="app-contents">
 					<TopTitle title={`风险提示审批`} canBack />
 					<TopSearcher
-						placeholder="请输入名称"
 						onClickQuery={this.onQuery}
 						conditionList={conditionList}
 						noinput
@@ -263,9 +258,9 @@ class App extends React.Component {
 		);
 	}
 
-	onViewProccess = pageData => {
+	onViewProccess = () => {
 		this.refs.proccess.show();
-		util.traceBack("onViewProccess", { ...pageData });
+		util.traceBack("onViewProccess");
 
 		if (debugging) {
 			this.setState({
@@ -327,18 +322,12 @@ class App extends React.Component {
 		}
 	};
 
-	proccessLoading = () => {
-		this.refs.proccess.loading();
-	};
-
-	proccessLoaded = () => {
-		this.refs.proccess.loaded();
-	};
-
 	onQuery = conditions => {
-		console.log(conditions);
-		const { name } = this.state;
-		util.traceBack("onChangeConditions", { name, ...conditions });
+		util.traceBack("onChangeConditions", { ...conditions });
+	};
+
+	hideDetail = () => {
+		this.refs.detail.hide();
 	};
 
 	listLoading = () => {
@@ -393,6 +382,7 @@ class App extends React.Component {
 						]
 					}
 				]);
+				this.listLoaded();
 			}, 1500);
 		}
 

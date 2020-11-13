@@ -4,6 +4,7 @@ import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
 import api from '../../api/index';
 import Toast from '../../components/Toast';
+import {putupData, run} from '../../core/common.js';
 
 const pageUri = 'file:///android_asset/h5/safe-env-certificates/index.html';
 
@@ -34,17 +35,7 @@ const transDateToTag = (date) => {
   } else {
     return '期限内';
   }
-  // (Date.parse(r.card_valid) >= new Date().getTime() &&
-  //   new Date().getTime() >=
-  //     Date.parse(r.card_valid) - 90 * 24 * 60 * 60 * 1000) ||
-  // Date.parse(r.card_valid) < new Date().getTime() ||
-  // r.card_valid == null ? (
-  //   <Tag color="red">即将到期</Tag>
-  // ) : (
-  //   <Tag color="green">期限内</Tag>
-  // );
 };
-
 class Default extends React.Component {
   state = {
     conditions: {},
@@ -52,16 +43,9 @@ class Default extends React.Component {
 
   componentDidMount() {}
 
-  postMessage = (obj) => {
-    this.refs.webview.postMessage(JSON.stringify(obj));
-  };
-
   error = (msg) => {
     Toast.show(msg);
-    this.postMessage({
-      etype: 'data',
-      pageLoading: false,
-    });
+    putupData(this, {pageLoading: false});
   };
 
   render() {
@@ -86,18 +70,32 @@ class Default extends React.Component {
     console.log(receivedData);
     //初始化完成之后互通消息然后放置数据
     if (etype === 'pageState' && receivedData.info === 'componentDidMount') {
-      this.postMessage({
-        etype: 'data',
+      // 加载一次树形结构数据
+      api.getInstitutionsDepartment().then((data) => {
+        if (data) {
+          putupData(this, {
+            institutions: [{title: '全部', key: undefined}, ...data],
+          });
+        } else {
+          Toast.show('机构数据竟然查询失败了');
+        }
+      });
+
+      putupData(this, {
         pageLoading: true,
+        types: [
+          {label: '全部', value: undefined},
+          {label: '安全', value: 1},
+          {label: '环保', value: 2},
+          {label: '消防', value: 3},
+        ],
       });
       this.query();
     }
     //下拉刷新
     else if (etype === 'onRefreshList') {
-      this.setState({
-        conditions: {},
-      });
-      this.query(0, {});
+      const {conditions} = this.state;
+      this.query(0, conditions);
     }
 
     // 底部加载更多
@@ -107,138 +105,124 @@ class Default extends React.Component {
 
     // 当改变查询条件的时候
     else if (etype === 'onChangeConditions') {
-      this.postMessage({
-        etype: 'data',
-        pageLoading: true,
-      });
-      const {name, date1, date2, type} = receivedData;
+      putupData(this, {pageLoading: true});
+      const {searchText, type, date, date2} = receivedData;
       let condition = {
-        start_date: date1 ? date1.split('T')[0] : undefined,
-        end_date: date2 ? date2.split('T')[0] : undefined,
-        card_name: name,
+        card_name: searchText,
         card_type: type && type[0] ? type[0] : undefined,
+        start_date: date,
+        end_date: date2,
+        isUpload: 1,
       };
+
       this.query(0, condition);
     }
 
     // 点击更多
     else if (etype === 'clickItem') {
-      const {
-        unit,
-        code,
-        name,
-        ins,
-        type,
-        date,
-        level,
-        person,
-        tag,
-        remarks,
-        id,
-      } = receivedData;
-      this.postMessage({
-        etype: 'data',
+      const {name, remarks, person, date, dataSource} = receivedData;
+      putupData(this, {
         detail: {
-          unit,
-          code,
-          name,
-          ins,
-          type,
-          date,
-          level,
-          person,
-          tag,
-          remarks,
-          id,
+          fieldContents: [
+            {label: '单位', content: dataSource.institution_unit},
+            {
+              label: '证件编号',
+              content: dataSource.card_id,
+            },
+            {
+              label: '证件名称',
+              content: dataSource.card_name,
+            },
+            {label: '发证机关', content: dataSource.card_department},
+            {label: '证件类别', content: transTypeToText(dataSource.card_type)},
+            {label: '有效期至', content: dataSource.card_valid},
+            {label: '许可范围/等级', content: dataSource.card_grade},
+            {
+              label: '上传人',
+              content: dataSource.creater_user_name,
+            },
+            {label: '备注', content: dataSource.remark, multiLines: true},
+          ],
+          files:
+            dataSource.fileList instanceof Array
+              ? dataSource.fileList.map((_item) => {
+                  return {
+                    title: _item.name,
+                    type: _item.file_type,
+                    url: _item.url_pdf,
+                  };
+                })
+              : [],
         },
-        loadingDetail: false,
       });
+    }
+    // 点击浏览文件
+    else if (etype === 'onClickFileItem') {
+      const {title, url} = receivedData;
+      navigate('pdf', {url, title});
     } else if (etype === 'back-btn') {
       navigation.goBack();
     }
   };
 
-  query = (page = 0, conditions = {}, bool) => {
+  query = (page = 0, conditions = {}) => {
     if (!page) currPage = 0;
-
-    api.getSafeEnvCertificatesList({page, ps, ...conditions}).then((res) => {
-      console.log(res);
-      const {errcode, errmsg, data} = res;
-      // 超时
-      if (errcode === 504) {
-        this.error('请求超时!');
-        return;
-      }
-      // 成功
-      else if (!errcode) {
-        // 没数据
-        if (!data || !data.list || !data.list.length) {
-          this.postMessage({
-            etype: 'event',
-            event: 'loadListData',
-            args: [],
-          });
-          this.error('没有任何数据');
+    this.setState({conditions});
+    api
+      .getSafeEnvCertificatesList({
+        page,
+        ps,
+        ...conditions,
+      })
+      .then((res) => {
+        const {errcode, errmsg, data} = res;
+        // 超时
+        if (errcode === 504) {
+          this.error('请求超时!');
           return;
         }
+        // 成功
+        else if (!errcode) {
+          // 没数据
+          if (!data || !data.list || !data.list.length) {
+            this.error('没有任何数据');
+            run(this, 'loadListData', []);
+            return;
+          }
 
-        if (data.list.length < ps) {
-          this.postMessage({
-            etype: 'event',
-            event: 'noMoreItem',
-          });
+          if (data.list.length < ps) {
+            run(this, 'noMoreItem');
+          }
+
+          putupData(this, {pageLoading: false});
+          run(this, 'listLoaded');
+
+          let dataArr = data.list
+            .map((item) => {
+              return {
+                remarks: item.remark,
+                name: item.card_name,
+                date: item.card_valid,
+                person: item.creater_user_name,
+                status: transDateToTag(item.card_valid),
+                dataSource: item,
+              };
+            })
+            .reverse();
+
+          run(this, 'loadListData', dataArr);
         }
-
-        this.postMessage({
-          etype: 'data',
-          pageLoading: false,
-        });
-        this.postMessage({
-          etype: 'event',
-          event: 'listLoaded',
-        });
-
-        let dataArr = data.list.map((item) => {
-          return {
-            unit: item.institution_unit,
-            code: item.card_id,
-            name: item.card_name,
-            ins: item.card_department,
-            type: transTypeToText(item.card_type),
-            date: item.card_valid,
-            level: item.card_grade,
-            person: item.creater_user_name,
-            tag: transDateToTag(item.card_valid),
-            remarks: item.remark,
-            id: item.id,
-          };
-        });
-        if (bool) {
-          this.postMessage({
-            etype: 'event',
-            event: 'setListData',
-            args: dataArr,
-          });
-          return;
+        // 错误
+        else {
+          this.error('请求出错了！');
         }
-        console.log(dataArr);
-        this.postMessage({
-          etype: 'event',
-          event: 'loadListData',
-          args: dataArr,
-        });
-      }
-      // 错误
-      else {
-        this.error('请求出错了！');
-      }
-    });
+      });
   };
 
   //
   getMore = () => {
     const {conditions} = this.state;
-    this.query(++currPage, conditions, true);
+    this.query(++currPage, conditions);
   };
 }
 

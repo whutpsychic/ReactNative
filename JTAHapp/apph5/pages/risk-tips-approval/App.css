@@ -10,6 +10,11 @@
 	padding: 10px;
 	margin: 10px;
 	background-color: #fff;
+	position: relative;
+}
+
+.item-outer:first-child {
+	margin-top: 0;
 }
 
 .item-outer .title {
@@ -34,4 +39,10 @@
 }
 
 .item-outer .detail span {
+}
+
+.status {
+	position: absolute;
+	top: 8px;
+	right: 16px;
 }

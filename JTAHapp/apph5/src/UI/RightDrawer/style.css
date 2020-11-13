@@ -1,24 +1,32 @@
-.right-drawer-container {
-}
-
-.right-drawer-container {
-	display: flex;
-	justify-content: flex-end;
-	position: fixed;
-	width: 100vw;
-	height: 100vh;
-	top: 0;
-	left: 0;
-	z-index: 9;
-}
-
-.right-drawer-container .msk {
+.right-drawer-msk {
+	display: block;
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: 100%;
 	background-color: rgba(0, 0, 0, 0.3);
+	z-index: 3;
+}
+
+.right-drawer-msk.hidden {
+	display: none;
+}
+
+.right-drawer-container {
+	display: flex;
+	justify-content: flex-end;
+	position: fixed;
+	/*width: 100vw;*/
+	height: 100vh;
+	top: 0;
+	right: 0;
+	z-index: 9;
+	transition: 0.3s;
+}
+
+.right-drawer-container.hidden {
+	right: -100vw;
 }
 
 .right-drawer-container .main-container {
@@ -31,7 +39,7 @@
 	overflow: auto;
 	position: relative;
 	right: 0;
-	animation: slideIn 0.2s;
+	animation: rightDrawerSlideIn 0.2s;
 }
 
 .right-drawer-container .main-container li {
@@ -57,7 +65,7 @@
 	margin-top: 30px;
 }
 
-@keyframes slideIn {
+@keyframes rightDrawerSlideIn {
 	from {
 		right: -100%;
 	}

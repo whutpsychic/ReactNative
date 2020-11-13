@@ -52,13 +52,31 @@ const formatDuration = (milliseconds) => {
   return '0';
 };
 
+let ps = 20;
+let currPage = 0;
+
 class Default extends React.Component {
-  state = {};
+  state = {conditions: {}, currItem: {}};
 
   componentDidMount() {}
 
   postMessage = (obj) => {
     this.refs.webview.postMessage(JSON.stringify(obj));
+  };
+
+  putupData = (data) => {
+    this.postMessage({
+      etype: 'data',
+      ...data,
+    });
+  };
+
+  runEvent = (name, args) => {
+    this.postMessage({
+      etype: 'event',
+      event: name,
+      args,
+    });
   };
 
   render() {
@@ -83,100 +101,85 @@ class Default extends React.Component {
     console.log(receivedData);
     //初始化完成之后互通消息然后放置数据
     if (etype === 'pageState' && receivedData.info === 'componentDidMount') {
-      // 加载机构数据
-      api.getInstitutions().then((res) => {
-        const {errcode, errmsg, data} = res;
-        // 成功
-        if (!errcode) {
-          // 没数据
-          if (!data || !data.title) {
-            Toast.show('机构数据竟然没有任何数据！');
-          }
-
-          // 有数据
+      // 加载一次树形结构数据
+      api.getInstitutionsDepartment().then((data) => {
+        if (data) {
           this.postMessage({
             etype: 'data',
-            institutions: [data],
+            institutions: data,
           });
-        }
-        // 超时
-        else if (errcode === 504) {
-          Toast.show('机构数据请求超时！');
+        } else {
+          Toast.show('机构数据竟然查询失败了');
           return;
         }
-        // 错误
-        else {
-          Toast.show('机构数据查询失败！');
-          return;
-        }
-      });
-      // 加载类型数据
-      this.postMessage({
-        etype: 'data',
-        types: [
-          {label: '安全', value: 1},
-          {label: '环保', value: 2},
-          {label: '消防', value: 3},
-        ],
       });
 
-      this.query({flowState: 1});
+      this.postMessage({
+        etype: 'data',
+        pageLoading: true,
+      });
+
+      this.query();
     }
     //条件查询
     else if (etype === 'onChangeConditions') {
-      const {date, institution, name, status, type} = receivedData;
+      const {searchText, institutions, type, status, time} = receivedData;
       let conditions = {
-        institutionId: institution ? institution[0] : undefined,
-        newsType: typeof type === 'number' ? type : type[0],
-        newsTime: moment(date).valueOf(),
-        newsName: name,
-        flowState: status ? status + 1 : undefined,
+        institutionId: institutions ? institutions[0] : undefined,
+        newsType: typeof type === 'number' ? type : undefined,
+        newsTime: time,
+        newsName: searchText,
+        flowState: status ? status[0] : undefined,
       };
-      this.query(conditions);
+      this.query(0, conditions);
     }
     // 点击单项
     else if (etype === 'onClickItem') {
-      const {serviceId} = receivedData;
-      api.getNewsDetail(serviceId).then((res) => {
-        console.log(res);
-        const {errcode, errmsg, data} = res;
+      const {
+        dataSource,
+        dataSource: {serviceId, flowId},
+      } = receivedData;
+      this.postMessage({
+        etype: 'data',
+        approvalable: false, //默认先不允许审批
+        detail: {
+          fieldContents: [
+            {label: '发布单位', content: dataSource.institutionName},
+            {label: '标题', content: dataSource.newsName},
+            {label: '分类', content: typeToWord(dataSource.newsType)},
+            {label: '编制人', content: dataSource.createrUserName},
+            {label: '编制时间', content: dataSource.newsTime},
+            {label: '发布时间', content: dataSource.publishTime},
+            {label: '审批状态', content: dataSource.statusDes},
+          ],
+          files: dataSource.fileList
+            ? dataSource.fileList.map((item) => {
+                return {title: item.name, type: item.file_type};
+              })
+            : null,
+        },
+      });
 
+      // 本地记录当前数据条
+      this.setState({
+        currItem: {
+          serviceId,
+          flowId,
+        },
+      });
+
+      api.getNewsDetail(serviceId).then((res) => {
+        const {errcode, errmsg, data} = res;
         //超时
         if (errcode === 504) {
           Toast.show('请求超时了');
           return;
         }
-
         // 成功
         else if (!errcode && data) {
-          const {newsName, institutionName, newsType, createrUserName} = data;
-          const {newsTime, publishTime, statusDes, cover, content} = data;
-          const {fileList, nowNode, updatedNode, status} = data;
-          const {id, flowId} = data;
-          console.log(data);
-
-          this.postMessage({
-            etype: 'data',
-            detailData: {
-              serviceId: id,
-              flowId,
-              approvalable:
-                nowNode == updatedNode && status != 5 ? true : false,
-              name: newsName,
-              unit: institutionName,
-              type: typeToWord(newsType),
-              person: createrUserName,
-              orgDate: newsTime,
-              publishDate: publishTime,
-              status: statusDes,
-              img: cover && cover.length ? cover[0].url : '',
-              contents: content,
-              files: fileList
-                ? fileList.map((item) => {
-                    return {title: item.name, type: item.file_type};
-                  })
-                : null,
-            },
+          const {nowNode, updatedNode, status} = data;
+          this.putupData({
+            approvalable: nowNode == updatedNode && status != 5 ? true : false,
           });
         }
 
@@ -190,20 +193,43 @@ class Default extends React.Component {
 
     // 查看流程
     else if (etype === 'onViewProccess') {
-      const {serviceId, flowId} = receivedData;
+      const {serviceId, flowId} = this.state.currItem;
       this.queryProccess({serviceId, flowInfoId: flowId});
-    } else if (etype === 'onOverview') {
-      const {serviceId} = receivedData;
+    }
+    // 预览
+    else if (etype === 'onPreview') {
+      const {serviceId} = this.state.currItem;
       navigate('news_overview', {id: serviceId});
     }
 
     // 审核通过
     else if (etype === 'pass') {
-      const {serviceId, flowId, comments} = receivedData;
-      api.newsApprovalPass({serviceId, flowInfoId: flowId}).then((res) => {
+      const {serviceId, flowId} = this.state.currItem;
+      const {comments} = receivedData;
+      api
+        .newsApprovalPass({serviceId, flowInfoId: flowId, comments})
+        .then((res) => {
+          const {errcode, errmsg} = res;
+          if (!errcode) {
+            Toast.show('审核成功通过!');
+            this.runEvent('hideDetail');
+            this.query();
+          } else {
+            Toast.show('网络连接有问题，请稍后再试');
+            return;
+          }
+        });
+    }
+
+    // 审核驳回
+    else if (etype === 'reject') {
+      const {serviceId, flowId} = this.state.currItem;
+      api.newsApprovalReject({serviceId, flowInfoId: flowId}).then((res) => {
         const {errcode, errmsg} = res;
         if (!errcode) {
-          Toast.show('审核成功通过!');
+          Toast.show('审核成功驳回!');
+          this.runEvent('hideDetail');
+          this.query();
         } else {
           Toast.show('网络连接有问题，请稍后再试');
           return;
@@ -211,40 +237,46 @@ class Default extends React.Component {
       });
     }
 
-    // 审核驳回
-    else if (etype === 'reject') {
-      const {serviceId, flowId, comments} = receivedData;
-      api.newsApprovalReject({serviceId, flowInfoId: flowId}).then((res) => {
-        const {errcode, errmsg} = res;
-        if (!errcode) {
-          Toast.show('审核成功驳回!');
-        } else {
-          Toast.show('网络连接有问题，请稍后再试');
-          return;
-        }
-      });
+    //下拉刷新
+    else if (etype === 'onRefreshList') {
+      this.query();
     }
+
+    // 底部加载更多
+    else if (etype === 'onEndReached') {
+      this.getMore();
+    }
+
     //
     else if (etype === 'back-btn') {
       navigation.goBack();
     }
   };
 
+  endLoad = () => {
+    this.postMessage({
+      etype: 'data',
+      pageLoading: false,
+    });
+    this.postMessage({
+      etype: 'event',
+      event: 'listLoaded',
+    });
+  };
+
   // 查询主数据列表
-  query = (conditions) => {
+  query = (page = 0, conditions = {}) => {
+    if (!page) currPage = 0;
     this.postMessage({
       etype: 'data',
       pageLoading: true,
     });
-    api.getNewsApprovalList({...conditions}).then((res) => {
+    api.getNewsApprovalList({ofs: page, ps, ...conditions}).then((res) => {
       const {errcode, errmsg, data = {}} = res;
       // 超时
       if (errcode === 504) {
         Toast.show('请求超时！');
-        this.postMessage({
-          etype: 'data',
-          pageLoading: false,
-        });
+        this.endLoad();
         return;
       }
       // 成功
@@ -252,47 +284,57 @@ class Default extends React.Component {
         // 没数据
         if (!data.list || !data.list.length) {
           Toast.show('没有任何数据！');
-          this.postMessage({
-            etype: 'data',
-            pageLoading: false,
-          });
+          this.endLoad();
           return;
         }
 
         const {list} = data;
 
-        let mainData = list.map((item, i) => {
-          return {
-            id: item.id,
-            flowId: item.flowId,
-            serviceId: item.serviceId,
-            name: item.newsName,
-            unit: item.institutionName,
-            type: typeToWord(item.newsType),
-            person: item.createrUserName || '',
-            orgDate: item.newsTime,
-            publishDate: item.publishTime,
-            status: item.statusDes,
-          };
-        });
+        let mainData = list
+          .map((item, i) => {
+            return {
+              name: item.newsName,
+              person: item.createrUserName || '',
+              remarks: item.remark,
+              time: item.createrTime,
+              status: item.statusDes,
+              dataSource: item,
+            };
+          })
+          .reverse();
 
-        this.postMessage({
-          etype: 'data',
-          pageLoading: false,
-          mainData,
-        });
-        return;
+        this.endLoad();
+
+        if (mainData.length < ps) {
+          this.runEvent('noMoreItem');
+        }
+
+        if (!page) {
+          this.postMessage({
+            etype: 'event',
+            event: 'loadListData',
+            args: mainData,
+          });
+        } else {
+          this.postMessage({
+            etype: 'event',
+            event: 'setListData',
+            args: mainData,
+          });
+        }
       }
       // 失败
       else {
-        Toast.show(`请求超时！${errmsg}`);
-        this.postMessage({
-          etype: 'data',
-          pageLoading: false,
-        });
+        Toast.show(`请求失败！${errmsg}`);
+        this.endLoad();
         return;
       }
     });
+  };
+
+  getMore = () => {
+    const {conditions} = this.state;
+    this.query(++currPage, conditions);
   };
 
   // 查询流程数据
@@ -306,7 +348,6 @@ class Default extends React.Component {
       event: 'proccessLoading',
     });
     api.viewNewsApprovalProccess({serviceId, flowInfoId}).then((res) => {
-      console.log(res);
       const {errcode, errmsg, data} = res;
 
       // 超时

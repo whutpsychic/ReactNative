@@ -5,14 +5,26 @@ import mockData from './mockData.js';
 
 // main-query
 const {mainQueryData} = mockData;
-
 // =================================================
+const xcUrl = 'http://10.99.189.116';
+const xcPort = '18085';
+const gsUrl = 'http://192.168.0.127';
+const gsPort = '18085';
 
 let proxy;
-if (config.mode === 'production') {
-	proxy = 'http://192.168.0.127:18085';
-} else if (config.mode === 'develop') {
-	proxy = 'http://192.168.0.127:18085';
+// 打包产品
+const {mode, inposition} = config;
+if (mode === 'production') {
+	proxy = `${xcUrl}:${xcPort}`;
+}
+// 开发模式时
+else if (mode === 'develop') {
+	// 如果在公司
+	if (inposition) proxy = `${gsUrl}:${gsPort}`;
+	// 其他情况均视为在现场
+	else {
+		proxy = `${xcUrl}:${xcPort}`;
+	}
 }
 // 超时设置
 const loginTimeout = 2000;
@@ -22,7 +34,7 @@ const api = {};
 
 // ***************************************************
 // 简化一般请求方法
-const buildFetcher = (url, data = {}) => {
+const buildFetcher = (url, data = {}, type) => {
 	const controller = new AbortController();
 	let signal = controller.signal;
 
@@ -33,7 +45,7 @@ const buildFetcher = (url, data = {}) => {
 		}, timeout);
 	});
 
-	const fetchPromise = postData(url, data, signal)
+	const fetchPromise = postData(url, data, signal, type)
 		.then((response) => {
 			// return response;
 			return response.json();
@@ -41,6 +53,7 @@ const buildFetcher = (url, data = {}) => {
 		.catch((err) => {
 			// 超时之后的错误不予以处理
 			console.log(err);
+			return {errcode: 256, errmsg: 'failed'};
 		});
 
 	return Promise.race([fetchPromise, timeoutPromise]);
@@ -111,6 +124,173 @@ api.getInstitutionsDepartment = () => {
 		},
 	);
 };
+
+// 获取单位树形数据(一维)
+// 强制全可以选择
+api.getInstitutionRoleItems = () => {
+	return buildFetcher(commonPrefix + 'users/institutionRoleTree', {}).then(
+		(res) => {
+			console.log(res);
+			const {errcode, errmsg, data} = res;
+			// 超时
+			if (errcode === 504) {
+				Toast.show(`单位数据查询超时！`);
+				return;
+			}
+			// 默认成功
+			else if (!errcode) {
+				// 没数据
+				if (!data || !(data instanceof Array) || !data.length) {
+					Toast.show('查询单位竟没有任何数据！');
+					return;
+				}
+				// 有数据
+				else {
+					const _childs = data[0].children
+						.filter((item) => {
+							return item.sort;
+						})
+						.map((item) => {
+							item.title = item.label;
+							item.key = item.value;
+							item.children = [];
+							item.selectable = true;
+							return item;
+						});
+					data[0].children = _childs;
+					data[0].title = data[0].label;
+					data[0].key = data[0].value;
+					data[0].selectable = true;
+					return data;
+				}
+			}
+			// 失败
+			else {
+				Toast.show(`单位数据查询失败,原因：${errmsg}`);
+				return;
+			}
+		},
+	);
+};
+
+// 获取机构图片列表数据
+api.getImgUrlList = () => {
+	return buildFetcher(commonPrefix + 'institutions/imgUrlList');
+};
+
+// 查询某单位名下有多少水库
+api.getReservoirsByUnit = (condition = {}) => {
+	const {id = '390090725934497792', date = '2100-01-01'} = condition;
+	return buildFetcher(commonPrefix + 'keyAreas/recordDayList', {
+		institutionId: id,
+		date,
+	}).then((res) => {
+		const {errcode, errmsg, data} = res;
+		// 超时
+		if (errcode === 504) {
+			Toast.show(`水库数量查询超时！`);
+			return;
+		}
+		// 默认成功
+		else if (!errcode) {
+			// 没数据
+			if (
+				!data ||
+				!(data instanceof Object) ||
+				!data.list instanceof Array ||
+				!data.list.length
+			) {
+				Toast.show('查询水库竟没有任何数据！');
+				return;
+			}
+			// 有数据
+			else {
+				return data.list;
+			}
+		}
+		// 失败
+		else {
+			Toast.show(`水库数据查询失败,原因：${errmsg}`);
+			return;
+		}
+	});
+};
+
+// 查询某单位名下有多少监测点
+api.getMonitorPointByUnit = (condition = {}) => {
+	const {id = '390090725934497792', date = '2100-01-01'} = condition;
+	return buildFetcher(commonPrefix + 'rain/recordDayList', {
+		institutionId: id,
+		date,
+	}).then((res) => {
+		const {errcode, errmsg, data} = res;
+		// 超时
+		if (errcode === 504) {
+			Toast.show(`监测点查询超时！`);
+			return;
+		}
+		// 默认成功
+		else if (!errcode) {
+			// 没数据
+			if (
+				!data ||
+				!(data instanceof Object) ||
+				!data.list instanceof Array ||
+				!data.list.length
+			) {
+				Toast.show('查询监测点竟没有任何数据！');
+				return;
+			}
+			// 有数据
+			else {
+				return data.list;
+			}
+		}
+		// 失败
+		else {
+			Toast.show(`监测点查询失败,原因：${errmsg}`);
+			return;
+		}
+	});
+};
+
+// 查询某单位名下有几个废水厂
+api.getWasteWaterWorkShop = (condition = {}) => {
+	const {id = '390090725934497792', date = '2100-01-01'} = condition;
+	return buildFetcher(commonPrefix + 'waste/recordDayList', {
+		institutionId: id,
+		date,
+	}).then((res) => {
+		const {errcode, errmsg, data} = res;
+		// 超时
+		if (errcode === 504) {
+			Toast.show(`监测点查询超时！`);
+			return;
+		}
+		// 默认成功
+		else if (!errcode) {
+			// 没数据
+			if (
+				!data ||
+				!(data instanceof Object) ||
+				!data.list instanceof Array ||
+				!data.list.length
+			) {
+				Toast.show('查询监测点竟没有任何数据！');
+				return;
+			}
+			// 有数据
+			else {
+				return data.list;
+			}
+		}
+		// 失败
+		else {
+			Toast.show(`监测点查询失败,原因：${errmsg}`);
+			return;
+		}
+	});
+};
 // ==========================公用接口================================
 
 // main-home
@@ -143,13 +323,6 @@ api.getMainQueryMenuList = () => {
 	});
 };
 // =============================================================
-// risk-grade-control
-// 【风险分级管控】
-// 获取主列表数据
-api.getRiskGradeControlList = () => {
-	return buildFetcher(commonPrefix + 'institutions/imgUrlList');
-};
-
 // risk-grade-control-list
 // 【风险分级管控数据列表】
 // 获取列表数据
@@ -174,11 +347,6 @@ api.getEmergencyReservePlanList = (conditions) => {
 		...conditions,
 	});
 };
-
-// rescue-drill
-// 【救援演练与评估】
-// 获取单位列表
-api.getResecueDrillList = api.getRiskGradeControlList;
 
 // rescue-drill-list
 // 【救援演练与评估】
@@ -351,6 +519,25 @@ api.getAbnormalInfoGroupList = (conditions) => {
 	});
 };
 
+// abnormal-info-enterprise
+// 【异常信息（企业）】
+// 获取主数据列表
+api.getAbnormalInfoEnterpriseList = (conditions) => {
+	const {page, ps} = conditions;
+	return buildFetcher(commonPrefix + 'exception/list', {
+		ofs: page,
+		ps,
+		...conditions,
+	});
+};
+
+// abnormal-info-enterprise
+// 【异常信息（企业）】
+// 编辑
+api.abnormalInfoEnterpriseEdit = (conditions) => {
+	return buildFetcher(commonPrefix + 'exception/list', conditions, 'post');
+};
+
 // archives-safe
 // 【安全档案资料】
 // 获取主数据列表
@@ -429,12 +616,12 @@ api.getArchivesOthersList = (conditions) => {
 	return buildFetcher(commonPrefix + 'HseArchive/list', conditionObj);
 };
 
-// ecology-repair-info
-// 【生态修复信息】
-// 获取生态修复信息主图片列表
-api.getEcologyRepairImgs = () => {
-	return buildFetcher(commonPrefix + 'institutions/imgUrlList');
-};
+// // ecology-repair-info
+// // 【生态修复信息】
+// // 获取生态修复信息主图片列表
+// api.getEcologyRepairImgs = () => {
+// 	return buildFetcher(commonPrefix + 'institutions/imgUrlList');
+// };
 
 // ecology-repair-info
 // 【生态修复信息】
@@ -450,12 +637,12 @@ api.getSafeCalendarData = (conditions) => {
 	return buildFetcher(commonPrefix + 'AccidentAnalyse/queryByYear', conditions);
 };
 
-// fire-control-manage
-// 【消防管理】
-// 获取主列表数据
-api.getFireControlMainData = () => {
-	return buildFetcher(commonPrefix + 'institutions/imgUrlList');
-};
+// // fire-control-manage
+// // 【消防管理】
+// // 获取主列表数据
+// api.getFireControlMainData = () => {
+// 	return buildFetcher(commonPrefix + 'institutions/imgUrlList');
+// };
 
 // fire-control-data-list
 // 【消防资料查询】
@@ -472,19 +659,12 @@ api.getFireControlDataList = (conditions) => {
 // 【新闻审批】
 // 获取审批列表
 api.getNewsApprovalList = (conditions) => {
-	console.log(conditions);
-	return buildFetcher(commonPrefix + 'News/list', {
-		ofs: 0,
-		ps: 999,
+	conditions = {
 		nodeState: 2,
 		...conditions,
-	});
+	};
+	return buildFetcher(commonPrefix + 'News/list', conditions);
 };
-
-// news-approval
-// 【新闻审批】
-// 获取机构树形数据
-api.getInstitutions = api.getInstitutionsDepartment;
 
 // news-approval
 // 【新闻审批】
@@ -503,15 +683,19 @@ api.viewNewsApprovalProccess = (condtions) => {
 // news-approval
 // 【新闻审批】
 // 审核通过
-api.newsApprovalPass = (condtions) => {
-	return buildFetcher(commonPrefix + 'FlowInfoRuns/approve', condtions);
+api.newsApprovalPass = (conditions) => {
+	return buildFetcher(
+		commonPrefix + 'FlowInfoRuns/approve',
+		conditions,
+		'post',
+	);
 };
 
 // news-approval
 // 【新闻审核】
 // 驳回审核
-api.newsApprovalReject = () => {
-	return buildFetcher(commonPrefix + 'FlowInfoRuns/reject', condtions);
+api.newsApprovalReject = (conditions) => {
+	return buildFetcher(commonPrefix + 'FlowInfoRuns/reject', conditions, 'post');
 };
 
 // news-overview
@@ -531,11 +715,6 @@ api.getDangerRectificationList = () => {
 		ps: 999,
 	});
 };
-
-// danger-screening-administer
-// 【隐患排查治理】
-// 获取树形数据责任单位
-api.getTreeUnit = api.getInstitutionsDepartment;
 
 // danger-screening-administer
 // 【隐患排查治理】
@@ -632,6 +811,52 @@ api.riskTipsApprovalPass = (condtions) => {
 // 驳回审核
 api.riskTipsApprovalReject = () => {
 	return buildFetcher(commonPrefix + 'FlowInfoRuns/reject', condtions);
+};
+
+// acidic-reservoir-edit
+// 【酸性水库编辑】-新增
+api.acidicReservoirSubmitAdd = (condtions) => {
+	return buildFetcher(commonPrefix + 'keyAreas/addRecord', condtions, 'post');
+};
+
+// acidic-reservoir-edit
+// 【酸性水库编辑】-编辑
+api.acidicReservoirSubmitEdit = (condtions) => {
+	return buildFetcher(
+		commonPrefix + 'keyAreas/updateRecord',
+		condtions,
+		'post',
+	);
+};
+
+// rain-info-edit
+// 【降雨量编辑】-新增
+api.rainInfoSubmitAdd = (condtions) => {
+	return buildFetcher(commonPrefix + 'rain/addRecord', condtions, 'post');
+};
+
+// rain-info-edit
+// 【降雨量编辑】-编辑
+api.rainInfoSubmitEdit = (condtions) => {
+	return buildFetcher(commonPrefix + 'rain/updateRecord', condtions, 'post');
+};
+
+// waste-water-edit
+// 【废水厂编辑】-新增
+api.wasteWaterSubmitAdd = (condtions) => {
+	return buildFetcher(commonPrefix + 'waste/addRecord', condtions, 'post');
+};
+
+// waste-water-edit
+// 【废水厂编辑】-编辑
+api.wasteWaterSubmitEdit = (condtions) => {
+	return buildFetcher(commonPrefix + 'waste/updateRecord', condtions, 'post');
+};
+
+// abnormal-info-enterprise-edit
+// 【异常信息（企业）】-编辑
+api.abnormalInfoEnterpriseEdit = (condtions) => {
+	return buildFetcher(commonPrefix + 'exception/add', condtions, 'post');
 };
 
 export default api;

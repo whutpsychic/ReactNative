@@ -74,7 +74,7 @@ class Default extends React.Component {
   };
 
   query = () => {
-    api.getRiskGradeControlList().then((res) => {
+    api.getImgUrlList().then((res) => {
       console.log(res);
       const {errcode, errmsg, data} = res;
       // 超时

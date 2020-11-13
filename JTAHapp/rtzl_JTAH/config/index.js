@@ -4,6 +4,8 @@ const config = {};
 config.mode = 'develop';
 // config.mode = 'preview';
 
+config.inposition = false;
+
 config.bottomTabHeight = 56;
 
 config.bottomTabPaddingVertical = 4;

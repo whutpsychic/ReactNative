@@ -5,6 +5,11 @@
 	align-items: center;
 }
 
+.rtmcc-rnweb-select.disabled {
+	color: #aaa;
+	background-color: #eee;
+}
+
 .rtmcc-rnweb-select span {
 	font-size: 14px;
 }

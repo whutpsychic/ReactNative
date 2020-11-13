@@ -1,11 +1,88 @@
-后台对接
-《登录页》
+核心模板页标识
+1.一般信息列表(废) risk-grade-control
+2.一般信息列表+点击详情+附件概览(废) risk-grade-control-list
+3.一般信息列表+条件筛选+点击详情+附件概览(废) emergency-reserve-plan
+
+二代模板(废)：
+1.一般信息列表+条件筛选+点击详情+附件概览 safe-env-certificates
+
+三代模板：
+1.一般信息列表+条件筛选+点击详情+新增/修改 
+acidic-reservoir-edit
+2.一般信息列表+条件筛选+点击详情(详情有文件预览) 
+risk-grade-control-list/emergency-resrve-plan
+3.流程审批（一般信息列表+条件筛选+点击详情）
+news/accountapprove
 
 
+隐患排查 hidden/group （已做）
+风险分级管控 hidden/riskmaster(完成对接&&代码升级)
+新闻审批 news/accountapprove (完成对接&&代码升级)(搜索功能有问题)
+风险提示审批 news/riskapprove（代码升级&&未对接）无数据无法对接
+应急预案管理 contingency/master(完成对接&&代码升级)
+救援演练与评估查询  contingency/recusemaster(完成对接&&代码升级)
+事故快报 accident/account(完成对接&&代码升级)
+安全生产日历 accident/analysemaster/resources1（已做）
+事故查询 accident/analysemaster/resources2 (完成对接&&代码升级)
+------
+
+------
+安全环保证照维护 safecard/master(完成对接&&代码升级)
+教育培训 edu/master(完成对接&&代码升级)
+相关方信息检索 third/master(完成对接&&代码升级)
+危险化学用品信息 dangerous/master(完成对接&&代码升级)
+------
+生态修复信息 repair/master （已做）
+消防资料管理 firecontrol/check（已做）
+------
+法律法规 record/lawmaster(完成对接&&代码升级)
+
+安全档案资料 record/envirMaster/environmentalrecordmaster1(完成对接&&代码升级)
+环保档案资料 record/envirMaster/environmentalrecordmaster2(完成对接&&代码升级)
+职业卫生档案资料 record/envirMaster/environmentalrecordmaster3(完成对接&&代码升级)
+规章制度 record/envirMaster/environmentalrecordmaster4(代码升级)（未对接）
+其他 record/envirMaster/environmentalrecordmaster5(完成对接&&代码升级)
+
+履职报告 record/resumptionmaster（未对接）
+文件通知 record/masternotice（未对接）
+---------------------------------------------------------
+酸性水库记录维护(带录入) area/record(完成对接&&代码升级)
+降雨量记录维护(带录入) area/rainrecord(完成对接&&代码升级)
+废水处理量记录维护(带录入) area/wasterecord(完成对接&&代码升级)
+
+---------------------------------------------------------
+在线监测管理 
+	监测数据查询&历史数据 rtdata/autolist （未对接）
+	异常信息(企业)（带编辑） rtdata/accountexception(完成对接&&代码升级)
+	异常信息(集团) rtdata/masterexception（未对接）
+
+(x)生态修复信息(浏览) repair/view
+x安全环保目标统计（集团）
+x环保类报表
+x安全类报表
 
 
+首页
+登录页
+信息查询主菜单
+视频监控主菜单
+pdf 查看页
 
-
+===========================================
+主目录=>信息查询=>风险管控=>隐患排查,风险分级管控
+						   =>信息发布=>新闻审批,风险提示审批
+               =>应急管理=>应急预案管理,救援演练与评估查询
+	             =>事故管理=>事故快报,安全生产日历,事故查询
+	             =>重点区域管理=>酸性水库记录(查看),降雨量记录(查看),废水处理量记录
+	             =>证照管理=>安全环保证照维护
+	             =>培训管理=>教育培训
+	             =>相关方信息=>相关方信息检索
+	             =>危险品=>危险化学用品信息
+							 =>生态修复=>生态修复信息,生态修复信息(浏览)
+							 =>消防管理=>消防资料管理
+							 =>档案管理=>法律法规,档案管理-档案管理-所有 ,履职报告,文件通知
+							 
+主目录=>信息维护=>酸性水库记录维护(带录入),降雨量记录维护(带录入),废水处理量记录维护(带录入) 
 
 
 

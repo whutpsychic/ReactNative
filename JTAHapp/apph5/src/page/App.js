@@ -1,38 +1,17 @@
 import React from "react";
 import "./App.css";
 import util from "../util/index";
-import TopTitle from "../UI/TopTitle/index";
+// ====================================
+import TopTitle from "../components/TopTitle/index";
 import PageLoading from "../components/PageLoading/index";
+import TopSearcher from "../UI/TopSearcher/index";
+import Details from "../UI/Details/index";
+// ====================================
 import ListView from "../components/ListView/index";
-import imgs from "../img/img.js";
-import { SearchOutlined, MenuOutlined } from "@ant-design/icons";
-import { Button } from "antd-mobile";
-import DatePicker from "../components/DatePicker/index";
-import SelectTree from "../components/SelectTree/index";
-
-const {
-	fileIcon_xlsx,
-	fileIcon_pdf,
-	fileIcon_txt,
-	fileIcon_jpg,
-	fileIcon_defaulti
-} = imgs;
+import { renderImgIcon } from "../common/index";
 
 // debug模式
 const debugging = false;
-
-// 渲染分割元素
-const separator = (sectionID, rowID) => (
-	<div
-		key={`${sectionID}-${rowID}`}
-		style={{
-			backgroundColor: "#F5F5F9",
-			height: 10,
-			borderTop: "1px solid #ECECED",
-			borderBottom: "1px solid #ECECED"
-		}}
-	/>
-);
 
 // 渲染每一项
 const renderListItem = ({
@@ -48,6 +27,19 @@ const renderListItem = ({
 	}
 	const obj = data[itemIndex];
 	if (!obj) return null;
+
+	// const renderTab = tag => {
+	// 	if (tag === "期限内") {
+	// 		return <span className="tag inner">期限内</span>;
+	// 	} else if (tag === "即将到期") {
+	// 		return <span className="tag will">即将到期</span>;
+	// 	} else if (tag === "已过期") {
+	// 		return <span className="tag outer">已过期</span>;
+	// 	} else {
+	// 		return <span className="tag">未知状态</span>;
+	// 	}
+	// };
+
 	return (
 		<div
 			key={rowID}
@@ -61,177 +53,18 @@ const renderListItem = ({
 			<p className="remarks">{obj.remarks}</p>
 			<div className="spliter"></div>
 			<p className="detail">
-				<span>日期：{obj.date}</span>
+				<span>年度：{obj.year}</span>
+				<span>上传时间：{obj.time}</span>
 			</p>
 		</div>
 	);
 };
 
-class Detail extends React.Component {
-	state = {
-		show: false
-	};
-	render() {
-		const { show } = this.state;
-		const { data = {}, loading } = this.props;
-		const { name, unit, date, distance, height, remarks } = data;
-		return show ? (
-			<div className="detail-container">
-				<div className="msk" onClick={this.hide} />
-				{loading ? <PageLoading /> : null}
-				<div className="main-container">
-					<p className="detail-title">{name}</p>
-					<ul>
-						<li>
-							<label>{`上报单位`}</label>
-							<span>{unit}</span>
-						</li>
-						<li>
-							<label>{`水位/m`}</label>
-							<span>{height}</span>
-						</li>
-						<li>
-							<label>{`距溢口/m`}</label>
-							<span>{distance}</span>
-						</li>
-						<li>
-							<label>{`日期`}</label>
-							<span>{date}</span>
-						</li>
-						<li>
-							<label>{`备注`}</label>
-						</li>
-						<li className="multi-lines">
-							<p>{remarks}</p>
-						</li>
-					</ul>
-				</div>
-			</div>
-		) : null;
-	}
-
-	show = () => {
-		this.setState({
-			show: true
-		});
-	};
-
-	hide = () => {
-		this.setState({
-			show: false
-		});
-	};
-
-	renderImgIcon = item => {
-		const { type } = item;
-		switch (type) {
-			case "xlsx":
-				return <img alt={""} src={fileIcon_xlsx} className={"icon"} />;
-			case "pdf":
-				return <img alt={""} src={fileIcon_pdf} className={"icon"} />;
-			case "txt":
-				return <img alt={""} src={fileIcon_txt} className={"icon"} />;
-			case "png":
-				return <img alt={""} src={fileIcon_defaulti} className={"icon"} />;
-			case "jpg":
-				return <img alt={""} src={fileIcon_jpg} className={"icon"} />;
-			case "jpeg":
-				return <img alt={""} src={fileIcon_defaulti} className={"icon"} />;
-			default:
-				return <img alt={""} src={fileIcon_defaulti} className={"icon"} />;
-		}
-	};
-}
-
-// 筛选抽屉
-class Drawer extends React.Component {
-	state = {
-		showDrawer: false,
-		status: 0
-	};
-
-	render() {
-		const { showDrawer } = this.state;
-		const { institutions } = this.props;
-		return showDrawer ? (
-			<div className="right-drawer-container">
-				<div className="msk" onClick={this.onClickMsk} />
-				<div className="main-container">
-					<ul>
-						<li>
-							<label>机构名称</label>
-							<SelectTree ref="ins" data={institutions} />
-						</li>
-						<li>
-							<label>开始日期</label>
-							<DatePicker ref="date1" placeholder="请选择开始日期" clearable />
-						</li>
-						<li>
-							<label>结束日期</label>
-							<DatePicker ref="date2" placeholder="请选择结束日期" clearable />
-						</li>
-					</ul>
-					<div className="drawer-btns">
-						<Button type="primary" size="small" onClick={this.onConfirm}>
-							确定
-						</Button>
-						<Button type="primary" size="small" onClick={this.hide}>
-							取消
-						</Button>
-					</div>
-				</div>
-			</div>
-		) : null;
-	}
-
-	getConditions = () => {
-		let institution = this.refs.ins.getValue();
-		let date1 = this.refs.date1.getValue();
-		let date2 = this.refs.date2.getValue();
-
-		return { institution, date1, date2 };
-	};
-
-	onConfirm = () => {
-		let conditions = this.getConditions();
-		const { onChange } = this.props;
-		if (typeof onChange === "function") onChange(conditions);
-		this.hide();
-	};
-
-	hide = () => {
-		this.setState({
-			showDrawer: false
-		});
-	};
-
-	onChangeRadio = e => {
-		const { value } = e.target;
-		this.setState({
-			status: value
-		});
-	};
-
-	onClickMsk = () => {
-		this.setState({
-			showDrawer: false
-		});
-	};
-
-	show = () => {
-		this.setState({
-			showDrawer: true
-		});
-	};
-}
-
 class App extends React.Component {
 	state = {
 		pageLoading: false,
 		detail: {},
-		loadingDetail: false,
-		name: "",
-		conditions: {},
+		// types: [],
 		institutions: []
 	};
 
@@ -255,6 +88,230 @@ class App extends React.Component {
 
 		// ***************************************************
 		if (debugging) {
+			this.setState({
+				institutions: [
+					{
+						value: "390090725934497792",
+						label: "江西铜业集团有限公司",
+						parentId: "0",
+						sort: 0,
+						level: 1,
+						children: [
+							{
+								value: "436932209262198784",
+								label: "德兴铜矿",
+								parentId: "390090725934497792",
+								sort: 1,
+								level: 2,
+								children: [],
+								title: "德兴铜矿",
+								key: "436932209262198784"
+							},
+							{
+								value: "436933485161086976",
+								label: "城门山铜矿",
+								parentId: "390090725934497792",
+								sort: 2,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "城门山铜矿",
+								key: "436933485161086976"
+							},
+							{
+								value: "436934554456948736",
+								label: "永平铜矿",
+								parentId: "390090725934497792",
+								sort: 3,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "永平铜矿",
+								key: "436934554456948736"
+							},
+							{
+								value: "436935221909127168",
+								label: "武山铜矿",
+								parentId: "390090725934497792",
+								sort: 4,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "武山铜矿",
+								key: "436935221909127168"
+							},
+							{
+								value: "436935493695832064",
+								label: "银山矿业",
+								parentId: "390090725934497792",
+								sort: 5,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "银山矿业",
+								key: "436935493695832064"
+							},
+							{
+								value: "436936484168138752",
+								label: "东同矿业",
+								parentId: "390090725934497792",
+								sort: 6,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "东同矿业",
+								key: "436936484168138752"
+							},
+							{
+								value: "436936900947738624",
+								label: "四川稀土",
+								parentId: "390090725934497792",
+								sort: 7,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "四川稀土",
+								key: "436936900947738624"
+							},
+							{
+								value: "436937049254133760",
+								label: "七宝山矿业",
+								parentId: "390090725934497792",
+								sort: 8,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "七宝山矿业",
+								key: "436937049254133760"
+							},
+							{
+								value: "436937866908532736",
+								label: "贵溪冶炼厂",
+								parentId: "390090725934497792",
+								sort: 9,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "贵溪冶炼厂",
+								key: "436937866908532736"
+							},
+							{
+								value: "436942583181082624",
+								label: "铅锌公司",
+								parentId: "390090725934497792",
+								sort: 10,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "铅锌公司",
+								key: "436942583181082624"
+							},
+							{
+								value: "436942983275741184",
+								label: "金德铅业",
+								parentId: "390090725934497792",
+								sort: 11,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "金德铅业",
+								key: "436942983275741184"
+							},
+							{
+								value: "436943904206487552",
+								label: "江铜清远",
+								parentId: "390090725934497792",
+								sort: 12,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "江铜清远",
+								key: "436943904206487552"
+							},
+							{
+								value: "436948078520434688",
+								label: "铜加工事业部",
+								parentId: "390090725934497792",
+								sort: 13,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "铜加工事业部",
+								key: "436948078520434688"
+							},
+							{
+								value: "436944350979555328",
+								label: "铜板带公司",
+								parentId: "390090725934497792",
+								sort: 14,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "铜板带公司",
+								key: "436944350979555328"
+							},
+							{
+								value: "436944640503971840",
+								label: "铜箔公司",
+								parentId: "390090725934497792",
+								sort: 15,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "铜箔公司",
+								key: "436944640503971840"
+							},
+							{
+								value: "436945762669035520",
+								label: "铜材公司",
+								parentId: "390090725934497792",
+								sort: 16,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "铜材公司",
+								key: "436945762669035520"
+							},
+							{
+								value: "462948831454035968",
+								label: "广州铜材",
+								parentId: "390090725934497792",
+								sort: 17,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "广州铜材",
+								key: "462948831454035968"
+							},
+							{
+								value: "481028643292708864",
+								label: "江铜物流",
+								parentId: "390090725934497792",
+								sort: 18,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "江铜物流",
+								key: "481028643292708864"
+							},
+							{
+								value: "481029125448925184",
+								label: "南方公司",
+								parentId: "390090725934497792",
+								sort: 19,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "南方公司",
+								key: "481029125448925184"
+							}
+						],
+						selectable: false,
+						title: "江西铜业集团有限公司",
+						key: "390090725934497792"
+					}
+				]
+			});
 			this.loadListData([
 				{
 					name: "文件名test0",
@@ -262,154 +319,41 @@ class App extends React.Component {
 					person: "admin",
 					date: "2020-06-07",
 					remarks:
-						"djslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkj",
-					files: [
-						{
-							id: 1,
-							name: "f1",
-							type: "xlsx",
-							url: "xxxxxx1"
-						},
-						{
-							id: 2,
-							name: "f2",
-							type: "pdf",
-							url: "xxxxxx2"
-						},
-						{
-							id: 3,
-							name: "f3",
-							type: "txt",
-							url: "xxxxxx3"
-						}
-					]
-				},
-				{
-					name: "文件名test1",
-					unit: "德兴铜矿",
-					person: "admin",
-					date: "2020-06-07",
-					remarks:
-						"djslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkj",
-					files: [
-						{
-							id: 1,
-							name: "f1",
-							type: "xlsx",
-							url: "xxxxxx1"
-						},
-						{
-							id: 2,
-							name: "f2",
-							type: "pdf",
-							url: "xxxxxx2"
-						},
-						{
-							id: 3,
-							name: "f3",
-							type: "txt",
-							url: "xxxxxx3"
-						}
-					]
+						"djslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkj"
 				}
 			]);
-
-			setTimeout(() => {
-				console.log(233);
-				// this.loadListData([])
-
-				this.loadListData([
-					{
-						name: "文件名test2",
-						unit: "德兴铜矿",
-						person: "admin",
-						date: "2020-06-07",
-						remarks:
-							"djslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkj",
-						files: [
-							{
-								id: 1,
-								name: "f1",
-								type: "xlsx",
-								url: "xxxxxx1"
-							},
-							{
-								id: 2,
-								name: "f2",
-								type: "pdf",
-								url: "xxxxxx2"
-							},
-							{
-								id: 3,
-								name: "f3",
-								type: "txt",
-								url: "xxxxxx3"
-							}
-						]
-					},
-					{
-						name: "文件名test3",
-						unit: "德兴铜矿",
-						person: "admin",
-						date: "2020-06-07",
-						remarks:
-							"djslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkj",
-						files: [
-							{
-								id: 1,
-								name: "f1",
-								type: "xlsx",
-								url: "xxxxxx1"
-							},
-							{
-								id: 2,
-								name: "f2",
-								type: "pdf",
-								url: "xxxxxx2"
-							},
-							{
-								id: 3,
-								name: "f3",
-								type: "txt",
-								url: "xxxxxx3"
-							}
-						]
-					}
-				]);
-			}, 1000);
 		}
 	}
 
 	render() {
-		const { pageLoading, detail, loadingDetail, institutions } = this.state;
+		const { pageLoading, detail } = this.state;
+
+		const conditionList = [
+			{
+				label: "单位",
+				field: "institution",
+				type: "selecttree",
+				data: this.state.institutions
+			},
+			{
+				label: "分类",
+				field: "year",
+				type: "year",
+				clearable: true
+			}
+		];
+
 		return (
 			<div className="app-container">
 				<div className="app-contents">
-					{<Detail ref="detail" data={detail} loading={loadingDetail} />}
+					<Details ref="detail" title="详情" data={detail} />
 					{pageLoading ? <PageLoading /> : null}
-					{
-						<Drawer
-							ref="drawer"
-							onChange={this.onPressConfirmButton}
-							institutions={institutions}
-						/>
-					}
-					<TopTitle
-						title={`酸性水库信息`}
-						canBack
-						add
-						onAdd={this.onClickAdd}
+					<TopTitle title={`履职报告`} canBack />
+					<TopSearcher
+						placeholder="报告名称"
+						onClickQuery={this.onQuery}
+						conditionList={conditionList}
 					/>
-					<div className="top-searcher">
-						<div className="main-input">
-							<input onChange={this.onChangeText} placeholder="查询名称" />
-							<SearchOutlined onClick={this.onQuery} />
-						</div>
-						<div className="right-screen" onClick={this.onOpenDrawer}>
-							<span>筛选</span>
-							<MenuOutlined />
-						</div>
-					</div>
 					<ListView
 						ref="lv"
 						height={document.documentElement.clientHeight}
@@ -424,49 +368,53 @@ class App extends React.Component {
 		);
 	}
 
-	onClickAdd = () => {
-		util.traceBack("onAdd");
-	};
-
-	onQuery = () => {
-		const { name, conditions } = this.state;
-		util.traceBack("onChangeConditions", { name, ...conditions });
-	};
-
-	onPressConfirmButton = conditions => {
-		const { name } = this.state;
-		this.setState({
-			conditions
-		});
-		util.traceBack("onChangeConditions", { name, ...conditions });
-	};
-
-	onChangeText = e => {
-		const { value } = e.target;
-		this.setState({ name: value });
-	};
-
-	onOpenDrawer = () => {
-		this.refs.drawer.show();
+	onQuery = condition => {
+		util.traceBack("onChangeConditions", condition);
 	};
 
 	onClickItem = x => {
 		this.refs.detail.show();
-		this.setState({
-			loadingDetail: true
-		});
 		if (debugging) {
 			setTimeout(() => {
-				this.setState(
-					{
-						detail: x
-					},
-					() => {
-						this.setState({
-							loadingDetail: false
-						});
+				this.setState({
+					detail: {
+						fieldContents: [
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{
+								label: "名称",
+								content: "抗洪抢险，江铜在行动 4",
+								multiLines: true
+							},
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" }
+						],
+						files: [
+							{
+								id: 1,
+								title: "f1",
+								type: "xlsx",
+								url: "xxxxxx1"
+							},
+							{
+								id: 2,
+								title: "f2",
+								type: "pdf",
+								url: "xxxxxx2"
+							},
+							{
+								id: 3,
+								title: "f3",
+								type: "txt",
+								url: "xxxxxx3"
+							}
+						]
 					}
-				);
+				});
 			}, 1000);
 		}
 	};
@@ -497,7 +445,7 @@ class App extends React.Component {
 			setTimeout(() => {
 				this.loadListData([
 					{
-						title: "文件名test01111111111111",
+						name: "文件名test01111111111111",
 						person: "admin",
 						date: "2020-06-07",
 						remarks: "djslkahljashlgjkhasfkj",
@@ -523,9 +471,7 @@ class App extends React.Component {
 						]
 					}
 				]);
-				this.setState({
-					loadingDetail: false
-				});
+				this.listLoaded();
 			}, 1500);
 		}
 
@@ -537,7 +483,7 @@ class App extends React.Component {
 			setTimeout(() => {
 				this.setListData([
 					{
-						title: "文件名test02222222222222",
+						name: "文件名test02222222222222",
 						person: "admin",
 						date: "2020-06-07",
 						remarks: "djslkahljashlgjkhasfkj",
@@ -563,9 +509,6 @@ class App extends React.Component {
 						]
 					}
 				]);
-				this.setState({
-					loadingDetail: false
-				});
 			}, 1500);
 		}
 		util.traceBack("onEndReached", { ps });

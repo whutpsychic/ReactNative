@@ -14,6 +14,10 @@ import util from "../../../util/index";
 import calendar from "../../../img/icon-calendar.png";
 import { CloseOutlined } from "@ant-design/icons";
 
+const formatter = x => {
+	return x.format("YYYY");
+};
+
 const getYearStr = date => {
 	let d;
 	if (!date) d = new Date();
@@ -140,7 +144,7 @@ class YearPicker extends React.Component {
 	};
 
 	getValue = () => {
-		if (this.state.value) return moment(this.state.value);
+		if (this.state.value) return formatter(moment(this.state.value));
 		return undefined;
 	};
 }

@@ -10,49 +10,6 @@ const pageUri = 'file:///android_asset/h5/acidic-reservoir-info/index.html';
 let currPage = 0;
 const ps = 20;
 
-const buildListItems = ({values = [], dataSourceArr = []}) => {
-  return [
-    {
-      label: '单位名称',
-      type: 'tree-select',
-      disabled: true,
-      data: dataSourceArr[0] || [],
-      defaultValue: values[0] || {text: '江西铜业有限公司', value: 1},
-    },
-    {
-      label: '日期',
-      type: 'date',
-    },
-    {
-      label: '水库名称',
-      type: 'select',
-      disabled: true,
-      data: [],
-      defaultValue: values[1] || {text: '风格五', value: 1},
-    },
-    {
-      label: '水库水位/m',
-      type: 'number',
-    },
-    {
-      label: '水库名称',
-      type: 'select',
-      disabled: true,
-      data: [],
-      defaultValue: values[1] || {text: '水库3', value: 1},
-    },
-    {
-      label: '水库水位/m',
-      type: 'number',
-    },
-    {
-      label: '备注',
-      type: 'text-area',
-      defaultValue: '',
-    },
-  ];
-};
-
 class Default extends React.Component {
   state = {
     conditions: {},
@@ -60,7 +17,11 @@ class Default extends React.Component {
     institutions: [],
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.props.navigation.addListener('focus', () => {
+      this.query();
+    });
+  }
 
   postMessage = (obj) => {
     this.refs.webview.postMessage(JSON.stringify(obj));
@@ -98,12 +59,14 @@ class Default extends React.Component {
     if (etype === 'pageState' && receivedData.info === 'componentDidMount') {
       // 加载一次树形结构数据
       api.getInstitutionsDepartment().then((data) => {
-        console.log(data);
         if (data) {
           this.postMessage({
             etype: 'data',
             institutions: data,
           });
+        } else {
+          Toast.show('机构数据竟然查询失败了');
+          return;
         }
       });
 
@@ -129,12 +92,12 @@ class Default extends React.Component {
         etype: 'data',
         pageLoading: true,
       });
-      const {name, date1, date2, institution} = receivedData;
+      const {searchText, startTime, endTime, institutions} = receivedData;
       let condition = {
-        beginTime: date1 ? date1.split('T')[0] : undefined,
-        overTime: date2 ? date2.split('T')[0] : undefined,
-        reservoirName: name,
-        institutionId: institution ? institution[0] : undefined,
+        beginTime: startTime,
+        overTime: endTime,
+        reservoirName: searchText,
+        institutionId: institutions ? institutions[0] : undefined,
       };
       console.log(condition);
       this.query(0, condition);
@@ -146,24 +109,27 @@ class Default extends React.Component {
       this.postMessage({
         etype: 'data',
         detail: {
-          name,
-          unit,
-          height,
-          distance,
-          remarks,
-          date,
+          fieldContents: [
+            {label: '水库名称', content: name},
+            {label: '上报单位', content: unit},
+            {label: '距溢流口高度', content: height},
+            {label: '水库水位/m', content: distance},
+            {label: '备注', content: remarks},
+            {label: '日期', content: date},
+          ],
         },
-        loadingDetail: false,
       });
     } else if (etype === 'onAdd') {
-      // 加载一次树形结构数据
-      api.getInstitutionsDepartment().then((data) => {
-        console.log(data);
-        if (data) {
-        }
+      navigate('acidic_reservoir_edit', {
+        title: '酸性水库记录-新增',
+        type: 'add',
       });
-      let ListItems = buildListItems({values: [], dataSourceArr: []});
-      navigate('common_list_edit', {title: '酸性水库记录-新增', ListItems});
+    } else if (etype === 'edit') {
+      navigate('acidic_reservoir_edit', {
+        title: '酸性水库记录-编辑',
+        type: 'edit',
+        dataSource: receivedData.dataSource,
+      });
     } else if (etype === 'back-btn') {
       navigation.goBack();
     }
@@ -173,7 +139,6 @@ class Default extends React.Component {
     if (!page) currPage = 0;
 
     api.getAcidicReservoirInfoList({page, ps, ...conditions}).then((res) => {
-      console.log(res);
       const {errcode, errmsg, data} = res;
       // 超时
       if (errcode === 504) {
@@ -212,23 +177,30 @@ class Default extends React.Component {
           event: 'listLoaded',
         });
 
-        let dataArr = data.list.map((item) => {
-          return {
-            name: item.reservoirName,
-            unit: item.institutionName,
-            height: item.valueB,
-            distance: item.valueA,
-            remarks: item.remark,
-            date: item.date,
-            id: item.id,
-          };
-        });
-        console.log(dataArr);
-        this.postMessage({
-          etype: 'event',
-          event: 'loadListData',
-          args: dataArr,
-        });
+        let dataArr = data.list
+          .map((item) => {
+            return {
+              name: item.reservoirName,
+              unit: item.institutionName,
+              remarks: item.remark,
+              date: item.date,
+              dataSource: item,
+            };
+          })
+          .reverse();
+        if (!page) {
+          this.postMessage({
+            etype: 'event',
+            event: 'loadListData',
+            args: dataArr,
+          });
+        } else {
+          this.postMessage({
+            etype: 'event',
+            event: 'setListData',
+            args: dataArr,
+          });
+        }
       }
       // 错误
       else {

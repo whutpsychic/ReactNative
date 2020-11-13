@@ -16,7 +16,8 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
-    "react-tmap": "^1.0.1"
+    "react-tmap": "^1.0.1",
+    "video.js": "^7.10.2"
   },
   "scripts": {
     "start": "set port=3003 && react-app-rewired start",

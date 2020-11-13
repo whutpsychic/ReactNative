@@ -4,18 +4,22 @@ import { Radio } from "antd";
 import "antd/es/radio/style/index.css";
 
 export default class extends React.Component {
-	state = {
-		active: 0
-	};
+	state = {};
+
+	componentDidMount() {}
 
 	render() {
-		const { active } = this.state;
-		const { data = [] } = this.props;
-
+		const { data = [], defaultValue } = this.props;
+		const loadDefaultValue = () => {
+			if (defaultValue) return defaultValue;
+			else {
+				return data[0] ? data[0].value : undefined;
+			}
+		};
 		return (
 			<div className="rtmcc-rnweb-radios">
 				<Radio.Group
-					defaultValue={data[0] ? data[0].value : undefined}
+					defaultValue={loadDefaultValue()}
 					options={data}
 					onChange={this.onChangeRadio}
 					optionType="button"
@@ -33,8 +37,7 @@ export default class extends React.Component {
 	};
 
 	getValue = () => {
-		const { active } = this.state;
-		const { data } = this.props;
-		return data[active].value;
+		const { value } = this.state;
+		return value;
 	};
 }

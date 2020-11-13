@@ -8,9 +8,6 @@ import moment from 'moment';
 
 const pageUri = 'file:///android_asset/h5/risk-tips-approval/index.html';
 
-let currPage = 0;
-const ps = 20;
-
 // 根据类型渲染文字
 const typeToWord = (x) => {
   switch (x) {
@@ -20,23 +17,6 @@ const typeToWord = (x) => {
       return '风险提示';
     default:
       return '未知类型';
-  }
-};
-
-const statusToWord = (x) => {
-  switch (x) {
-    case 1:
-      return '待编制';
-    case 2:
-      return '待审批';
-    case 3:
-      return '待发布';
-    case 4:
-      return '被撤回';
-    case 5:
-      return '已发布';
-    default:
-      return '未知状态';
   }
 };
 
@@ -70,10 +50,11 @@ const formatDuration = (milliseconds) => {
   return '0';
 };
 
+let ps = 20;
+let currPage = 0;
+
 class Default extends React.Component {
-  state = {
-    conditions: {},
-  };
+  state = {conditions: {}, currItem: {}};
 
   componentDidMount() {}
 
@@ -81,17 +62,19 @@ class Default extends React.Component {
     this.refs.webview.postMessage(JSON.stringify(obj));
   };
 
-  error = (text) => {
-    Toast.show(text);
+  putupData = (data) => {
     this.postMessage({
       etype: 'data',
-      pageLoading: false,
+      ...data,
     });
+  };
+
+  runEvent = (name, args) => {
     this.postMessage({
       etype: 'event',
-      event: 'listLoaded',
+      event: name,
+      args,
     });
-    return;
   };
 
   render() {
@@ -116,31 +99,15 @@ class Default extends React.Component {
     console.log(receivedData);
     //初始化完成之后互通消息然后放置数据
     if (etype === 'pageState' && receivedData.info === 'componentDidMount') {
-      // 加载机构数据
-      api.getInstitutions().then((res) => {
-        const {errcode, errmsg, data} = res;
-        // 成功
-        if (!errcode) {
-          // 没数据
-          if (!data || !data.title) {
-            Toast.show('机构数据竟然没有任何数据！');
-            return;
-          }
-
-          // 有数据
+      // 加载一次树形结构数据
+      api.getInstitutionsDepartment().then((data) => {
+        if (data) {
           this.postMessage({
             etype: 'data',
-            institutions: [data],
+            institutions: data,
           });
-        }
-        // 超时
-        else if (errcode === 504) {
-          Toast.show('机构数据请求超时！');
-          return;
-        }
-        // 错误
-        else {
-          Toast.show('机构数据查询失败！');
+        } else {
+          Toast.show('机构数据竟然查询失败了');
           return;
         }
       });
@@ -154,86 +121,98 @@ class Default extends React.Component {
     }
     //条件查询
     else if (etype === 'onChangeConditions') {
-      this.postMessage({
-        etype: 'data',
-        pageLoading: true,
-      });
-      const {date, institution, name, status, type} = receivedData;
-
+      const {searchText, institutions, type, status, time} = receivedData;
       let conditions = {
-        institutionId: institution ? institution[0] : undefined,
-        newsType: typeof type === 'number' ? type : type[0],
-        newsTime: moment(date).valueOf(),
-        newsName: name,
-        flowState: status ? status + 1 : undefined,
+        institutionId: institutions ? institutions[0] : undefined,
+        newsType: typeof type === 'number' ? type : undefined,
+        newsTime: time,
+        newsName: searchText,
+        flowState: status ? status[0] : undefined,
       };
       this.query(0, conditions);
     }
-
-    //下拉刷新
-    else if (etype === 'onRefreshList') {
-      this.setState({
-        conditions: {},
-      });
-      this.query(0, {});
-    }
-
-    // 底部加载更多
-    else if (etype === 'onEndReached') {
-      this.getMore();
-    }
-
     // 点击单项
     else if (etype === 'onClickItem') {
-      const {serviceId, name, type, person, status, remarks} = receivedData;
+      const {
+        dataSource,
+        dataSource: {serviceId, flowId},
+      } = receivedData;
+
       this.postMessage({
         etype: 'data',
+        approvalable: false, //默认先不允许审批
         detail: {
           fieldContents: [
-            {label: '单位名称', content: name},
-            {label: '分类', content: type},
-            {label: '发布人', content: person},
-            {label: '当前状态', content: status},
-            {
-              label: '提示内容',
-              multiLines: true,
-              content: remarks,
-            },
+            {label: '发布单位', content: dataSource.institutionName},
+            {label: '标题', content: dataSource.newsName},
+            {label: '分类', content: typeToWord(dataSource.newsType)},
+            {label: '编制人', content: dataSource.createrUserName},
+            {label: '编制时间', content: dataSource.newsTime},
+            {label: '发布时间', content: dataSource.publishTime},
+            {label: '审批状态', content: dataSource.statusDes},
           ],
-          files: [],
+          files: dataSource.fileList
+            ? dataSource.fileList.map((item) => {
+                return {title: item.name, type: item.file_type};
+              })
+            : null,
         },
       });
-    }
 
-    // 查看流程
-    else if (etype === 'onViewProccess') {
-      const {serviceId, flowId} = receivedData;
-      this.queryProccess({serviceId, flowInfoId: flowId});
-    }
+      // 本地记录当前数据条
+      this.setState({
+        currItem: {
+          serviceId,
+          flowId,
+        },
+      });
 
-    // 审核通过
-    else if (etype === 'pass') {
-      const {serviceId, flowId, comments} = receivedData;
-      api.riskTipsApprovalPass({serviceId, flowInfoId: flowId}).then((res) => {
-        const {errcode, errmsg} = res;
-        if (!errcode) {
-          Toast.show('审核成功通过!');
-        } else {
-          Toast.show('网络连接有问题，请稍后再试');
+      api.getNewsDetail(serviceId).then((res) => {
+        const {errcode, errmsg, data} = res;
+        //超时
+        if (errcode === 504) {
+          Toast.show('请求超时了');
+          return;
+        }
+        // 成功
+        else if (!errcode && data) {
+          const {nowNode, updatedNode, status} = data;
+          this.putupData({
+            approvalable: nowNode == updatedNode && status != 5 ? true : false,
+          });
+        }
+
+        // 失败
+        else {
+          Toast.show(`请求失败了：${errmsg}`);
           return;
         }
       });
     }
 
-    // 审核驳回
-    else if (etype === 'reject') {
-      const {serviceId, flowId, comments} = receivedData;
+    // 查看流程
+    else if (etype === 'onViewProccess') {
+      const {serviceId, flowId} = this.state.currItem;
+      this.queryProccess({serviceId, flowInfoId: flowId});
+    }
+    // 预览
+    else if (etype === 'onPreview') {
+      const {serviceId} = this.state.currItem;
+      navigate('news_overview', {id: serviceId});
+    }
+
+    // 审核通过
+    else if (etype === 'pass') {
+      const {serviceId, flowId} = this.state.currItem;
+      const {comments} = receivedData;
       api
-        .riskTipsApprovalReject({serviceId, flowInfoId: flowId})
+        .riskTipsApprovalPass({serviceId, flowInfoId: flowId, comments})
         .then((res) => {
           const {errcode, errmsg} = res;
           if (!errcode) {
-            Toast.show('审核成功驳回!');
+            Toast.show('审核成功通过!');
+            this.runEvent('hideDetail');
+            this.query();
           } else {
             Toast.show('网络连接有问题，请稍后再试');
             return;
@@ -241,10 +220,120 @@ class Default extends React.Component {
         });
     }
 
+    // 审核驳回
+    else if (etype === 'reject') {
+      const {serviceId, flowId} = this.state.currItem;
+      api.riskTipsApprovalReject({serviceId, flowInfoId: flowId}).then((res) => {
+        const {errcode, errmsg} = res;
+        if (!errcode) {
+          Toast.show('审核成功驳回!');
+          this.runEvent('hideDetail');
+          this.query();
+        } else {
+          Toast.show('网络连接有问题，请稍后再试');
+          return;
+        }
+      });
+    }
+
+    //下拉刷新
+    else if (etype === 'onRefreshList') {
+      this.query();
+    }
+
+    // 底部加载更多
+    else if (etype === 'onEndReached') {
+      this.getMore();
+    }
+
     //
     else if (etype === 'back-btn') {
       navigation.goBack();
     }
+  };
+
+  endLoad = () => {
+    this.postMessage({
+      etype: 'data',
+      pageLoading: false,
+    });
+    this.postMessage({
+      etype: 'event',
+      event: 'listLoaded',
+    });
+  };
+
+  // 查询主数据列表
+  query = (page = 0, conditions = {}) => {
+    if (!page) currPage = 0;
+    this.postMessage({
+      etype: 'data',
+      pageLoading: true,
+    });
+    api.getRiskTipsApproval({ofs: page, ps, ...conditions}).then((res) => {
+      const {errcode, errmsg, data = {}} = res;
+      // 超时
+      if (errcode === 504) {
+        Toast.show('请求超时！');
+        this.endLoad();
+        return;
+      }
+      // 成功
+      else if (!errcode) {
+        // 没数据
+        if (!data.list || !data.list.length) {
+          Toast.show('没有任何数据！');
+          this.endLoad();
+          return;
+        }
+
+        const {list} = data;
+
+        let mainData = list
+          .map((item, i) => {
+            return {
+              name: item.newsName,
+              person: item.createrUserName || '',
+              remarks: item.remark,
+              time: item.createrTime,
+              status: item.statusDes,
+              dataSource: item,
+            };
+          })
+          .reverse();
+
+        this.endLoad();
+
+        if (mainData.length < ps) {
+          this.runEvent('noMoreItem');
+        }
+
+        if (!page) {
+          this.postMessage({
+            etype: 'event',
+            event: 'loadListData',
+            args: mainData,
+          });
+        } else {
+          this.postMessage({
+            etype: 'event',
+            event: 'setListData',
+            args: mainData,
+          });
+        }
+      }
+      // 失败
+      else {
+        Toast.show(`请求失败！${errmsg}`);
+        this.endLoad();
+        return;
+      }
+    });
+  };
+
+  getMore = () => {
+    const {conditions} = this.state;
+    this.query(++currPage, conditions);
   };
 
   // 查询流程数据
@@ -258,7 +347,6 @@ class Default extends React.Component {
       event: 'proccessLoading',
     });
     api.viewRiskTipsApprovalProccess({serviceId, flowInfoId}).then((res) => {
-      console.log(res);
       const {errcode, errmsg, data} = res;
 
       // 超时
@@ -302,84 +390,6 @@ class Default extends React.Component {
         Toast.show('流程数据请求失败!');
       }
     });
-  };
-
-  query = (page = 0, conditions = {}, bool) => {
-    if (!page) currPage = 0;
-    api.getRiskTipsApproval({page, ps, ...conditions}).then((res) => {
-      console.log(res);
-      const {errcode, errmsg, data} = res;
-      // 超时
-      if (errcode === 504) {
-        this.error('请求超时!');
-        return;
-      }
-      // 成功
-      else if (!errcode) {
-        // 没数据
-        if (!data || !data.list || !data.list.length) {
-          this.postMessage({
-            etype: 'event',
-            event: 'loadListData',
-            args: [],
-          });
-          this.error('没有任何数据');
-          return;
-        }
-
-        if (data.list.length < ps) {
-          this.postMessage({
-            etype: 'event',
-            event: 'noMoreItem',
-          });
-        }
-
-        this.postMessage({
-          etype: 'data',
-          pageLoading: false,
-        });
-        this.postMessage({
-          etype: 'event',
-          event: 'listLoaded',
-        });
-
-        let dataArr = data.list.map((item) => {
-          return {
-            id: item.id,
-            flowId: item.flowId,
-            serviceId: item.serviceId,
-            name: item.institutionName,
-            remarks: item.content,
-            person: item.createrUserName,
-            status: statusToWord(item.status),
-            type: typeToWord(item.type),
-          };
-        });
-        if (bool) {
-          this.postMessage({
-            etype: 'event',
-            event: 'setListData',
-            args: dataArr,
-          });
-          return;
-        }
-        this.postMessage({
-          etype: 'event',
-          event: 'loadListData',
-          args: dataArr,
-        });
-      }
-      // 错误
-      else {
-        this.error('请求出错了！');
-      }
-    });
-  };
-
-  //
-  getMore = () => {
-    const {conditions} = this.state;
-    this.query(++currPage, conditions, true);
   };
 }
 

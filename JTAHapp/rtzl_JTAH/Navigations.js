@@ -10,16 +10,18 @@ import config from './config/index';
 // ===================================== //
 import Logo from './pages/logo/index';
 import Login from './pages/login/index';
+// pdf 阅览页
+import pdf from './pages/_pdf';
 // -------------------------------------------
-import Home from './pages/main-home/index';
-import Mine from './pages/main-mine/index';
-import Query from './pages/main-query/index';
-import Video from './pages/main-video/index';
-import Fix from './pages/main-fix/index';
+import Main_Home from './pages/main-home/index';
+import Main_Mine from './pages/main-mine/index';
+import Main_Query from './pages/main-query/index';
+import Main_Video from './pages/main-video/index';
 // -------------------------------------------
 // 通用列表编辑/新增页面
-import common_list_edit from './pages/common-list-edit';
-
+// import common_list_edit from './pages/common-list-edit';
+// 视频监测播放
+import common_video_player from './pages/common-video-player';
 // -------------------------------------------
 // 隐患排查
 import danger_screening_administer from './pages/danger-screening-administer/index';
@@ -39,10 +41,16 @@ import accident_quick_report from './pages/accident-quick-report/index';
 import accident_query from './pages/accident-query/index';
 // 酸型水库信息
 import acidic_reservoir_info from './pages/acidic-reservoir-info/index';
+// 酸型水库信息(编辑)
+import acidic_reservoir_edit from './pages/acidic-reservoir-edit/index';
 // 降雨量信息
 import rain_info from './pages/rain-info/index';
+// 降雨量信息(编辑)
+import rain_info_edit from './pages/rain-info-edit/index';
 // 废水处理量
 import waste_water from './pages/waste-water/index';
+// 废水处理量(编辑)
+import waste_water_edit from './pages/waste-water-edit/index';
 // 安环证照管理
 import safe_env_certificates from './pages/safe-env-certificates/index';
 // 教育培训台账
@@ -59,6 +67,10 @@ import duties_report from './pages/duties-report/index';
 import file_notice from './pages/file-notice/index';
 // 异常信息（集团）
 import abnormal_info_group from './pages/abnormal-info-group/index';
+// 异常信息（企业）
+import abnormal_info_enterprise from './pages/abnormal-info-enterprise/index';
+// 异常信息（企业）编辑
+import abnormal_info_enterprise_edit from './pages/abnormal-info-enterprise-edit/index';
 // 安全档案资料
 import archives_safe from './pages/archives-safe/index';
 // 环保档案资料
@@ -112,7 +124,7 @@ const BottomTabs = () => {
       }}>
       <Tab.Screen
         name="home"
-        component={Home}
+        component={Main_Home}
         options={{
           tabBarLabel: '首页',
           tabBarIcon: ({focused}) => {
@@ -122,7 +134,7 @@ const BottomTabs = () => {
       />
       <Tab.Screen
         name="home-query"
-        component={Query}
+        component={Main_Query}
         options={{
           tabBarLabel: '信息管理',
           tabBarIcon: ({focused}) => {
@@ -132,7 +144,7 @@ const BottomTabs = () => {
       />
       <Tab.Screen
         name="home-video"
-        component={Video}
+        component={Main_Video}
         options={{
           tabBarLabel: '视频监测',
           tabBarIcon: ({focused}) => {
@@ -142,7 +154,7 @@ const BottomTabs = () => {
       />
       <Tab.Screen
         name="home-mine"
-        component={Mine}
+        component={pdf}
         options={{
           tabBarLabel: '个人中心',
           tabBarIcon: ({focused}) => {
@@ -165,12 +177,12 @@ class App extends React.Component {
             <Stack.Screen name="logo" component={Logo} />
           ) : isLogin ? (
             <Fragment>
+              {<Stack.Screen name="pdf" component={pdf} />}
               <Stack.Screen
-                name="common_list_edit"
-                component={common_list_edit}
+                name="common_video_player"
+                component={common_video_player}
               />
               <Stack.Screen name="main" component={BottomTabs} />
-
               <Stack.Screen
                 name="danger_screening_administer"
                 component={danger_screening_administer}
@@ -201,8 +213,17 @@ class App extends React.Component {
                 name="acidic_reservoir_info"
                 component={acidic_reservoir_info}
               />
+              <Stack.Screen
+                name="acidic_reservoir_edit"
+                component={acidic_reservoir_edit}
+              />
               <Stack.Screen name="rain_info" component={rain_info} />
+              <Stack.Screen name="rain_info_edit" component={rain_info_edit} />
               <Stack.Screen name="waste_water" component={waste_water} />
+              <Stack.Screen
+                name="waste_water_edit"
+                component={waste_water_edit}
+              />
               <Stack.Screen
                 name="safe_env_certificates"
                 component={safe_env_certificates}
@@ -225,6 +246,14 @@ class App extends React.Component {
               <Stack.Screen
                 name="abnormal_info_group"
                 component={abnormal_info_group}
+              />
+              <Stack.Screen
+                name="abnormal_info_enterprise"
+                component={abnormal_info_enterprise}
+              />
+              <Stack.Screen
+                name="abnormal_info_enterprise_edit"
+                component={abnormal_info_enterprise_edit}
               />
               <Stack.Screen name="archives_safe" component={archives_safe} />
               <Stack.Screen name="archives_env" component={archives_env} />
@@ -249,7 +278,6 @@ class App extends React.Component {
                 name="risk_tips_approval"
                 component={risk_tips_approval}
               />
-
               <Stack.Screen
                 name="ecology_repair_info"
                 component={ecology_repair_info}

@@ -7,14 +7,19 @@ import arrow_disabled from "../../../img/icon-select-arrow-disabled.png";
 
 class Default extends React.Component {
 	static getDerivedStateFromProps(nextProps, prevState) {
+		const { defaultValue } = nextProps;
 		let et = nextProps.data.filter(item => {
 			return item.label === prevState.text;
 		})[0];
 
 		if (!et)
 			return {
-				text: nextProps.data[0] && nextProps.data[0].label,
-				value: nextProps.data[0] && [nextProps.data[0].value]
+				text: defaultValue
+					? defaultValue.text
+					: nextProps.data[0] && nextProps.data[0].label,
+				value: defaultValue
+					? defaultValue.value
+					: nextProps.data[0] && [nextProps.data[0].value]
 			};
 
 		return { data: nextProps.data };
@@ -35,13 +40,17 @@ class Default extends React.Component {
 	}
 
 	render() {
+		const { disabled } = this.props;
 		const { data, showBox } = this.state;
 		let { text, value } = this.state;
 		if (!text && data.length) text = data[0].label;
 		if (!value && data.length) value = data[0].value;
 		return (
 			<React.Fragment>
-				<div className="rtmcc-rnweb-select" onClick={this.onOpenBox}>
+				<div
+					className={`rtmcc-rnweb-select${disabled ? " disabled" : ""}`}
+					onClick={this.onOpenBox}
+				>
 					<span>{text ? text : data[0] ? data[0].label : ""}</span>
 					<img alt="" src={arrow} />
 				</div>
@@ -85,6 +94,8 @@ class Default extends React.Component {
 	};
 
 	onOpenBox = () => {
+		const { disabled } = this.props;
+		if (disabled) return;
 		this.setState({
 			showBox: true
 		});

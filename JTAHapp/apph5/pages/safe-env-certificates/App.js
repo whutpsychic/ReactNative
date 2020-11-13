@@ -1,30 +1,17 @@
 import React from "react";
 import "./App.css";
 import util from "../util/index";
+// ====================================
 import TopTitle from "../components/TopTitle/index";
 import PageLoading from "../components/PageLoading/index";
+import TopSearcher from "../UI/TopSearcher/index";
+import Details from "../UI/Details/index";
+// ====================================
 import ListView from "../components/ListView/index";
-import { SearchOutlined, MenuOutlined } from "@ant-design/icons";
-import { Button } from "antd-mobile";
-import DatePicker from "../components/DatePicker/index";
-// import SelectTree from "../components/SelectTree/index";
-import Select from "../components/Select/index";
+import { renderImgIcon } from "../common/index";
 
 // debug模式
 const debugging = false;
-
-// 渲染分割元素
-const separator = (sectionID, rowID) => (
-	<div
-		key={`${sectionID}-${rowID}`}
-		style={{
-			backgroundColor: "#F5F5F9",
-			height: 10,
-			borderTop: "1px solid #ECECED",
-			borderBottom: "1px solid #ECECED"
-		}}
-	/>
-);
 
 // 渲染每一项
 const renderListItem = ({
@@ -40,6 +27,19 @@ const renderListItem = ({
 	}
 	const obj = data[itemIndex];
 	if (!obj) return null;
+
+	const renderTab = tag => {
+		if (tag === "期限内") {
+			return <span className="tag inner">期限内</span>;
+		} else if (tag === "即将到期") {
+			return <span className="tag will">即将到期</span>;
+		} else if (tag === "已过期") {
+			return <span className="tag outer">已过期</span>;
+		} else {
+			return <span className="tag">未知状态</span>;
+		}
+	};
+
 	return (
 		<div
 			key={rowID}
@@ -51,209 +51,22 @@ const renderListItem = ({
 		>
 			<p className="title">{obj.name}</p>
 			<p className="remarks">{obj.remarks}</p>
+			{renderTab(obj.status)}
 			<div className="spliter"></div>
 			<p className="detail">
-				<span>有效期：{obj.date}</span>
-				<span>上传人：{obj.date}</span>
+				<span>有效期至：{obj.date}</span>
+				<span>上传人：{obj.person}</span>
 			</p>
 		</div>
 	);
 };
 
-class Detail extends React.Component {
-	state = {
-		show: false
-	};
-	render() {
-		const { show } = this.state;
-		const { data = {}, loading } = this.props;
-		const {
-			unit,
-			code,
-			name,
-			ins,
-			type,
-			date,
-			level,
-			person,
-			remarks,
-			tag
-		} = data;
-		return show ? (
-			<div className="detail-container">
-				<div className="msk" onClick={this.hide} />
-				{loading ? <PageLoading /> : null}
-				<div className="main-container">
-					<p className="detail-title">{name}</p>
-					<ul>
-						<li>
-							<label>{`单位`}</label>
-							<span>{unit}</span>
-						</li>
-						<li>
-							<label>{`标签`}</label>
-							<span>{tag}</span>
-						</li>
-						<li>
-							<label>{`证件编号`}</label>
-							<span>{code}</span>
-						</li>
-						<li>
-							<label>{`发证机关`}</label>
-							<span>{ins}</span>
-						</li>
-						<li>
-							<label>{`证件类别`}</label>
-							<span>{type}</span>
-						</li>
-						<li>
-							<label>{`有效期`}</label>
-							<span>{date}</span>
-						</li>
-						<li>
-							<label>{`等级`}</label>
-							<span>{level}</span>
-						</li>
-						<li>
-							<label>{`上传人`}</label>
-							<span>{person}</span>
-						</li>
-
-						<li>
-							<label>{`备注`}</label>
-						</li>
-						<li className="multi-lines">
-							<p>{remarks}</p>
-						</li>
-					</ul>
-				</div>
-			</div>
-		) : null;
-	}
-
-	show = () => {
-		this.setState({
-			show: true
-		});
-	};
-
-	hide = () => {
-		this.setState({
-			show: false
-		});
-	};
-}
-
-// 筛选抽屉
-class Drawer extends React.Component {
-	state = {
-		showDrawer: false,
-
-		date1: undefined,
-		date2: undefined
-	};
-
-	render() {
-		const { showDrawer } = this.state;
-		const { date1, date2 } = this.state;
-		const { types } = this.props;
-		return showDrawer ? (
-			<div className="right-drawer-container">
-				<div className="msk" onClick={this.onClickMsk} />
-				<div className="main-container">
-					<ul>
-						<li>
-							<label>证件类别</label>
-							<Select ref="select" data={types} />
-						</li>
-						<li>
-							<label>有效开始日期</label>
-							<DatePicker
-								ref="date1"
-								placeholder="开始日期"
-								onChange={date => {
-									this.setState({ date1: date });
-								}}
-								defaultValue={date1}
-								clearable
-							/>
-						</li>
-						<li>
-							<label>有效结束日期</label>
-							<DatePicker
-								ref="date2"
-								placeholder="结束日期"
-								onChange={date => {
-									this.setState({ date2: date });
-								}}
-								defaultValue={date2}
-								clearable
-							/>
-						</li>
-					</ul>
-					<div className="drawer-btns">
-						<Button type="primary" size="small" onClick={this.onConfirm}>
-							确定
-						</Button>
-						<Button type="primary" size="small" onClick={this.hide}>
-							取消
-						</Button>
-					</div>
-				</div>
-			</div>
-		) : null;
-	}
-
-	getConditions = () => {
-		let type = this.refs.select.getValue();
-		let date1 = this.refs.date1.getValue();
-		let date2 = this.refs.date2.getValue();
-
-		date1 = date1 ? date1.format("YYYY-MM-DD") : undefined;
-		date2 = date2 ? date2.format("YYYY-MM-DD") : undefined;
-
-		return { type, date1, date2 };
-	};
-
-	onConfirm = () => {
-		let conditions = this.getConditions();
-		const { onChange } = this.props;
-		if (typeof onChange === "function") onChange(conditions);
-		this.hide();
-	};
-
-	hide = () => {
-		this.setState({
-			showDrawer: false
-		});
-	};
-
-	onClickMsk = () => {
-		this.setState({
-			showDrawer: false
-		});
-	};
-
-	show = () => {
-		this.setState({
-			showDrawer: true
-		});
-	};
-}
-
 class App extends React.Component {
 	state = {
 		pageLoading: false,
 		detail: {},
-		loadingDetail: false,
-		name: "",
-		conditions: {},
-		types: [
-			{ label: "全部", value: undefined },
-			{ label: "安全", value: 1 },
-			{ label: "环保", value: 2 },
-			{ label: "安全生产标准化", value: 3 }
-		]
+		types: []
+		// institutions: []
 	};
 
 	componentDidMount() {
@@ -276,6 +89,9 @@ class App extends React.Component {
 
 		// ***************************************************
 		if (debugging) {
+			this.setState({
+				institutions: [{ text: "xxxxxxx", value: 1 }]
+			});
 			this.loadListData([
 				{
 					name: "文件名test0",
@@ -283,57 +99,47 @@ class App extends React.Component {
 					person: "admin",
 					date: "2020-06-07",
 					remarks:
-						"djslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkj",
-					files: [
-						{
-							id: 1,
-							name: "f1",
-							type: "xlsx",
-							url: "xxxxxx1"
-						},
-						{
-							id: 2,
-							name: "f2",
-							type: "pdf",
-							url: "xxxxxx2"
-						},
-						{
-							id: 3,
-							name: "f3",
-							type: "txt",
-							url: "xxxxxx3"
-						}
-					]
+						"djslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkj"
 				}
 			]);
 		}
 	}
 
 	render() {
-		const { pageLoading, detail, loadingDetail, types } = this.state;
+		const { pageLoading, detail } = this.state;
+
+		const conditionList = [
+			{
+				label: "证件类别",
+				field: "type",
+				type: "select",
+				data: this.state.types
+			},
+			{
+				label: "有效开始时间",
+				field: "date",
+				type: "date",
+				clearable: true
+			},
+			{
+				label: "有效结束时间",
+				field: "date2",
+				type: "date",
+				clearable: true
+			}
+		];
+
 		return (
 			<div className="app-container">
 				<div className="app-contents">
-					{<Detail ref="detail" data={detail} loading={loadingDetail} />}
+					<Details ref="detail" title="详情" data={detail} />
 					{pageLoading ? <PageLoading /> : null}
-					{
-						<Drawer
-							ref="drawer"
-							onChange={this.onPressConfirmButton}
-							types={types}
-						/>
-					}
-					<TopTitle title={`安全环保证照管理`} canBack />
-					<div className="top-searcher">
-						<div className="main-input">
-							<input onChange={this.onChangeText} placeholder="证件名称" />
-							<SearchOutlined onClick={this.onQuery} />
-						</div>
-						<div className="right-screen" onClick={this.onOpenDrawer}>
-							<span>筛选</span>
-							<MenuOutlined />
-						</div>
-					</div>
+					<TopTitle title={`安环证照`} canBack />
+					<TopSearcher
+						placeholder="证件名称"
+						onClickQuery={this.onQuery}
+						conditionList={conditionList}
+					/>
 					<ListView
 						ref="lv"
 						height={document.documentElement.clientHeight}
@@ -348,45 +154,53 @@ class App extends React.Component {
 		);
 	}
 
-	onQuery = () => {
-		const { name, conditions } = this.state;
-		util.traceBack("onChangeConditions", { name, ...conditions });
-	};
-
-	onPressConfirmButton = conditions => {
-		const { name } = this.state;
-		this.setState({
-			conditions
-		});
-		util.traceBack("onChangeConditions", { name, ...conditions });
-	};
-
-	onChangeText = e => {
-		const { value } = e.target;
-		this.setState({ name: value });
-	};
-
-	onOpenDrawer = () => {
-		this.refs.drawer.show();
+	onQuery = condition => {
+		util.traceBack("onChangeConditions", condition);
 	};
 
 	onClickItem = x => {
 		this.refs.detail.show();
-		this.setState({
-			loadingDetail: true
-		});
 		if (debugging) {
 			setTimeout(() => {
-				this.setState(
-					{
-						detail: x
-					},
-					() => {
-						this.setState({
-							loadingDetail: false
-						});
+				this.setState({
+					detail: {
+						fieldContents: [
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{
+								label: "名称",
+								content: "抗洪抢险，江铜在行动 4",
+								multiLines: true
+							},
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" }
+						],
+						files: [
+							{
+								id: 1,
+								title: "f1",
+								type: "xlsx",
+								url: "xxxxxx1"
+							},
+							{
+								id: 2,
+								title: "f2",
+								type: "pdf",
+								url: "xxxxxx2"
+							},
+							{
+								id: 3,
+								title: "f3",
+								type: "txt",
+								url: "xxxxxx3"
+							}
+						]
 					}
-				);
+				});
 			}, 1000);
 		}
 	};
@@ -417,7 +231,7 @@ class App extends React.Component {
 			setTimeout(() => {
 				this.loadListData([
 					{
-						title: "文件名test01111111111111",
+						name: "文件名test01111111111111",
 						person: "admin",
 						date: "2020-06-07",
 						remarks: "djslkahljashlgjkhasfkj",
@@ -443,9 +257,7 @@ class App extends React.Component {
 						]
 					}
 				]);
-				this.setState({
-					loadingDetail: false
-				});
+				this.listLoaded();
 			}, 1500);
 		}
 
@@ -457,7 +269,7 @@ class App extends React.Component {
 			setTimeout(() => {
 				this.setListData([
 					{
-						title: "文件名test02222222222222",
+						name: "文件名test02222222222222",
 						person: "admin",
 						date: "2020-06-07",
 						remarks: "djslkahljashlgjkhasfkj",
@@ -483,9 +295,6 @@ class App extends React.Component {
 						]
 					}
 				]);
-				this.setState({
-					loadingDetail: false
-				});
 			}, 1500);
 		}
 		util.traceBack("onEndReached", { ps });

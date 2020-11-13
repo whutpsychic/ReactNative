@@ -5,12 +5,19 @@ import {WebView} from 'react-native-webview';
 import api from '../../api/index';
 import Toast from '../../components/Toast/index';
 
+import faker from './faker.js';
+
 const pageUri = 'file:///android_asset/h5/main-video/index.html';
 
 class Default extends React.Component {
   state = {};
 
-  componentDidMount() {}
+  componentDidMount() {
+    // this.props.navigation.navigate('common_video_player', {
+    //   title: 'xxxxxxx',
+    //   url: 'http://10.99.189.116:18000/hls/1/index.m3u8',
+    // });
+  }
 
   postMessage = (obj) => {
     this.refs.webview.postMessage(JSON.stringify(obj));
@@ -62,21 +69,21 @@ class Default extends React.Component {
           return;
         }
         const {monitors} = list;
-        // console.log(JSON.stringify(monitors));
+
+        let selectData = monitors.map((item) => {
+          faker.map((_item) => {
+            if (_item.name === item.name) {
+              item.points = _item.points;
+            }
+          });
+          return item;
+        });
+
         //
         this.postMessage({
           etype: 'data',
           pageLoading: false,
-          data: monitors.map((item) => {
-            if (item.name === '德兴铜矿') {
-              item.points = [
-                {label: 'xxxx1', value: 1},
-                {label: 'xxxx2', value: 2},
-                {label: 'xxxx3', value: 3},
-              ];
-            }
-            return item;
-          }),
+          data: selectData,
         });
       });
     }
@@ -91,14 +98,18 @@ class Default extends React.Component {
       });
       this.postMessage({
         etype: 'data',
-        selectData: !points.length ? [{label: '无'}] : points,
+        selectData: !points.length
+          ? [{label: '无'}]
+          : points.map((item) => {
+              return {label: item.name, value: item.url};
+            }),
       });
     } else if (etype === 'selectPicker') {
       const {result} = receivedData;
       if (!result) return;
       if (result) {
-        const {value} = result;
-        console.log(value);
+        const {label, value} = result;
+        navigate('common_video_player', {title: label, url: value});
       }
     }
   };

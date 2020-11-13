@@ -4,6 +4,7 @@ import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
 import api from '../../api/index';
 import Toast from '../../components/Toast';
+import {putupData, run} from '../../core/common.js';
 
 const pageUri = 'file:///android_asset/h5/danger-chemical/index.html';
 
@@ -30,16 +31,9 @@ class Default extends React.Component {
 
   componentDidMount() {}
 
-  postMessage = (obj) => {
-    this.refs.webview.postMessage(JSON.stringify(obj));
-  };
-
   error = (msg) => {
     Toast.show(msg);
-    this.postMessage({
-      etype: 'data',
-      pageLoading: false,
-    });
+    putupData(this, {pageLoading: false});
   };
 
   render() {
@@ -66,26 +60,30 @@ class Default extends React.Component {
     if (etype === 'pageState' && receivedData.info === 'componentDidMount') {
       // 加载一次树形结构数据
       api.getInstitutionsDepartment().then((data) => {
-        console.log(data);
-        if (data)
-          this.postMessage({
-            etype: 'data',
-            institutions: data,
+        if (data) {
+          putupData(this, {
+            institutions: [{title: '全部', key: undefined}, ...data],
           });
+        } else {
+          Toast.show('机构数据竟然查询失败了');
+        }
       });
 
-      this.postMessage({
-        etype: 'data',
+      putupData(this, {
         pageLoading: true,
+        types: [
+          {label: '全部', value: undefined},
+          {label: '原辅材料', value: 1},
+          {label: '中间产品', value: 2},
+          {label: '成品', value: 3},
+        ],
       });
       this.query();
     }
     //下拉刷新
     else if (etype === 'onRefreshList') {
-      this.setState({
-        conditions: {},
-      });
-      this.query(0, {});
+      const {conditions} = this.state;
+      this.query(0, conditions);
     }
 
     // 底部加载更多
@@ -95,119 +93,120 @@ class Default extends React.Component {
 
     // 当改变查询条件的时候
     else if (etype === 'onChangeConditions') {
-      this.postMessage({
-        etype: 'data',
-        pageLoading: true,
-      });
-      const {type, institution, nature, name} = receivedData;
+      putupData(this, {pageLoading: true});
+      const {searchText, type, institution, string} = receivedData;
       let condition = {
+        chemicalsName: searchText,
         institutionId:
           institution && institution[0] ? institution[0] : undefined,
         chemicalsType: type && type[0] ? type[0] : undefined,
-        physicochemicalProperty: nature,
-        chemicalsName: name,
+        physicochemicalProperty: string,
       };
+
       this.query(0, condition);
     }
 
     // 点击更多
     else if (etype === 'clickItem') {
-      const {name, unit, type, nature, maxStorage, remarks, id} = receivedData;
-      this.postMessage({
-        etype: 'data',
+      const {name, remarks, person, date, dataSource} = receivedData;
+      putupData(this, {
         detail: {
-          name,
-          unit,
-          type,
-          nature,
-          maxStorage,
-          remarks,
-          id,
+          fieldContents: [
+            {label: '单位名称', content: dataSource.institutionName},
+            {
+              label: '化学品名',
+              content: dataSource.chemicalsName,
+            },
+            {
+              label: '来源分类',
+              content: transTypeToText(dataSource.chemicalsType),
+            },
+            {label: '理化性质', content: dataSource.physicochemicalProperty},
+            {
+              label: '最大库存',
+              content: dataSource.maxInventory,
+            },
+            {label: '备注', content: dataSource.remark, multiLines: true},
+          ],
+          // files:
+          //   dataSource.fileList instanceof Array
+          //     ? dataSource.fileList.map((_item) => {
+          //         return {
+          //           title: _item.name,
+          //           type: _item.file_type,
+          //           url: _item.url_pdf,
+          //         };
+          //       })
+          //     : [],
         },
-        loadingDetail: false,
       });
+    }
+    // 点击浏览文件
+    else if (etype === 'onClickFileItem') {
+      const {title, url} = receivedData;
+      navigate('pdf', {url, title});
     } else if (etype === 'back-btn') {
       navigation.goBack();
     }
   };
 
-  query = (page = 0, conditions = {}, bool) => {
+  query = (page = 0, conditions = {}) => {
     if (!page) currPage = 0;
-
-    api.getDangerChemicalList({page, ps, ...conditions}).then((res) => {
-      console.log(res);
-      const {errcode, errmsg, data} = res;
-      // 超时
-      if (errcode === 504) {
-        this.error('请求超时!');
-        return;
-      }
-      // 成功
-      else if (!errcode) {
-        // 没数据
-        if (!data || !data.list || !data.list.length) {
-          this.postMessage({
-            etype: 'event',
-            event: 'loadListData',
-            args: [],
-          });
-          this.error('没有任何数据');
+    this.setState({conditions});
+    api
+      .getDangerChemicalList({
+        page,
+        ps,
+        ...conditions,
+      })
+      .then((res) => {
+        const {errcode, errmsg, data} = res;
+        // 超时
+        if (errcode === 504) {
+          this.error('请求超时!');
           return;
         }
+        // 成功
+        else if (!errcode) {
+          // 没数据
+          if (!data || !data.list || !data.list.length) {
+            this.error('没有任何数据');
+            run(this, 'loadListData', []);
+            return;
+          }
 
-        if (data.list.length < ps) {
-          this.postMessage({
-            etype: 'event',
-            event: 'noMoreItem',
-          });
+          if (data.list.length < ps) {
+            run(this, 'noMoreItem');
+          }
+
+          putupData(this, {pageLoading: false});
+          run(this, 'listLoaded');
+
+          let dataArr = data.list
+            .map((item) => {
+              return {
+                remarks: item.remark,
+                name: item.chemicalsName,
+                storage: item.maxInventory,
+                type: transTypeToText(item.chemicalsType),
+                dataSource: item,
+              };
+            })
+            .reverse();
+
+          run(this, 'loadListData', dataArr);
         }
-
-        this.postMessage({
-          etype: 'data',
-          pageLoading: false,
-        });
-        this.postMessage({
-          etype: 'event',
-          event: 'listLoaded',
-        });
-
-        let dataArr = data.list.map((item) => {
-          return {
-            name: item.chemicalsName,
-            unit: item.institutionName,
-            type: transTypeToText(item.chemicalsType),
-            nature: item.physicochemicalProperty,
-            maxStorage: item.maxInventory,
-            remarks: item.remark,
-            id: item.id,
-          };
-        });
-        if (bool) {
-          this.postMessage({
-            etype: 'event',
-            event: 'setListData',
-            args: dataArr,
-          });
-          return;
+        // 错误
+        else {
+          this.error('请求出错了！');
         }
-        console.log(dataArr);
-        this.postMessage({
-          etype: 'event',
-          event: 'loadListData',
-          args: dataArr,
-        });
-      }
-      // 错误
-      else {
-        this.error('请求出错了！');
-      }
-    });
+      });
   };
 
   //
   getMore = () => {
     const {conditions} = this.state;
-    this.query(++currPage, conditions, true);
+    this.query(++currPage, conditions);
   };
 }
 

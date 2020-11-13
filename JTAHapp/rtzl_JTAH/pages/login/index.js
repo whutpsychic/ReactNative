@@ -73,25 +73,30 @@ class Default extends React.Component {
   };
 
   login = ({name, psw, rememberPsw}) => {
+    console.log(name, psw, rememberPsw);
     const {login} = this.props;
+
+    let p1, p2;
 
     api.login(name, psw).then((res) => {
       const {ok, status} = res;
       //成功
       if (ok && status === 200) {
-        login(true);
-        initialized();
-        Toast.show('登录成功');
-        console.log('登陆成功');
         // 记住身份
         if (rememberPsw) {
-          storage.setData('jtah_userName', name);
-          storage.setData('jtah_psw', psw);
+          p1 = storage.setData('jtah_userName', name);
+          p2 = storage.setData('jtah_psw', psw);
         } else {
-          storage.setData('jtah_userName', null);
-          storage.setData('jtah_psw', null);
+          p1 = storage.setData('jtah_userName', null);
+          p2 = storage.setData('jtah_psw', null);
         }
-        return;
+
+        Promise.all([p1, p2]).then((resArr) => {
+          login(true);
+          initialized();
+          Toast.show('登录成功');
+          return;
+        });
       }
       // 超时
       else if (!ok && status === 504) {

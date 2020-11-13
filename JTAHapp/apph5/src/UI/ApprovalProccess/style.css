@@ -48,7 +48,7 @@
 	padding: 20px;
 	z-index: 2;
 	overflow: auto;
-	animation: goIn 0.2s;
+	animation: approvalProccessGoIn 0.2s;
 }
 
 .approval-proccess-container .main-container > p {
@@ -67,7 +67,7 @@
 	margin-bottom: 8px;
 }
 
-@keyframes goIn {
+@keyframes approvalProccessGoIn {
 	from {
 		height: 0;
 	}

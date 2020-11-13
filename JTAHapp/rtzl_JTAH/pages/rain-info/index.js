@@ -13,9 +13,15 @@ const ps = 20;
 class Default extends React.Component {
   state = {
     conditions: {},
+    nomore: false,
+    institutions: [],
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.props.navigation.addListener('focus', () => {
+      this.query();
+    });
+  }
 
   postMessage = (obj) => {
     this.refs.webview.postMessage(JSON.stringify(obj));
@@ -53,12 +59,15 @@ class Default extends React.Component {
     if (etype === 'pageState' && receivedData.info === 'componentDidMount') {
       // 加载一次树形结构数据
       api.getInstitutionsDepartment().then((data) => {
-        console.log(data);
-        if (data)
+        if (data) {
           this.postMessage({
             etype: 'data',
             institutions: data,
           });
+        } else {
+          Toast.show('机构数据竟然查询失败了');
+          return;
+        }
       });
 
       this.postMessage({
@@ -69,10 +78,7 @@ class Default extends React.Component {
     }
     //下拉刷新
     else if (etype === 'onRefreshList') {
-      this.setState({
-        conditions: {},
-      });
-      this.query(0, {});
+      this.query();
     }
 
     // 底部加载更多
@@ -86,42 +92,54 @@ class Default extends React.Component {
         etype: 'data',
         pageLoading: true,
       });
-      const {name, date1, date2, institution} = receivedData;
-      console.log()
+      const {searchText, startTime, endTime, institutions} = receivedData;
       let condition = {
-        beginTime: date1 ? date1.split('T')[0] : undefined,
-        overTime: date2 ? date2.split('T')[0] : undefined,
-        reservoirName: name,
-        institutionId: institution ? institution[0] : undefined,
+        beginTime: startTime,
+        overTime: endTime,
+        monitorLocation: searchText,
+        institutionId: institutions ? institutions[0] : undefined,
       };
-      console.log(condition);
       this.query(0, condition);
     }
 
     // 点击更多
     else if (etype === 'clickItem') {
-      const {name, unit, quality, date, remarks} = receivedData;
+      const {name, unit, remarks, date, dataSource} = receivedData;
       this.postMessage({
         etype: 'data',
         detail: {
-          name,
-          unit,
-          quality,
-          date,
-          remarks,
+          fieldContents: [
+            {label: '监测地点', content: name},
+            {label: '上报单位', content: unit},
+            {label: '降雨量/mm', content: dataSource.valueA},
+            {label: '日期', content: date},
+            {label: '备注', content: remarks},
+          ],
         },
-        loadingDetail: false,
+      });
+    } else if (etype === 'onAdd') {
+      navigate('rain_info_edit', {
+        title: '降雨记录-新增',
+        type: 'add',
+      });
+    } else if (etype === 'edit') {
+      navigate('rain_info_edit', {
+        title: '降雨记录-编辑',
+        type: 'edit',
+        dataSource: receivedData.dataSource,
       });
     } else if (etype === 'back-btn') {
       navigation.goBack();
     }
   };
 
-  query = (page = 0, conditions = {}, bool) => {
+  query = (page = 0, conditions = {}) => {
+     this.setState({
+      conditions: condition,
+    });
     if (!page) currPage = 0;
 
     api.getRainInfoList({page, ps, ...conditions}).then((res) => {
-      console.log(res);
       const {errcode, errmsg, data} = res;
       // 超时
       if (errcode === 504) {
@@ -146,6 +164,9 @@ class Default extends React.Component {
             etype: 'event',
             event: 'noMoreItem',
           });
+          this.setState({
+            nomore: true,
+          });
         }
 
         this.postMessage({
@@ -157,30 +178,30 @@ class Default extends React.Component {
           event: 'listLoaded',
         });
 
-        let dataArr = data.list.map((item) => {
-          return {
-            name: item.monitorLocation,
-            unit: item.institutionName,
-            quality: item.valueA,
-            date: item.time,
-            remarks: item.remark,
-            id: item.id,
-          };
-        });
-        if (bool) {
+        let dataArr = data.list
+          .map((item) => {
+            return {
+              name: item.monitorLocation,
+              unit: item.institutionName,
+              remarks: item.remark,
+              date: item.time,
+              dataSource: item,
+            };
+          })
+          .reverse();
+        if (!page) {
+          this.postMessage({
+            etype: 'event',
+            event: 'loadListData',
+            args: dataArr,
+          });
+        } else {
           this.postMessage({
             etype: 'event',
             event: 'setListData',
             args: dataArr,
           });
-          return;
         }
-
-        this.postMessage({
-          etype: 'event',
-          event: 'loadListData',
-          args: dataArr,
-        });
       }
       // 错误
       else {
@@ -191,8 +212,15 @@ class Default extends React.Component {
 
   //
   getMore = () => {
-    const {conditions} = this.state;
-    this.query(++currPage, conditions, true);
+    const {conditions, nomore} = this.state;
+    if (nomore) {
+      this.postMessage({
+        etype: 'event',
+        event: 'noMoreItem',
+      });
+      return;
+    }
+    this.query(++currPage, conditions);
   };
 }
 

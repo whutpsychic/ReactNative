@@ -15,20 +15,51 @@ const {
 } = RightDrawerConditions;
 
 const renderConditionItem = item => {
-	const { field, type, data, placeholder, clearable } = item;
+	const {
+		field,
+		type,
+		data,
+		placeholder,
+		clearable,
+		disabled,
+		defaultValue
+	} = item;
 	switch (type) {
 		case "input":
-			return <Input ref={field} placeholder={placeholder} />;
+			return (
+				<Input
+					ref={field}
+					placeholder={placeholder}
+					disabled={disabled}
+					defaultValue={defaultValue}
+				/>
+			);
 		case "select":
-			return <Select ref={field} data={data} />;
+			return (
+				<Select
+					ref={field}
+					data={data}
+					disabled={disabled}
+					defaultValue={defaultValue}
+				/>
+			);
 		case "radios":
-			return <Radios ref={field} data={data} />;
+			return (
+				<Radios
+					ref={field}
+					data={data}
+					disabled={disabled}
+					defaultValue={defaultValue}
+				/>
+			);
 		case "date":
 			return (
 				<DatePicker
 					ref={field}
 					placeholder={placeholder}
 					clearable={clearable}
+					disabled={disabled}
+					defaultValue={defaultValue}
 				/>
 			);
 		case "month":
@@ -37,6 +68,8 @@ const renderConditionItem = item => {
 					ref={field}
 					placeholder={placeholder}
 					clearable={clearable}
+					disabled={disabled}
+					defaultValue={defaultValue}
 				/>
 			);
 		case "year":
@@ -45,10 +78,20 @@ const renderConditionItem = item => {
 					ref={field}
 					placeholder={placeholder}
 					clearable={clearable}
+					disabled={disabled}
+					defaultValue={defaultValue}
 				/>
 			);
 		case "selecttree":
-			return <SelectTree ref={field} placeholder={placeholder} data={data} />;
+			return (
+				<SelectTree
+					ref={field}
+					placeholder={placeholder}
+					data={data}
+					disabled={disabled}
+					defaultValue={defaultValue}
+				/>
+			);
 		default:
 			return null;
 	}
@@ -63,31 +106,44 @@ class Default extends React.Component {
 	render() {
 		const { showDrawer } = this.state;
 		const { data } = this.props;
-		return showDrawer ? (
-			<div className="right-drawer-container">
-				<div className="msk" onClick={() => this.hide()} />
-				<div className="main-container">
-					<ul>
-						{data.map((item, i) => {
-							return (
-								<li key={`i${i}`}>
-									<label>{item.label}</label>
-									{renderConditionItem(item)}
-								</li>
-							);
-						})}
-					</ul>
-					<div className="drawer-btns">
-						<Button type="primary" size="small" onClick={this.onConfirm}>
-							确定
-						</Button>
-						<Button type="primary" size="small" onClick={this.hide}>
-							取消
-						</Button>
+		return (
+			<React.Fragment>
+				<div
+					className={
+						showDrawer ? "right-drawer-msk" : "right-drawer-msk hidden"
+					}
+					onClick={() => this.hide()}
+				/>
+				<div
+					className={
+						showDrawer
+							? "right-drawer-container"
+							: "right-drawer-container hidden"
+					}
+				>
+					<div className="main-container">
+						<ul>
+							{data.map((item, i) => {
+								return (
+									<li key={`i${i}`}>
+										<label>{item.label}</label>
+										{renderConditionItem(item)}
+									</li>
+								);
+							})}
+						</ul>
+						<div className="drawer-btns">
+							<Button type="primary" size="small" onClick={this.onConfirm}>
+								确定
+							</Button>
+							<Button type="primary" size="small" onClick={this.hide}>
+								取消
+							</Button>
+						</div>
 					</div>
 				</div>
-			</div>
-		) : null;
+			</React.Fragment>
+		);
 	}
 
 	show = () => {

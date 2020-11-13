@@ -1,38 +1,18 @@
 import React from "react";
 import "./App.css";
 import util from "../util/index";
-import TopTitle from "../components/TopTitle/index";
-import PageLoading from "../components/PageLoading/index";
-import ListView from "../components/ListView/index";
-import imgs from "../img/img.js";
-import { SearchOutlined, MenuOutlined } from "@ant-design/icons";
+// ====================================
+import TopTitle from "../UI/TopTitle/index";
+import PageLoading from "../UI/PageLoading/index";
+import TopSearcher from "../UI/TopSearcher/index";
+import Details from "../UI/Details/index";
+// ====================================
+import ListView from "../core/components/ListView/index";
+import { renderImgIcon } from "../common/index";
 import { Button } from "antd-mobile";
-import DatePicker from "../components/DatePicker/index";
-import SelectTree from "../components/SelectTree/index";
-
-const {
-	fileIcon_xlsx,
-	fileIcon_pdf,
-	fileIcon_txt,
-	fileIcon_jpg,
-	fileIcon_defaulti
-} = imgs;
 
 // debug模式
 const debugging = false;
-
-// 渲染分割元素
-const separator = (sectionID, rowID) => (
-	<div
-		key={`${sectionID}-${rowID}`}
-		style={{
-			backgroundColor: "#F5F5F9",
-			height: 10,
-			borderTop: "1px solid #ECECED",
-			borderBottom: "1px solid #ECECED"
-		}}
-	/>
-);
 
 // 渲染每一项
 const renderListItem = ({
@@ -58,192 +38,33 @@ const renderListItem = ({
 			}}
 		>
 			<p className="title">{obj.name}</p>
+			<span
+				className="editor"
+				onClick={e => {
+					e.stopPropagation();
+					util.traceBack("edit", obj);
+				}}
+			>
+				编辑
+			</span>
 			<p className="remarks">{obj.remarks}</p>
 			<div className="spliter"></div>
 			<p className="detail">
+				<span>上传单位：{obj.unit}</span>
 				<span>日期：{obj.date}</span>
 			</p>
 		</div>
 	);
 };
 
-class Detail extends React.Component {
-	state = {
-		show: false
-	};
-	render() {
-		const { show } = this.state;
-		const { data = {}, loading } = this.props;
-		const { name, unit, quality, date, remarks } = data;
-		return show ? (
-			<div className="detail-container">
-				<div className="msk" onClick={this.hide} />
-				{loading ? <PageLoading /> : null}
-				<div className="main-container">
-					<p className="detail-title">{name}</p>
-					<ul>
-						<li>
-							<label>{`上报单位`}</label>
-							<span>{unit}</span>
-						</li>
-						<li>
-							<label>{`废水/吨`}</label>
-							<span>{quality}</span>
-						</li>
-						<li>
-							<label>{`日期`}</label>
-							<span>{date}</span>
-						</li>
-						<li>
-							<label>{`备注`}</label>
-						</li>
-						<li className="multi-lines">
-							<p>{remarks}</p>
-						</li>
-					</ul>
-				</div>
-			</div>
-		) : null;
-	}
-
-	show = () => {
-		this.setState({
-			show: true
-		});
-	};
-
-	hide = () => {
-		this.setState({
-			show: false
-		});
-	};
-
-	renderImgIcon = item => {
-		const { type } = item;
-		switch (type) {
-			case "xlsx":
-				return <img alt={""} src={fileIcon_xlsx} className={"icon"} />;
-			case "pdf":
-				return <img alt={""} src={fileIcon_pdf} className={"icon"} />;
-			case "txt":
-				return <img alt={""} src={fileIcon_txt} className={"icon"} />;
-			case "png":
-				return <img alt={""} src={fileIcon_defaulti} className={"icon"} />;
-			case "jpg":
-				return <img alt={""} src={fileIcon_jpg} className={"icon"} />;
-			case "jpeg":
-				return <img alt={""} src={fileIcon_defaulti} className={"icon"} />;
-			default:
-				return <img alt={""} src={fileIcon_defaulti} className={"icon"} />;
-		}
-	};
-}
-
-// 筛选抽屉
-class Drawer extends React.Component {
-	state = {
-		showDrawer: false,
-		institution: undefined,
-		date1: undefined,
-		date2: undefined
-	};
-
-	render() {
-		const { showDrawer } = this.state;
-		const { institution, date1, date2 } = this.state;
-		const { types, institutions } = this.props;
-		return showDrawer ? (
-			<div className="right-drawer-container">
-				<div className="msk" onClick={this.onClickMsk} />
-				<div className="main-container">
-					<ul>
-						<li>
-							<label>机构名称</label>
-							<SelectTree
-								ref="ins"
-								data={institutions}
-								defaultValue={institution}
-							/>
-						</li>
-						<li>
-							<label>开始日期</label>
-							<DatePicker
-								ref="date1"
-								placeholder="开始日期"
-								onChange={date => {
-									this.setState({ date1: date });
-								}}
-								defaultValue={date1}
-								clearable
-							/>
-						</li>
-						<li>
-							<label>结束日期</label>
-							<DatePicker
-								ref="date2"
-								placeholder="结束日期"
-								onChange={date => {
-									this.setState({ date2: date });
-								}}
-								defaultValue={date2}
-								clearable
-							/>
-						</li>
-					</ul>
-					<div className="drawer-btns">
-						<Button type="primary" size="small" onClick={this.onConfirm}>
-							确定
-						</Button>
-						<Button type="primary" size="small" onClick={this.hide}>
-							取消
-						</Button>
-					</div>
-				</div>
-			</div>
-		) : null;
-	}
-
-	getConditions = () => {
-		let institution = this.refs.ins.getValue();
-		let date1 = this.refs.date1.getValue().format("YYYY-MM-DD");
-		let date2 = this.refs.date2.getValue().format("YYYY-MM-DD");
-
-		return { institution, date1, date2 };
-	};
-
-	onConfirm = () => {
-		let conditions = this.getConditions();
-		const { onChange } = this.props;
-		if (typeof onChange === "function") onChange(conditions);
-		this.hide();
-	};
-
-	hide = () => {
-		this.setState({
-			showDrawer: false
-		});
-	};
-
-	onClickMsk = () => {
-		this.setState({
-			showDrawer: false
-		});
-	};
-
-	show = () => {
-		this.setState({
-			showDrawer: true
-		});
-	};
-}
-
 class App extends React.Component {
 	state = {
+		// 页面加载中
 		pageLoading: false,
+		// ========
+		// 细节数据
 		detail: {},
-		loadingDetail: false,
-		name: "",
-		conditions: {},
+		// 机构树形数据
 		institutions: []
 	};
 
@@ -267,74 +88,96 @@ class App extends React.Component {
 
 		// ***************************************************
 		if (debugging) {
-			this.loadListData([
-				{
-					name: "文件名test0",
-					unit: "德兴铜矿",
-					person: "admin",
-					date: "2020-06-07",
-					remarks:
-						"djslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkj",
-					files: [
+			this.setState({
+				pageLoading: true
+			});
+			setTimeout(() => {
+				this.setState({
+					pageLoading: false,
+					institutions: [
+						{ title: "全部", key: "all" },
 						{
-							id: 1,
-							name: "f1",
-							type: "xlsx",
-							url: "xxxxxx1"
-						},
-						{
-							id: 2,
-							name: "f2",
-							type: "pdf",
-							url: "xxxxxx2"
-						},
-						{
-							id: 3,
-							name: "f3",
-							type: "txt",
-							url: "xxxxxx3"
+							title: "根节点",
+							key: "gjd",
+							children: [
+								{
+									title: "子节点1",
+									key: "z1",
+									children: [
+										{ title: "叶子结点1", key: "yz1" },
+										{ title: "叶子结点2", key: "yz2" },
+										{ title: "叶子结点3", key: "yz3" },
+										{ title: "叶子结点4", key: "yz4" }
+									]
+								}
+							]
 						}
 					]
-				}
-			]);
+				});
+				this.loadListData([
+					{
+						name: "文件名test0",
+						unit: "德兴铜矿",
+						person: "admin",
+						date: "2020-06-07",
+						remarks:
+							"djslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkj"
+					},
+					{
+						name: "文件名test1",
+						unit: "德兴铜矿",
+						person: "admin",
+						date: "2020-06-07",
+						remarks:
+							"djslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkj"
+					}
+				]);
+			}, 800);
 		}
 	}
 
 	render() {
-		const {
-			pageLoading,
-			detail,
-			loadingDetail,
-			types,
-			institutions
-		} = this.state;
+		const conditionList = [
+			{
+				label: "单位名称",
+				field: "institutions",
+				type: "selecttree",
+				placeholder: "请选择单位",
+				data: this.state.institutions
+			},
+			{
+				label: "开始时间",
+				field: "startTime",
+				type: "date",
+				placeholder: "请选择开始时间",
+				clearable: true
+			},
+			{
+				label: "结束时间",
+				field: "endTime",
+				type: "date",
+				placeholder: "请选择结束时间",
+				clearable: true
+			}
+		];
+
+		const { pageLoading, detail } = this.state;
 		return (
 			<div className="app-container">
 				<div className="app-contents">
-					{<Detail ref="detail" data={detail} loading={loadingDetail} />}
+					<Details ref="detail" data={detail} />
 					{pageLoading ? <PageLoading /> : null}
-					{
-						<Drawer
-							ref="drawer"
-							onChange={this.onPressConfirmButton}
-							types={types}
-							institutions={institutions}
-						/>
-					}
-					<TopTitle title={`废水处理量信息`} canBack />
-					<div className="top-searcher">
-						<div className="main-input">
-							<input
-								onChange={this.onChangeText}
-								placeholder="废水处理厂名称"
-							/>
-							<SearchOutlined onClick={this.onQuery} />
-						</div>
-						<div className="right-screen" onClick={this.onOpenDrawer}>
-							<span>筛选</span>
-							<MenuOutlined />
-						</div>
-					</div>
+					<TopTitle
+						title={`废水处理量信息`}
+						canBack
+						add
+						onAdd={this.onClickAdd}
+					/>
+					<TopSearcher
+						placeholder="废水处理厂名称"
+						onClickQuery={this.onQuery}
+						conditionList={conditionList}
+					/>
 					<ListView
 						ref="lv"
 						height={document.documentElement.clientHeight}
@@ -349,45 +192,38 @@ class App extends React.Component {
 		);
 	}
 
-	onQuery = () => {
-		const { name, conditions } = this.state;
-		util.traceBack("onChangeConditions", { name, ...conditions });
+	onClickAdd = () => {
+		util.traceBack("onAdd");
 	};
 
-	onPressConfirmButton = conditions => {
-		const { name } = this.state;
-		this.setState({
-			conditions
-		});
-		util.traceBack("onChangeConditions", { name, ...conditions });
-	};
-
-	onChangeText = e => {
-		const { value } = e.target;
-		this.setState({ name: value });
-	};
-
-	onOpenDrawer = () => {
-		this.refs.drawer.show();
+	onQuery = conditions => {
+		console.log(conditions);
+		util.traceBack("onChangeConditions", { ...conditions });
 	};
 
 	onClickItem = x => {
 		this.refs.detail.show();
-		this.setState({
-			loadingDetail: true
-		});
 		if (debugging) {
 			setTimeout(() => {
-				this.setState(
-					{
-						detail: x
-					},
-					() => {
-						this.setState({
-							loadingDetail: false
-						});
+				this.setState({
+					detail: {
+						fieldContents: [
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{
+								label: "名称",
+								content: "抗洪抢险，江铜在行动 4",
+								multiLines: true
+							},
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" }
+						]
 					}
-				);
+				});
 			}, 1000);
 		}
 	};

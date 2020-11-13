@@ -31,15 +31,11 @@ class Default extends React.Component {
 
 	state = {
 		value: null,
-		showBox: true
+		showBox: false,
+		busy: false // 正在展示
 	};
 
-	componentDidMount() {
-		//修复那个蜜汁bug
-		this.setState({
-			showBox: false
-		});
-	}
+	componentDidMount() {}
 
 	render() {
 		const { data, loading } = this.props;
@@ -90,16 +86,22 @@ class Default extends React.Component {
 		);
 	}
 
-	show = () => {
+	show = e => {
 		const { onShowBox } = this.props;
 		if (typeof onShowBox === "function") onShowBox();
 		this.setState({
-			showBox: true
+			showBox: true,
+			busy: true
 		});
+		setTimeout(() => {
+			this.setState({
+				busy: false
+			});
+		}, 150);
 	};
 
 	hide = e => {
-		if (e && e.stopPropagation) e.stopPropagation();
+		if (this.state.busy) return;
 		this.setState({
 			showBox: false
 		});

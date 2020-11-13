@@ -42,7 +42,6 @@ class Default extends React.Component {
         pageLoading: true,
       });
       api.getMainQueryMenuList().then((res) => {
-        console.log(res);
         this.postMessage({
           etype: 'data',
           pageLoading: false,
