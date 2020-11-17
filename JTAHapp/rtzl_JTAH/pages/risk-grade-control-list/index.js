@@ -180,21 +180,40 @@ class Default extends React.Component {
             event: 'listLoaded',
           });
 
-          this.postMessage({
-            etype: 'event',
-            event: 'loadListData',
-            args: data.list.map((item) => {
-              return {
-                name: item.title_name,
-                unit: title,
-                remarks: item.remark,
-                person: item.creater_user_name,
-                date: item.creater_time,
+          if (!page) {
+            this.postMessage({
+              etype: 'event',
+              event: 'loadListData',
+              args: data.list.map((item) => {
+                return {
+                  name: item.title_name,
+                  unit: title,
+                  remarks: item.remark,
+                  person: item.creater_user_name,
+                  date: item.creater_time,
 
-                dataSource: item,
-              };
-            }),
-          });
+                  dataSource: item,
+                };
+              }),
+            });
+            return;
+          } else {
+            this.postMessage({
+              etype: 'event',
+              event: 'setListData',
+              args: data.list.map((item) => {
+                return {
+                  name: item.title_name,
+                  unit: title,
+                  remarks: item.remark,
+                  person: item.creater_user_name,
+                  date: item.creater_time,
+
+                  dataSource: item,
+                };
+              }),
+            });
+          }
         }
         // 错误
         else {

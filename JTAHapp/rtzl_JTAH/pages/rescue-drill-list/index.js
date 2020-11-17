@@ -184,7 +184,12 @@ class Default extends React.Component {
             })
             .reverse();
 
-          run(this, 'loadListData', dataArr);
+          if (!page) {
+            run(this, 'loadListData', dataArr);
+            return;
+          } else {
+            run(this, 'setListData', dataArr);
+          }
         }
         // 错误
         else {

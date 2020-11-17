@@ -4,6 +4,7 @@ import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
 import Toast from '../../components/Toast/index';
 import api from '../../api/index';
+import {putupData, run} from '../../core/common.js';
 import moment from 'moment';
 
 const pageUri = 'file:///android_asset/h5/risk-tips-approval/index.html';
@@ -58,25 +59,6 @@ class Default extends React.Component {
 
   componentDidMount() {}
 
-  postMessage = (obj) => {
-    this.refs.webview.postMessage(JSON.stringify(obj));
-  };
-
-  putupData = (data) => {
-    this.postMessage({
-      etype: 'data',
-      ...data,
-    });
-  };
-
-  runEvent = (name, args) => {
-    this.postMessage({
-      etype: 'event',
-      event: name,
-      args,
-    });
-  };
-
   render() {
     return (
       <View style={styles.container}>
@@ -102,21 +84,14 @@ class Default extends React.Component {
       // 加载一次树形结构数据
       api.getInstitutionsDepartment().then((data) => {
         if (data) {
-          this.postMessage({
-            etype: 'data',
-            institutions: data,
-          });
+          putupData(this, {institutions: data});
         } else {
           Toast.show('机构数据竟然查询失败了');
           return;
         }
       });
 
-      this.postMessage({
-        etype: 'data',
-        pageLoading: true,
-      });
-
+      putupData(this, {pageLoading: true});
       this.query();
     }
     //条件查询
@@ -138,8 +113,7 @@ class Default extends React.Component {
         dataSource: {serviceId, flowId},
       } = receivedData;
 
-      this.postMessage({
-        etype: 'data',
+      putupData(this, {
         approvalable: false, //默认先不允许审批
         detail: {
           fieldContents: [
@@ -177,7 +151,7 @@ class Default extends React.Component {
         // 成功
         else if (!errcode && data) {
           const {nowNode, updatedNode, status} = data;
-          this.putupData({
+          putupData(this, {
             approvalable: nowNode == updatedNode && status != 5 ? true : false,
           });
         }
@@ -211,7 +185,7 @@ class Default extends React.Component {
           const {errcode, errmsg} = res;
           if (!errcode) {
             Toast.show('审核成功通过!');
-            this.runEvent('hideDetail');
+            run(this, 'hideDetail');
             this.query();
           } else {
             Toast.show('网络连接有问题，请稍后再试');
@@ -223,17 +197,19 @@ class Default extends React.Component {
     // 审核驳回
     else if (etype === 'reject') {
       const {serviceId, flowId} = this.state.currItem;
-      api.riskTipsApprovalReject({serviceId, flowInfoId: flowId}).then((res) => {
-        const {errcode, errmsg} = res;
-        if (!errcode) {
-          Toast.show('审核成功驳回!');
-          this.runEvent('hideDetail');
-          this.query();
-        } else {
-          Toast.show('网络连接有问题，请稍后再试');
-          return;
-        }
-      });
+      api
+        .riskTipsApprovalReject({serviceId, flowInfoId: flowId})
+        .then((res) => {
+          const {errcode, errmsg} = res;
+          if (!errcode) {
+            Toast.show('审核成功驳回!');
+            run(this, 'hideDetail');
+            this.query();
+          } else {
+            Toast.show('网络连接有问题，请稍后再试');
+            return;
+          }
+        });
     }
 
     //下拉刷新
@@ -253,24 +229,16 @@ class Default extends React.Component {
   };
 
   endLoad = () => {
-    this.postMessage({
-      etype: 'data',
-      pageLoading: false,
-    });
-    this.postMessage({
-      etype: 'event',
-      event: 'listLoaded',
-    });
+    putupData(this, {pageLoading: false});
+    run(this, 'listLoaded');
   };
 
   // 查询主数据列表
   query = (page = 0, conditions = {}) => {
     if (!page) currPage = 0;
-    this.postMessage({
-      etype: 'data',
-      pageLoading: true,
-    });
+    putupData(this, {pageLoading: true});
     api.getRiskTipsApproval({ofs: page, ps, ...conditions}).then((res) => {
+      console.log(res);
       const {errcode, errmsg, data = {}} = res;
       // 超时
       if (errcode === 504) {
@@ -281,13 +249,13 @@ class Default extends React.Component {
       // 成功
       else if (!errcode) {
         // 没数据
-        if (!data.list || !data.list.length) {
+        if (!data || !data.list || !data.list.length) {
           Toast.show('没有任何数据！');
           this.endLoad();
           return;
         }
 
-        const {list} = data;
+        const {list = []} = data;
 
         let mainData = list
           .map((item, i) => {
@@ -305,21 +273,13 @@ class Default extends React.Component {
         this.endLoad();
 
         if (mainData.length < ps) {
-          this.runEvent('noMoreItem');
+          run(this, 'noMoreItem');
         }
 
         if (!page) {
-          this.postMessage({
-            etype: 'event',
-            event: 'loadListData',
-            args: mainData,
-          });
+          run(this, 'loadListData', mainData);
         } else {
-          this.postMessage({
-            etype: 'event',
-            event: 'setListData',
-            args: mainData,
-          });
+          run(this, 'setListData', mainData);
         }
       }
       // 失败
@@ -338,14 +298,8 @@ class Default extends React.Component {
 
   // 查询流程数据
   queryProccess = ({serviceId, flowInfoId}) => {
-    this.postMessage({
-      etype: 'data',
-      proccessData: [],
-    });
-    this.postMessage({
-      etype: 'event',
-      event: 'proccessLoading',
-    });
+    putupData(this, {proccessData: []});
+    run(this, 'proccessLoading');
     api.viewRiskTipsApprovalProccess({serviceId, flowInfoId}).then((res) => {
       const {errcode, errmsg, data} = res;
 
@@ -358,16 +312,12 @@ class Default extends React.Component {
         // 没数据
         if (!data || !data.length) {
           Toast.show('没有任何流程数据！');
-          this.postMessage({
-            etype: 'event',
-            event: 'proccessLoaded',
-          });
+          run(this, 'proccessLoaded');
           return;
         }
 
         // 有数据
-        this.postMessage({
-          etype: 'data',
+        putupData(this, {
           proccessData: data.map((item) => {
             return {
               title: item.nodeName,
@@ -379,10 +329,7 @@ class Default extends React.Component {
             };
           }),
         });
-        this.postMessage({
-          etype: 'event',
-          event: 'proccessLoaded',
-        });
+        run(this, 'proccessLoaded');
       }
 
       // 失败

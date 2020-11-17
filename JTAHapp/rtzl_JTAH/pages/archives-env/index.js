@@ -136,7 +136,10 @@ class Default extends React.Component {
               label: '环保影响评价环评单位',
               content: dataSource.reportingDepartment,
             },
-            {label: '环保影响评价审批单位', content: dataSource.approvalDepartment},
+            {
+              label: '环保影响评价审批单位',
+              content: dataSource.approvalDepartment,
+            },
             {label: '环保影响评价批复时间', content: dataSource.approvalTime},
             {
               label: '竣工环境保护验收时间',
@@ -222,7 +225,12 @@ class Default extends React.Component {
             })
             .reverse();
 
-          run(this, 'loadListData', dataArr);
+          if (!page) {
+            run(this, 'loadListData', dataArr);
+            return;
+          } else {
+            run(this, 'setListData', dataArr);
+          }
         }
         // 错误
         else {

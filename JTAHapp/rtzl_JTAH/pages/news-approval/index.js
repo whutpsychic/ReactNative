@@ -282,7 +282,7 @@ class Default extends React.Component {
       // 成功
       else if (!errcode) {
         // 没数据
-        if (!data.list || !data.list.length) {
+        if (!data || !data.list || !data.list.length) {
           Toast.show('没有任何数据！');
           this.endLoad();
           return;

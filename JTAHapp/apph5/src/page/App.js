@@ -28,17 +28,15 @@ const renderListItem = ({
 	const obj = data[itemIndex];
 	if (!obj) return null;
 
-	// const renderTab = tag => {
-	// 	if (tag === "期限内") {
-	// 		return <span className="tag inner">期限内</span>;
-	// 	} else if (tag === "即将到期") {
-	// 		return <span className="tag will">即将到期</span>;
-	// 	} else if (tag === "已过期") {
-	// 		return <span className="tag outer">已过期</span>;
-	// 	} else {
-	// 		return <span className="tag">未知状态</span>;
-	// 	}
-	// };
+	const renderTab = tag => {
+		if (tag === "已完成") {
+			return <span className="tag inner">已完成</span>;
+		} else if (tag === "未处置") {
+			return <span className="tag outer">未处置</span>;
+		} else {
+			return <span className="tag">未知状态</span>;
+		}
+	};
 
 	return (
 		<div
@@ -51,10 +49,11 @@ const renderListItem = ({
 		>
 			<p className="title">{obj.name}</p>
 			<p className="remarks">{obj.remarks}</p>
+			{renderTab(obj.status)}
 			<div className="spliter"></div>
 			<p className="detail">
-				<span>年度：{obj.year}</span>
-				<span>上传时间：{obj.time}</span>
+				<span>状态：{obj.status}</span>
+				<span>监测时间：{obj.time}</span>
 			</p>
 		</div>
 	);
@@ -64,7 +63,7 @@ class App extends React.Component {
 	state = {
 		pageLoading: false,
 		detail: {},
-		// types: [],
+		types: [],
 		institutions: []
 	};
 
@@ -336,10 +335,10 @@ class App extends React.Component {
 				data: this.state.institutions
 			},
 			{
-				label: "分类",
-				field: "year",
-				type: "year",
-				clearable: true
+				label: "状态",
+				field: "type",
+				type: "select",
+				data: this.state.types
 			}
 		];
 
@@ -348,9 +347,9 @@ class App extends React.Component {
 				<div className="app-contents">
 					<Details ref="detail" title="详情" data={detail} />
 					{pageLoading ? <PageLoading /> : null}
-					<TopTitle title={`履职报告`} canBack />
+					<TopTitle title={`异常信息（集团）`} canBack />
 					<TopSearcher
-						placeholder="报告名称"
+						placeholder="参数名称"
 						onClickQuery={this.onQuery}
 						conditionList={conditionList}
 					/>

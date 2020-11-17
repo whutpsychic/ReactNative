@@ -43,24 +43,23 @@ news/accountapprove
 规章制度 record/envirMaster/environmentalrecordmaster4(代码升级)（未对接）
 其他 record/envirMaster/environmentalrecordmaster5(完成对接&&代码升级)
 
-履职报告 record/resumptionmaster（未对接）
-文件通知 record/masternotice（未对接）
+履职报告 record/resumptionmaster(完成对接&&代码升级)
+文件通知 record/masternotice（未对接）无数据无法对接
 ---------------------------------------------------------
 酸性水库记录维护(带录入) area/record(完成对接&&代码升级)
 降雨量记录维护(带录入) area/rainrecord(完成对接&&代码升级)
 废水处理量记录维护(带录入) area/wasterecord(完成对接&&代码升级)
-
 ---------------------------------------------------------
 在线监测管理 
-	监测数据查询&历史数据 rtdata/autolist （未对接）
+	监测数据查询&历史数据 rtdata/autolist (完成对接&&代码升级)
 	异常信息(企业)（带编辑） rtdata/accountexception(完成对接&&代码升级)
-	异常信息(集团) rtdata/masterexception（未对接）
+	异常信息(集团) rtdata/masterexception(完成对接&&代码升级)
+
 
 (x)生态修复信息(浏览) repair/view
 x安全环保目标统计（集团）
 x环保类报表
 x安全类报表
-
 
 首页
 登录页

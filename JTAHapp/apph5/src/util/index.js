@@ -98,7 +98,7 @@ util.deepClone = obj => {
 util.executeNumber = num => {
   if (typeof num !== "number")
     throw new Error("executeNumber函数传进的参数不是一个数字类型");
-  if (num > 0 && num < 10) return `0${num}`;
+  if (num >= 0 && num < 10) return `0${num}`;
   return num.toString();
 };
 

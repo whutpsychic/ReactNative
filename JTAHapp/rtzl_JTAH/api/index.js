@@ -264,7 +264,7 @@ api.getWasteWaterWorkShop = (condition = {}) => {
 		const {errcode, errmsg, data} = res;
 		// 超时
 		if (errcode === 504) {
-			Toast.show(`监测点查询超时！`);
+			Toast.show(`废水厂查询超时！`);
 			return;
 		}
 		// 默认成功
@@ -276,7 +276,7 @@ api.getWasteWaterWorkShop = (condition = {}) => {
 				!data.list instanceof Array ||
 				!data.list.length
 			) {
-				Toast.show('查询监测点竟没有任何数据！');
+				Toast.show('查询废水厂竟没有任何数据！');
 				return;
 			}
 			// 有数据
@@ -286,7 +286,7 @@ api.getWasteWaterWorkShop = (condition = {}) => {
 		}
 		// 失败
 		else {
-			Toast.show(`监测点查询失败,原因：${errmsg}`);
+			Toast.show(`废水厂查询失败,原因：${errmsg}`);
 			return;
 		}
 	});
@@ -774,6 +774,22 @@ api.getMonitorOlDataList = (conditions) => {
 	};
 	console.log(conditionObj);
 	return buildFetcher(commonPrefix + 'AqhbAdataAuto/list', conditionObj);
+};
+
+// monitor-oldata-history
+// 【监控历史数据】
+// 获取住列表
+api.getMonitorOlDataHistoryList = (conditions) => {
+	const {page, ps, type = 1, avgType = 1} = conditions;
+	let conditionObj = {
+		ofs: page,
+		ps,
+		type,
+		avgType,
+		...conditions,
+	};
+	console.log(conditionObj);
+	return buildFetcher(commonPrefix + 'AqhbAdataAuto/historyList', conditionObj);
 };
 
 // risk-tips-approval

@@ -4,6 +4,7 @@ import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
 import api from '../../api/index';
 import Toast from '../../components/Toast/index';
+import {putupData, run} from '../../core/common.js';
 
 import faker from './faker.js';
 
@@ -18,10 +19,6 @@ class Default extends React.Component {
     //   url: 'http://10.99.189.116:18000/hls/1/index.m3u8',
     // });
   }
-
-  postMessage = (obj) => {
-    this.refs.webview.postMessage(JSON.stringify(obj));
-  };
 
   render() {
     return (
@@ -45,18 +42,12 @@ class Default extends React.Component {
     console.log(receivedData);
     //初始化完成之后互通消息然后放置数据
     if (etype === 'pageState' && receivedData.info === 'componentDidMount') {
-      this.postMessage({
-        etype: 'data',
-        pageLoading: true,
-      });
+      putupData(this, {pageLoading: true});
       api.getMapData().then((res) => {
         //如果查询失败
         const failed = () => {
           Toast.show('数据查询失败了!');
-          this.postMessage({
-            etype: 'data',
-            pageLoading: false,
-          });
+          putupData(this, {pageLoading: false});
         };
         const {data} = res;
         if (!data || !data.list) {
@@ -80,11 +71,7 @@ class Default extends React.Component {
         });
 
         //
-        this.postMessage({
-          etype: 'data',
-          pageLoading: false,
-          data: selectData,
-        });
+        putupData(this, {pageLoading: false, data: selectData});
       });
     }
     //
@@ -92,12 +79,8 @@ class Default extends React.Component {
       const {
         result: {points},
       } = receivedData;
-      this.postMessage({
-        etype: 'event',
-        event: 'select',
-      });
-      this.postMessage({
-        etype: 'data',
+      run(this, 'select');
+      putupData(this, {
         selectData: !points.length
           ? [{label: '无'}]
           : points.map((item) => {
@@ -105,10 +88,9 @@ class Default extends React.Component {
             }),
       });
     } else if (etype === 'selectPicker') {
-      const {result} = receivedData;
-      if (!result) return;
-      if (result) {
-        const {label, value} = result;
+      const {label, value} = receivedData;
+      if (!value) return;
+      if (value) {
         navigate('common_video_player', {title: label, url: value});
       }
     }

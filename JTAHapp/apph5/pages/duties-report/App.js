@@ -336,7 +336,7 @@ class App extends React.Component {
 				data: this.state.institutions
 			},
 			{
-				label: "分类",
+				label: "年度",
 				field: "year",
 				type: "year",
 				clearable: true

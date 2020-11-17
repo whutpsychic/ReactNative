@@ -152,7 +152,7 @@ const BottomTabs = () => {
           },
         }}
       />
-      <Tab.Screen
+      {/*<Tab.Screen
         name="home-mine"
         component={pdf}
         options={{
@@ -161,7 +161,7 @@ const BottomTabs = () => {
             return <ImageIcon name="mine" focused={focused} badgeName="m4" />;
           },
         }}
-      />
+      />*/}
     </Tab.Navigator>
   );
 };

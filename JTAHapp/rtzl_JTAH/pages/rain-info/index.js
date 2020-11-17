@@ -58,11 +58,11 @@ class Default extends React.Component {
     //初始化完成之后互通消息然后放置数据
     if (etype === 'pageState' && receivedData.info === 'componentDidMount') {
       // 加载一次树形结构数据
-      api.getInstitutionsDepartment().then((data) => {
+      api.getInstitutionRoleItems().then((data) => {
         if (data) {
           this.postMessage({
             etype: 'data',
-            institutions: data,
+            institutions: [{title: '全部', key: undefined}, ...data],
           });
         } else {
           Toast.show('机构数据竟然查询失败了');
@@ -135,7 +135,7 @@ class Default extends React.Component {
 
   query = (page = 0, conditions = {}) => {
      this.setState({
-      conditions: condition,
+      conditions: conditions,
     });
     if (!page) currPage = 0;
 

@@ -10,6 +10,7 @@ const {
 	DatePicker,
 	MonthPicker,
 	YearPicker,
+	TimePicker,
 	SelectTree,
 	Radios
 } = RightDrawerConditions;
@@ -22,7 +23,8 @@ const renderConditionItem = item => {
 		placeholder,
 		clearable,
 		disabled,
-		defaultValue
+		defaultValue,
+		onChange
 	} = item;
 	switch (type) {
 		case "input":
@@ -41,6 +43,7 @@ const renderConditionItem = item => {
 					data={data}
 					disabled={disabled}
 					defaultValue={defaultValue}
+					onChange={onChange}
 				/>
 			);
 		case "radios":
@@ -75,6 +78,16 @@ const renderConditionItem = item => {
 		case "year":
 			return (
 				<YearPicker
+					ref={field}
+					placeholder={placeholder}
+					clearable={clearable}
+					disabled={disabled}
+					defaultValue={defaultValue}
+				/>
+			);
+		case "time":
+			return (
+				<TimePicker
 					ref={field}
 					placeholder={placeholder}
 					clearable={clearable}

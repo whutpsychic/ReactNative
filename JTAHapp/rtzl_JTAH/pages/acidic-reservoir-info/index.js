@@ -4,6 +4,7 @@ import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
 import api from '../../api/index';
 import Toast from '../../components/Toast';
+import {putupData, run} from '../../core/common.js';
 
 const pageUri = 'file:///android_asset/h5/acidic-reservoir-info/index.html';
 
@@ -29,10 +30,7 @@ class Default extends React.Component {
 
   error = (msg) => {
     Toast.show(msg);
-    this.postMessage({
-      etype: 'data',
-      pageLoading: false,
-    });
+    putupData(this, {pageLoading: false});
   };
 
   render() {
@@ -58,22 +56,17 @@ class Default extends React.Component {
     //初始化完成之后互通消息然后放置数据
     if (etype === 'pageState' && receivedData.info === 'componentDidMount') {
       // 加载一次树形结构数据
-      api.getInstitutionsDepartment().then((data) => {
+      api.getInstitutionRoleItems().then((data) => {
         if (data) {
-          this.postMessage({
-            etype: 'data',
-            institutions: data,
+          putupData(this, {
+            institutions: [{title: '全部', key: undefined}, ...data],
           });
         } else {
           Toast.show('机构数据竟然查询失败了');
           return;
         }
       });
-
-      this.postMessage({
-        etype: 'data',
-        pageLoading: true,
-      });
+      putupData(this, {pageLoading: true});
       this.query();
     }
     //下拉刷新
@@ -88,10 +81,7 @@ class Default extends React.Component {
 
     // 当改变查询条件的时候
     else if (etype === 'onChangeConditions') {
-      this.postMessage({
-        etype: 'data',
-        pageLoading: true,
-      });
+      putupData(this, {pageLoading: true});
       const {searchText, startTime, endTime, institutions} = receivedData;
       let condition = {
         beginTime: startTime,
@@ -99,23 +89,21 @@ class Default extends React.Component {
         reservoirName: searchText,
         institutionId: institutions ? institutions[0] : undefined,
       };
-      console.log(condition);
       this.query(0, condition);
     }
 
     // 点击更多
     else if (etype === 'clickItem') {
-      const {name, unit, height, distance, remarks, date} = receivedData;
-      this.postMessage({
-        etype: 'data',
+      const {name, unit, dataSource} = receivedData;
+      putupData(this, {
         detail: {
           fieldContents: [
             {label: '水库名称', content: name},
             {label: '上报单位', content: unit},
-            {label: '距溢流口高度', content: height},
-            {label: '水库水位/m', content: distance},
-            {label: '备注', content: remarks},
-            {label: '日期', content: date},
+            {label: '水库水位/m', content: dataSource.valueA},
+            {label: '距溢流口高度', content: dataSource.valueB},
+            {label: '日期', content: dataSource.date},
+            {label: '备注', content: dataSource.remark, multiLines: true},
           ],
         },
       });
@@ -149,33 +137,17 @@ class Default extends React.Component {
       else if (!errcode) {
         // 没数据
         if (!data || !data.list || !data.list.length) {
-          this.postMessage({
-            etype: 'event',
-            event: 'loadListData',
-            args: [],
-          });
+          run(this, 'loadListData', []);
           this.error('没有任何数据');
           return;
         }
 
         if (data.list.length < ps) {
-          this.postMessage({
-            etype: 'event',
-            event: 'noMoreItem',
-          });
-          this.setState({
-            nomore: true,
-          });
+          run(this, 'noMoreItem');
         }
 
-        this.postMessage({
-          etype: 'data',
-          pageLoading: false,
-        });
-        this.postMessage({
-          etype: 'event',
-          event: 'listLoaded',
-        });
+        putupData(this, {pageLoading: false});
+        run(this, 'listLoaded');
 
         let dataArr = data.list
           .map((item) => {
@@ -189,17 +161,9 @@ class Default extends React.Component {
           })
           .reverse();
         if (!page) {
-          this.postMessage({
-            etype: 'event',
-            event: 'loadListData',
-            args: dataArr,
-          });
+          run(this, 'loadListData', dataArr);
         } else {
-          this.postMessage({
-            etype: 'event',
-            event: 'setListData',
-            args: dataArr,
-          });
+          run(this, 'setListData', dataArr);
         }
       }
       // 错误
@@ -211,14 +175,7 @@ class Default extends React.Component {
 
   //
   getMore = () => {
-    const {conditions, nomore} = this.state;
-    if (nomore) {
-      this.postMessage({
-        etype: 'event',
-        event: 'noMoreItem',
-      });
-      return;
-    }
+    const {conditions} = this.state;
     this.query(++currPage, conditions);
   };
 }
