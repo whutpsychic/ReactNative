@@ -5,6 +5,7 @@ import {WebView} from 'react-native-webview';
 import Toast from '../../components/Toast/index';
 import api from '../../api/index';
 import moment from 'moment';
+import {putupData, run} from '../../core/common.js';
 
 const pageUri = 'file:///android_asset/h5/news-approval/index.html';
 
@@ -125,7 +126,8 @@ class Default extends React.Component {
     else if (etype === 'onChangeConditions') {
       const {searchText, institutions, type, status, time} = receivedData;
       let conditions = {
-        institutionId: institutions ? institutions[0] : undefined,
+        institutionId:
+          institutions && institutions[0] ? institutions[0] : undefined,
         newsType: typeof type === 'number' ? type : undefined,
         newsTime: time,
         newsName: searchText,
@@ -284,6 +286,7 @@ class Default extends React.Component {
         // 没数据
         if (!data || !data.list || !data.list.length) {
           Toast.show('没有任何数据！');
+          run(this, 'loadListData', []);
           this.endLoad();
           return;
         }
@@ -373,8 +376,8 @@ class Default extends React.Component {
             return {
               title: item.nodeName,
               status: renderState(item),
-              opinion: item.comments,
-              date: item.flowDate,
+              opinion: item.comments || '未填写意见',
+              date: item.flowDate || '未知时间',
               cost: formatDuration(item.interval),
               person: item.userNameList.join(','),
             };

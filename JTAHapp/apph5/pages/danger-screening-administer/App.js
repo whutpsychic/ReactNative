@@ -33,7 +33,11 @@ class Tips extends React.Component {
 						{data.files &&
 							data.files.length &&
 							data.files.map((item, i) => {
-								return <a key={`${i}`}>{item.name}</a>;
+								return (
+									<a key={`${i}`} onClick={() => util.traceBack("file", item)}>
+										{item.name}
+									</a>
+								);
 							})}
 					</span>
 				</div>
@@ -95,7 +99,11 @@ class Detail extends React.Component {
 						{data.files1 &&
 							data.files1.length &&
 							data.files1.map(item => {
-								return <a>{item.name}</a>;
+								return (
+									<a onClick={() => util.traceBack("file", item)}>
+										{item.name}
+									</a>
+								);
 							})}
 					</span>
 					<p>整改反馈</p>
@@ -107,7 +115,11 @@ class Detail extends React.Component {
 						{data.files2 &&
 							data.files2.length &&
 							data.files2.map(item => {
-								return <a>{item.name}</a>;
+								return (
+									<a onClick={() => util.traceBack("file", item)}>
+										{item.name}
+									</a>
+								);
 							})}
 					</span>
 				</div>

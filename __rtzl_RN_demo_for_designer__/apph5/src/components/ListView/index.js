@@ -62,15 +62,6 @@ class Default extends React.Component {
 	onRefresh = () => {
 		console.log("inner-com-list onRefresh");
 		const { onRefresh } = this.props;
-		// 重置
-		pageIndex = 0;
-		this.setState({
-			hasMore: true,
-			data: [],
-			dataSource: new ListView.DataSource({
-				rowHasChanged: (row1, row2) => row1 !== row2
-			})
-		});
 
 		if (typeof onRefresh === "function") onRefresh();
 	};
@@ -182,7 +173,9 @@ class Default extends React.Component {
 	// 用于初始加载数据/刷新数据
 	loadData = data => {
 		// 率先清空
+		pageIndex = 0;
 		this.setState({
+			hasMore: true,
 			data: [],
 			dataSource: this.state.dataSource.cloneWithRows(genData(0, 0))
 		});

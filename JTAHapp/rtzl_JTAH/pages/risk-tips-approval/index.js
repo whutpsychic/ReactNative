@@ -100,11 +100,11 @@ class Default extends React.Component {
     else if (etype === 'onChangeConditions') {
       const {searchText, institutions, type, status, time} = receivedData;
       let conditions = {
-        institutionId: institutions ? institutions[0] : undefined,
-        newsType: typeof type === 'number' ? type : undefined,
-        newsTime: time,
-        newsName: searchText,
-        flowState: status ? status[0] : undefined,
+        institutionId:
+          institutions && institutions[0] ? institutions[0] : undefined,
+        createrTime: time,
+        type: type && type[0] ? type[0] : undefined,
+        flowState: status,
       };
       this.query(0, conditions);
     }
@@ -116,16 +116,17 @@ class Default extends React.Component {
       } = receivedData;
 
       putupData(this, {
-        approvalable: false, //默认先不允许审批
+        approvalable:
+          dataSource.nowNode == dataSource.updatedNode && dataSource.status != 5
+            ? true
+            : false,
         detail: {
           fieldContents: [
-            {label: '发布单位', content: dataSource.institutionName},
-            {label: '标题', content: dataSource.newsName},
-            {label: '分类', content: typeToWord(dataSource.newsType)},
-            {label: '编制人', content: dataSource.createrUserName},
-            {label: '编制时间', content: dataSource.newsTime},
-            {label: '发布时间', content: dataSource.publishTime},
-            {label: '审批状态', content: dataSource.statusDes},
+            {label: '单位', content: dataSource.institutionName},
+            {label: '分类', content: typeToWord(dataSource.type)},
+            {label: '发布人', content: dataSource.createrUserName},
+            {label: '当前状态', content: dataSource.statusDes},
+            {label: '提示内容', content: dataSource.content, multiLines: true},
           ],
           files: dataSource.fileList
             ? dataSource.fileList.map((item) => {
@@ -141,28 +142,6 @@ class Default extends React.Component {
           serviceId,
           flowId,
         },
-      });
-
-      api.getNewsDetail(serviceId).then((res) => {
-        const {errcode, errmsg, data} = res;
-        //超时
-        if (errcode === 504) {
-          Toast.show('请求超时了');
-          return;
-        }
-        // 成功
-        else if (!errcode && data) {
-          const {nowNode, updatedNode, status} = data;
-          putupData(this, {
-            approvalable: nowNode == updatedNode && status != 5 ? true : false,
-          });
-        }
-
-        // 失败
-        else {
-          Toast.show(`请求失败了：${errmsg}`);
-          return;
-        }
       });
     }
 
@@ -253,6 +232,7 @@ class Default extends React.Component {
         // 没数据
         if (!data || !data.list || !data.list.length) {
           Toast.show('没有任何数据！');
+          run(this, 'loadListData', []);
           this.endLoad();
           return;
         }
@@ -262,9 +242,9 @@ class Default extends React.Component {
         let mainData = list
           .map((item, i) => {
             return {
-              name: item.newsName,
+              name: item.institutionName,
               person: item.createrUserName || '',
-              remarks: item.remark,
+              remarks: item.content,
               time: item.createrTime,
               status: item.statusDes,
               dataSource: item,
@@ -324,8 +304,8 @@ class Default extends React.Component {
             return {
               title: item.nodeName,
               status: renderState(item),
-              opinion: item.comments,
-              date: item.flowDate,
+              opinion: item.comments || '未填写意见',
+              date: item.flowDate || '未知时间',
               cost: formatDuration(item.interval),
               person: item.userNameList.join(','),
             };

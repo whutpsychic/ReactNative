@@ -131,7 +131,9 @@ class Default extends React.Component {
           pageLoading: false,
         });
       });
-    } else if (etype === 'board1' || etype === 'board2') {
+    }
+    //
+    else if (etype === 'board1' || etype === 'board2') {
       const {text, date, files} = receivedData;
       this.postMessage({
         etype: 'data',
@@ -141,7 +143,10 @@ class Default extends React.Component {
           files,
         },
       });
-    } else if (etype === 'btn-query') {
+    }
+
+    //
+    else if (etype === 'btn-query') {
       const {input, select, startDate, endDate} = receivedData;
 
       const condition = {};
@@ -190,6 +195,12 @@ class Default extends React.Component {
         });
       });
     }
+    // 预览文件
+    else if (etype === 'file') {
+      const {name, url_pdf} = receivedData;
+      navigate('pdf', {title: name, url: url_pdf});
+    }
+
     //
     else if (etype === 'back-btn') {
       navigation.goBack();

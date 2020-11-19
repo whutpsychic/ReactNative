@@ -197,7 +197,6 @@ class App extends React.Component {
 					data={detail}
 					extra={() => (
 						<React.Fragment>
-							<a onClick={() => util.traceBack("onPreview")}>预览</a>
 							<a onClick={() => this.onViewProccess()}>查看审核流程</a>
 							{approvalable ? (
 								<React.Fragment>

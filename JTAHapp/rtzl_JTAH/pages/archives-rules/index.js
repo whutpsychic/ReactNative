@@ -28,6 +28,8 @@ const transTypeToText2 = (x) => {
   switch (x) {
     case 1:
       return '档案资料';
+    case 2:
+      return '规章制度';
     default:
       return '未知类型';
   }

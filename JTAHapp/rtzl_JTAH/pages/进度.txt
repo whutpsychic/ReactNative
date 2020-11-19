@@ -18,7 +18,7 @@ news/accountapprove
 隐患排查 hidden/group （已做）
 风险分级管控 hidden/riskmaster(完成对接&&代码升级)
 新闻审批 news/accountapprove (完成对接&&代码升级)(搜索功能有问题)
-风险提示审批 news/riskapprove（代码升级&&未对接）无数据无法对接
+风险提示审批 news/riskapprove(完成对接&&代码升级)
 应急预案管理 contingency/master(完成对接&&代码升级)
 救援演练与评估查询  contingency/recusemaster(完成对接&&代码升级)
 事故快报 accident/account(完成对接&&代码升级)
@@ -40,11 +40,11 @@ news/accountapprove
 安全档案资料 record/envirMaster/environmentalrecordmaster1(完成对接&&代码升级)
 环保档案资料 record/envirMaster/environmentalrecordmaster2(完成对接&&代码升级)
 职业卫生档案资料 record/envirMaster/environmentalrecordmaster3(完成对接&&代码升级)
-规章制度 record/envirMaster/environmentalrecordmaster4(代码升级)（未对接）
+规章制度 record/envirMaster/environmentalrecordmaster4(完成对接&&代码升级)
 其他 record/envirMaster/environmentalrecordmaster5(完成对接&&代码升级)
 
 履职报告 record/resumptionmaster(完成对接&&代码升级)
-文件通知 record/masternotice（未对接）无数据无法对接
+文件通知 record/masternotice(完成对接&&代码升级)
 ---------------------------------------------------------
 酸性水库记录维护(带录入) area/record(完成对接&&代码升级)
 降雨量记录维护(带录入) area/rainrecord(完成对接&&代码升级)
