@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StatusBar} from 'react-native';
+import {View, Text, StatusBar, Image} from 'react-native';
 import {StyleSheet} from 'react-native';
 import {connect} from 'react-redux';
 import {initializing, login} from '../../redux/actions.js';
@@ -7,6 +7,7 @@ import Toast from '../../components/Toast/index';
 import storage from '../../core/storage.js';
 import api from '../../api/index.js';
 import config from '../../config/index.js';
+import logo from './logo.png';
 
 class Default extends React.Component {
 	state = {};
@@ -24,25 +25,24 @@ class Default extends React.Component {
 		let p1 = storage.getData('jtah_userName');
 		let p2 = storage.getData('jtah_psw');
 		let P = Promise.all([p1, p2]).then((resArr) => {
-			console.log(resArr)
 			// 如果有记住用户名和密码
 			if (resArr[0] && resArr[1]) {
 				api.login(resArr[0], resArr[1]).then((res) => {
-					const {ok, status} = res;
+					const {errcode, data} = res;
 					//成功
-					if (ok && status === 200) {
+					if (!errcode && data) {
 						login(true);
 						initialized();
 						Toast.show('登录成功');
 						return;
 					}
 					// 超时
-					else if (!ok && status === 504) {
-						login(false);
-						initialized();
-						Toast.show('登录超时，请稍后重试');
-						return;
-					}
+					// else if (!ok && status === 504) {
+					// 	login(false);
+					// 	initialized();
+					// 	Toast.show('登录超时，请稍后重试');
+					// 	return;
+					// }
 
 					// 错误
 					else {
@@ -68,7 +68,8 @@ class Default extends React.Component {
 					translucent={true}
 				/>
 				<View style={styles.container}>
-					<Text style={styles.logoText}>LOGO</Text>
+					{/*<Text style={styles.logoText}>LOGO</Text>*/}
+					<Image alt="" source={logo} style={styles.logoImage} />
 				</View>
 			</React.Fragment>
 		);
@@ -93,11 +94,15 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
-	logoText: {
-		fontSize: 24,
-		color: 'black',
-		fontWeight: 'bold',
-		textAlign: 'center',
+	// logoText: {
+	// 	fontSize: 24,
+	// 	color: 'black',
+	// 	fontWeight: 'bold',
+	// 	textAlign: 'center',
+	// },
+	logoImage: {
+		height: '100%',
+		resizeMode: 'contain',
 	},
 });
 

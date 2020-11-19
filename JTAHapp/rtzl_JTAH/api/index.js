@@ -83,7 +83,7 @@ api.login = (userName, password) => {
 		'post',
 	)
 		.then((response) => {
-			return response;
+			return response.json();
 		})
 		.catch((err) => {
 			// 超时之后的错误不予以处理
@@ -616,13 +616,6 @@ api.getArchivesOthersList = (conditions) => {
 	return buildFetcher(commonPrefix + 'HseArchive/list', conditionObj);
 };
 
-// // ecology-repair-info
-// // 【生态修复信息】
-// // 获取生态修复信息主图片列表
-// api.getEcologyRepairImgs = () => {
-// 	return buildFetcher(commonPrefix + 'institutions/imgUrlList');
-// };
-
 // ecology-repair-info
 // 【生态修复信息】
 // 获取生态修复信息主数据列表
@@ -636,13 +629,6 @@ api.getEcologyRepairList = (conditions) => {
 api.getSafeCalendarData = (conditions) => {
 	return buildFetcher(commonPrefix + 'AccidentAnalyse/queryByYear', conditions);
 };
-
-// // fire-control-manage
-// // 【消防管理】
-// // 获取主列表数据
-// api.getFireControlMainData = () => {
-// 	return buildFetcher(commonPrefix + 'institutions/imgUrlList');
-// };
 
 // fire-control-data-list
 // 【消防资料查询】

@@ -1,0 +1,74 @@
+ul.rtmcc-rnweb-list {
+	margin: 0;
+	padding: 0;
+	background-color: #fff;
+	min-height: calc(100vh - 50px);
+	position: relative;
+}
+
+ul.rtmcc-rnweb-list > li {
+	position: relative;
+	font-size: 16px;
+	color: #233;
+	margin: 0 20px;
+	height: 48px;
+	line-height: 48px;
+	border-top: solid 1px #ddd;
+	display: flex;
+	justify-content: space-between;
+}
+
+ul.rtmcc-rnweb-list > li.disabled {
+	color: #ccc;
+}
+
+ul.rtmcc-rnweb-list > li:first-child {
+	border-top: none;
+}
+
+ul.rtmcc-rnweb-list > li > label {
+	display: block;
+	font-weight: bold;
+	margin-right: 10px;
+	min-width: 100px;
+	white-space: nowrap;
+}
+
+ul.rtmcc-rnweb-list > li > span {
+	display: block;
+	margin-right: 32px;
+}
+
+ul.rtmcc-rnweb-list > li > span[role="img"] {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 24px;
+	height: 24px;
+	margin: 12px 0;
+	position: absolute;
+	right: 0;
+}
+
+ul.rtmcc-rnweb-list > li > input,
+ul.rtmcc-rnweb-list > li > input.number {
+	outline: none;
+	border: none;
+	width: 100%;
+	flex-basis: 100%;
+	margin-right: 32px;
+	text-align: right;
+}
+
+ul.rtmcc-rnweb-list > li > textarea {
+	outline: none;
+	border: none;
+	flex-basis: 100%;
+	width: 100%;
+	resize: none;
+}
+
+ul.rtmcc-rnweb-list > li > input:disabled,
+ul.rtmcc-rnweb-list > li > textarea:disabled {
+	background-color: transparent;
+}

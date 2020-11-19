@@ -58,8 +58,7 @@ class Default extends React.Component {
       etype: 'data',
       pageLoading: true,
     });
-    api.getFireControlMainData().then((res) => {
-      console.log(res);
+    api.getImgUrlList().then((res) => {
       const {errcode, errmsg, data} = res;
       // 超时
       if (errcode === 504) {

@@ -1,0 +1,162 @@
+.detail-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100vw;
+	height: 100vh;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1;
+}
+
+.detail-container .msk {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.3);
+}
+
+.detail-container .main-container {
+	background-color: #fff;
+	display: block;
+	width: 90vw;
+	height: 70vh;
+	z-index: 2;
+	overflow: auto;
+	animation: detailsGoIn 0.2s;
+}
+
+.detail-container .main-container .detail-title {
+	font-size: 18px;
+	font-weight: bold;
+	text-align: center;
+	margin: 16px;
+}
+
+.detail-container .main-container ul {
+	margin: 10px;
+}
+
+.detail-container .main-container ul li {
+	display: flex;
+	line-height: 30px;
+	border-collapse: collapse;
+	margin-bottom: 4px;
+}
+
+.detail-container .main-container ul li.multi-lines {
+	display: block;
+}
+
+.detail-container .main-container ul li.multi-lines p {
+	text-indent: 2em;
+	line-height: 20px;
+}
+
+.detail-container .main-container ul li.multi-lines .files {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	margin-top: 20px;
+}
+
+.detail-container .main-container ul li.multi-lines .files li {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	margin-bottom: 10px;
+	min-width: 80px;
+}
+
+.detail-container .main-container ul li.multi-lines .files li img {
+	display: block;
+	width: 24px;
+	height: 24px;
+}
+
+.detail-container .main-container ul li.multi-lines .files li span {
+	display: block;
+	flex-basis: 100%;
+	text-align: center;
+	margin: 8px;
+}
+
+.detail-container .main-container ul li label {
+	font-weight: bold;
+	background-color: #eee;
+	text-align: right;
+	display: block;
+	width: 100px;
+	min-width: 100px;
+	padding-right: 8px;
+}
+
+.detail-container .main-container ul li label + span {
+	display: block;
+	padding-left: 10px;
+}
+
+.detail-container .main-container ul li.align-center {
+	justify-content: center;
+}
+
+.detail-container .main-container ul li > img.news-img {
+	display: block;
+	width: 200px;
+	height: 160px;
+}
+
+.detail-container .main-container > a {
+	display: block;
+	margin-bottom: 10px;
+	text-align: center;
+	font-size: 15px;
+}
+
+.detail-container .main-container .approval-btn {
+	user-select: none;
+	color: #fff;
+	margin: 20px;
+}
+
+.detail-container .main-container .approval-btn.agree {
+	background-color: green;
+}
+
+.detail-container .main-container .approval-btn.agree:active {
+	background-color: darkgreen;
+}
+
+.detail-container .main-container .approval-btn.reject {
+	background-color: red;
+}
+
+.detail-container .main-container .approval-btn.reject:active {
+	background-color: darkred;
+}
+
+.detail-container .main-container textarea {
+	margin: 20px;
+	margin-top: 0;
+	padding: 4px 10px;
+	border-color: #889;
+	width: calc(100% - 42px);
+	height: 160px;
+}
+
+.detail-container .main-container textarea::placeholder {
+	font-size: 14px;
+	color: #ccc;
+}
+
+@keyframes detailsGoIn {
+	from {
+		height: 0;
+	}
+	to {
+		height: 70vh;
+	}
+}

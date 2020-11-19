@@ -1,0 +1,23 @@
+ul.rtmcc-rnweb-list .btns {
+	width: calc(100% - 40px);
+	flex-basis: calc(100% - 40px);
+	margin-top: 16px;
+	margin-bottom: 16px;
+	/*position: absolute;*/
+	/*bottom: 0;*/
+}
+
+ul.rtmcc-rnweb-list .btns ul {
+	width: 100%;
+}
+
+ul.rtmcc-rnweb-list .btns li.button {
+	margin-bottom: 16px;
+}
+
+ul.rtmcc-rnweb-list .btns li.button.disabled {
+}
+
+ul.rtmcc-rnweb-list .btns li.button a {
+	width: 100%;
+}

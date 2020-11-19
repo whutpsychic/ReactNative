@@ -4,6 +4,7 @@ import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
 import api from '../../api/index';
 import Toast from '../../components/Toast';
+import {putupData, run} from '../../core/common.js';
 
 const pageUri = 'file:///android_asset/h5/risk-grade-control-list/index.html';
 
@@ -155,11 +156,8 @@ class Default extends React.Component {
           // 没数据
           if (!data || !data.list || !data.list.length) {
             this.error('没有任何数据');
-            this.postMessage({
-              etype: 'event',
-              event: 'loadListData',
-              args: [],
-            });
+            run(this, 'loadListData', []);
+            run(this, 'listLoaded');
             return;
           }
 

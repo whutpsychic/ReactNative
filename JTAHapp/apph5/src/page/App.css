@@ -2,73 +2,9 @@
 	overflow: auto;
 }
 
-.app-contents .am-list-body,
-.list-view-section-body {
-	background-color: transparent;
-}
-
-.item-outer {
-	margin: 12px;
-	margin-top: 0;
-	padding: 10px 16px;
-	background-color: #fff;
-	position: relative;
-}
-
-.item-outer:first-child {
-	/*margin-top: 12px;*/
-}
-
-.tag {
-	position: absolute;
-	top: 6px;
-	right: 12px;
-	padding: 2px 8px;
-	border: solid 1px #ccc;
-}
-
-.tag.inner {
-	color: #52c41a;
-	background-color: #f6ffed;
-	border: solid 1px #b7eb8f;
-}
-
-.tag.will {
-	color: #f5222d;
-	background-color: #fff1f0;
-	border: solid 1px #ffa39e;
-}
-
-.tag.outer {
-	color: #fff;
-	background-color: red;
-	border: solid 1px darkred;
-}
-
-.item-outer > .title {
-	font-size: 16px;
-	font-weight: bold;
-}
-
-.item-outer > .remarks {
-	width: calc(100vw - 56px);
-	height: 50px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-.item-outer > .spliter {
-	height: 1px;
-	background-color: #ddd;
-	margin: 8px 0;
-}
-
-.item-outer > .detail {
-	display: flex;
-	justify-content: space-between;
-}
-
-.item-outer > .detail span {
-	color: #aaa;
+.app-contents .map-container {
+	width: 100%;
+	height: calc(100% - 50px);
+	background-image: url("../img/main-video-bg.png");
+	background-position: right;
 }

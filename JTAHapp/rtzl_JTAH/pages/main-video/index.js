@@ -88,9 +88,10 @@ class Default extends React.Component {
             }),
       });
     } else if (etype === 'selectPicker') {
-      const {label, value} = receivedData;
-      if (!value) return;
-      if (value) {
+      const {result} = receivedData;
+      if (!result) return;
+      if (result) {
+        const {label, value} = result;
         navigate('common_video_player', {title: label, url: value});
       }
     }

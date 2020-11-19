@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "go": "cd android && gradlew clean && cd .. && react-native run-android",
+    "build": "cd android && gradlew clean && gradlew assembleRelease && cd .."
+  }
+}

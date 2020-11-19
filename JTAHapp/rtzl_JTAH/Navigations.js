@@ -152,16 +152,16 @@ const BottomTabs = () => {
           },
         }}
       />
-      {/*<Tab.Screen
+      <Tab.Screen
         name="home-mine"
-        component={pdf}
+        component={Main_Mine}
         options={{
           tabBarLabel: '个人中心',
           tabBarIcon: ({focused}) => {
             return <ImageIcon name="mine" focused={focused} badgeName="m4" />;
           },
         }}
-      />*/}
+      />
     </Tab.Navigator>
   );
 };

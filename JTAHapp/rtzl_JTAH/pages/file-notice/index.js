@@ -80,12 +80,11 @@ class Default extends React.Component {
     //初始化完成之后互通消息然后放置数据
     if (etype === 'pageState' && receivedData.info === 'componentDidMount') {
       // 加载一次树形结构数据
-      api.getInstitutionsDepartment().then((data) => {
-        console.log(data);
+      api.getInstitutionRoleItems().then((data) => {
         if (data)
           this.postMessage({
             etype: 'data',
-            institutions: data,
+            institutions: [{title: '全部', key: undefined}, ...data],
           });
       });
 

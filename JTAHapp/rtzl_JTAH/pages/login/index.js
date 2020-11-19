@@ -42,7 +42,7 @@ class Default extends React.Component {
     //初始化完成之后互通消息然后放置数据
     if (etype === 'pageState' && receivedData.info === 'componentDidMount') {
       storage.getData('jtah_userName').then((name) => {
-        if (name)
+        if (name && name !== 'null')
           this.postMessage({
             etype: 'data',
             name,
@@ -50,7 +50,7 @@ class Default extends React.Component {
       });
 
       storage.getData('jtah_psw').then((psw) => {
-        if (psw)
+        if (psw && psw !== 'null')
           this.postMessage({
             etype: 'data',
             psw,
@@ -79,9 +79,10 @@ class Default extends React.Component {
     let p1, p2;
 
     api.login(name, psw).then((res) => {
-      const {ok, status} = res;
+      console.log(res);
+      const {errcode, data} = res;
       //成功
-      if (ok && status === 200) {
+      if (!errcode && data) {
         // 记住身份
         if (rememberPsw) {
           p1 = storage.setData('jtah_userName', name);
@@ -92,25 +93,25 @@ class Default extends React.Component {
         }
 
         Promise.all([p1, p2]).then((resArr) => {
+          Toast.show('登录成功');
           login(true);
           initialized();
-          Toast.show('登录成功');
           return;
         });
       }
       // 超时
-      else if (!ok && status === 504) {
-        login(false);
-        initialized();
-        Toast.show('登录超时，请稍后重试');
-        return;
-      }
+      // else if (!ok && status === 504) {
+      //   login(false);
+      //   initialized();
+      //   Toast.show('登录超时，请稍后重试');
+      //   return;
+      // }
 
       // 错误
       else {
+        Toast.show('登录错误，请检查用户名密码是否正确');
         login(false);
         initialized();
-        Toast.show('登录错误');
         return;
       }
     });

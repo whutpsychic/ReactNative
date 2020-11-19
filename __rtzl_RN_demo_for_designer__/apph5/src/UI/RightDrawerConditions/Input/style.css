@@ -1,0 +1,12 @@
+.rtmcc-rnweb-input {
+	text-indent: 8px;
+}
+
+.rtmcc-rnweb-input.disabled {
+	color: #aaa;
+	background-color: #eee;
+}
+
+.rtmcc-rnweb-input span {
+	font-size: 14px;
+}

@@ -1,0 +1,34 @@
+.rtmcc-rnweb-radios > .ant-radio-group.ant-radio-group-solid {
+	flex-basis: 100%;
+	width: 100%;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+	border: none;
+}
+
+.rtmcc-rnweb-radios
+	> .ant-radio-group.ant-radio-group-solid
+	.ant-radio-button-wrapper:nth-child(3n + 1) {
+	border-left: solid 1px #ccc;
+	border-top: none;
+}
+
+.rtmcc-rnweb-radios
+	> .ant-radio-group.ant-radio-group-solid
+	.ant-radio-button-wrapper:first-child {
+	border-top: solid 1px #ccc;
+}
+
+.rtmcc-rnweb-radios
+	> .ant-radio-group.ant-radio-group-solid
+	.ant-radio-button-wrapper {
+	/*border: none;*/
+	/*border: solid 1px #ccc;*/
+}
+
+.rtmcc-rnweb-radios
+	> .ant-radio-group.ant-radio-group-solid
+	.ant-radio-button-wrapper::before {
+	width: 0;
+}

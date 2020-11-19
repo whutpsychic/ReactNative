@@ -49,7 +49,7 @@ class Default extends React.Component {
       });
 
       api
-        .getEcologyRepairImgs()
+        .getImgUrlList()
         .then((res) => {
           console.log(res);
           const {errcode, errmsg, data} = res;
