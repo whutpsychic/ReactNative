@@ -12,6 +12,8 @@ import nav_rn from './pages/nav_rn/index';
 
 // web-components
 import web_TopTitle from './pages/web_TopTitle/index';
+import web_ListView from './pages/web_ListView/index';
+import web_List from './pages/web_List/index';
 
 const Stack = createStackNavigator();
 
@@ -30,6 +32,8 @@ class App extends React.Component {
               <Stack.Screen name="web" component={nav_web} />
               <Stack.Screen name="rn" component={nav_rn} />
               <Stack.Screen name="web_TopTitle" component={web_TopTitle} />
+              <Stack.Screen name="web_ListView" component={web_ListView} />
+              <Stack.Screen name="web_List" component={web_List} />
             </Fragment>
           )}
         </Stack.Navigator>

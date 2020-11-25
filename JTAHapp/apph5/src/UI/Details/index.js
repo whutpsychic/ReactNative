@@ -31,11 +31,11 @@ export default class extends React.Component {
 					<ul>
 						{fieldContents instanceof Array && fieldContents.length > 0
 							? fieldContents.map((item, i) => {
-									const { multiLines, label, content } = item;
+									const { multiLines, label, content, color } = item;
 									return (
 										<li key={`i${i}`} className={calcCls(multiLines)}>
 											<label>{label}</label>
-											<span>{item["content"]}</span>
+											<span className={color}>{item["content"]}</span>
 										</li>
 									);
 							  })

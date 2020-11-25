@@ -6,6 +6,8 @@ import api from '../../api/index';
 import Toast from '../../components/Toast';
 import {putupData, run} from '../../core/common.js';
 
+import getDetail from './getDetail.js';
+
 const pageUri = 'file:///android_asset/h5/monitor-oldata-history/index.html';
 
 let currPage = 0;
@@ -66,6 +68,34 @@ class Default extends React.Component {
       this.getMore();
     }
 
+    //
+    else if (etype === 'clickItem') {
+      const {dataSource} = receivedData;
+      // 在此判断是废气还是废液
+      const {
+        route: {
+          params: {type},
+        },
+      } = this.props;
+
+      // 废液
+      if (type === 1) {
+        putupData(this, {
+          detail: {
+            fieldContents: getDetail(type, dataSource),
+          },
+        });
+      }
+      // 废气
+      else {
+        putupData(this, {
+          detail: {
+            fieldContents: getDetail(type, dataSource),
+          },
+        });
+      }
+    }
+
     // 当改变查询条件的时候
     else if (etype === 'onChangeConditions') {
       putupData(this, {pageLoading: true});
@@ -86,7 +116,7 @@ class Default extends React.Component {
   query = (page = 0, conditions = {}) => {
     const {
       route: {
-        params: {title, mnNumber},
+        params: {title, mnNumber, type},
       },
     } = this.props;
     if (!page) currPage = 0;
@@ -95,6 +125,7 @@ class Default extends React.Component {
       .getMonitorOlDataHistoryList({
         page,
         ps,
+        type,
         mnNumber,
         ...conditions,
       })
@@ -126,10 +157,7 @@ class Default extends React.Component {
               return {
                 name: title,
                 time: item.dataTime,
-                value1: item.liuliang,
-                value2: item.ph,
-                value3: item.xuyang,
-                value4: item.andan,
+                remarks: item.remark,
                 dataSource: item,
               };
             })

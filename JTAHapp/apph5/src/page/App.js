@@ -1,171 +1,73 @@
 import React from "react";
 import "./App.css";
 import util from "../util/index";
+// ====================================
 import TopTitle from "../components/TopTitle/index";
-import BoardInfo from "../components/BoardInfo/index";
-import Panel from "../components/Panel/index";
-
-import Button from "../components/Button/index";
-import Table from "../components/Table/index";
-import Input from "../components/Input/index";
-import SelectTree from "../components/SelectTree/index";
-import DatePicker from "../components/DatePicker/index";
 import PageLoading from "../components/PageLoading/index";
+import TopSearcher from "../UI/TopSearcher/index";
+import Details from "../UI/Details/index";
+// ====================================
+import ListView from "../components/ListView/index";
+import { renderImgIcon } from "../common/index";
 
-class Tips extends React.Component {
-	state = {
-		show: false,
-		loading: false
-	};
+// debug模式
+const debugging = false;
 
-	render() {
-		const { data } = this.props;
-		const { loading, show } = this.state;
-		return show ? (
-			<div className="tips-container-outer">
-				<div className="tips-msk" onClick={this.hide}></div>
-				{loading ? <PageLoading /> : null}
-				<div className="tips-container">
-					<span>通知内容：{data.content}</span>
-					<span>发布时间：{data.date}</span>
-					<span>
-						附件列表：
-						{data.files &&
-							data.files.length &&
-							data.files.map((item, i) => {
-								return (
-									<a key={`${i}`} onClick={() => util.traceBack("file", item)}>
-										{item.name}
-									</a>
-								);
-							})}
-					</span>
-				</div>
-			</div>
-		) : null;
+// 渲染每一项
+const renderListItem = ({
+	data,
+	onClick,
+	itemIndex,
+	rowData,
+	sectionID,
+	rowID
+}) => {
+	if (itemIndex < 0) {
+		itemIndex = data.length - 1;
 	}
+	const obj = data[itemIndex];
+	if (!obj) return null;
 
-	show = () => {
-		this.setState({
-			show: true
-		});
-	};
+	// const renderTab = tag => {
+	// 	if (tag === "期限内") {
+	// 		return <span className="tag inner">期限内</span>;
+	// 	} else if (tag === "即将到期") {
+	// 		return <span className="tag will">即将到期</span>;
+	// 	} else if (tag === "已过期") {
+	// 		return <span className="tag outer">已过期</span>;
+	// 	} else {
+	// 		return <span className="tag">未知状态</span>;
+	// 	}
+	// };
 
-	hide = () => {
-		this.setState({
-			show: false
-		});
-	};
-
-	loading = () => {
-		this.setState({
-			loading: true
-		});
-	};
-
-	loaded = () => {
-		this.setState({
-			loading: false
-		});
-	};
-}
-
-class Detail extends React.Component {
-	state = {
-		show: false,
-		loading: false
-	};
-
-	render() {
-		const { data } = this.props;
-		const { loading, show } = this.state;
-		return show ? (
-			<div className="detail-container-outer">
-				<div className="detail-msk" onClick={this.hide}></div>
-				{loading ? <PageLoading /> : null}
-				<div className="detail-container">
-					<p>事故隐患与整改意见表</p>
-					<span>检查项目名称:{data.name}</span>
-					<span>责任单位:{data.unit}</span>
-					<span>排查时间:{data.date}</span>
-					<span>责任人:{data.person}</span>
-					<span>整改期限:{data.time}</span>
-					<span>复核时间:{data.recheckTime}</span>
-					<span>复核状态:{data.recheckState}</span>
-					<span>存在问题:{data.question}</span>
-					<span>整改措施:{data.solution}</span>
-					<span>
-						问题附件：
-						{data.files1 &&
-							data.files1.length &&
-							data.files1.map(item => {
-								return (
-									<a onClick={() => util.traceBack("file", item)}>
-										{item.name}
-									</a>
-								);
-							})}
-					</span>
-					<p>整改反馈</p>
-					<span>完成时间:{data.checkDate}</span>
-					<span>反馈人:{data.fbPerson}</span>
-					<span>完成情况:{data.completed}</span>
-					<span>
-						反馈附件：
-						{data.files2 &&
-							data.files2.length &&
-							data.files2.map(item => {
-								return (
-									<a onClick={() => util.traceBack("file", item)}>
-										{item.name}
-									</a>
-								);
-							})}
-					</span>
-				</div>
-			</div>
-		) : null;
-	}
-
-	show = () => {
-		this.setState({
-			show: true
-		});
-	};
-
-	hide = () => {
-		this.setState({
-			show: false
-		});
-	};
-
-	loading = () => {
-		this.setState({
-			loading: true
-		});
-	};
-
-	loaded = () => {
-		this.setState({
-			loading: false
-		});
-	};
-}
+	return (
+		<div
+			key={rowID}
+			className="item-outer"
+			onClick={() => {
+				if (typeof onClick === "function") onClick(obj);
+				util.traceBack("clickItem", obj);
+			}}
+		>
+			<p className="title">{obj.name}</p>
+			<p className="remarks">{obj.remarks}</p>
+			<div className="spliter"></div>
+			<p className="detail">
+				<span>监测时间：{obj.time}</span>
+			</p>
+		</div>
+	);
+};
 
 class App extends React.Component {
 	state = {
 		pageLoading: false,
-
-		boardData: [],
-		boardData2: [],
-
-		selectData: [],
-		columns: [],
-		tableData: [],
-		tableLoading: false,
-
-		tipsData: {},
-		detailData: {}
+		detail: {},
+		types: [
+			{ label: "废水", value: 1 },
+			{ label: "废气", value: 2 }
+		],
+		institutions: []
 	};
 
 	componentDidMount() {
@@ -187,120 +89,443 @@ class App extends React.Component {
 		});
 
 		// ***************************************************
+		if (debugging) {
+			this.setState({
+				institutions: [
+					{
+						value: "390090725934497792",
+						label: "江西铜业集团有限公司",
+						parentId: "0",
+						sort: 0,
+						level: 1,
+						children: [
+							{
+								value: "436932209262198784",
+								label: "德兴铜矿",
+								parentId: "390090725934497792",
+								sort: 1,
+								level: 2,
+								children: [],
+								title: "德兴铜矿",
+								key: "436932209262198784"
+							},
+							{
+								value: "436933485161086976",
+								label: "城门山铜矿",
+								parentId: "390090725934497792",
+								sort: 2,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "城门山铜矿",
+								key: "436933485161086976"
+							},
+							{
+								value: "436934554456948736",
+								label: "永平铜矿",
+								parentId: "390090725934497792",
+								sort: 3,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "永平铜矿",
+								key: "436934554456948736"
+							},
+							{
+								value: "436935221909127168",
+								label: "武山铜矿",
+								parentId: "390090725934497792",
+								sort: 4,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "武山铜矿",
+								key: "436935221909127168"
+							},
+							{
+								value: "436935493695832064",
+								label: "银山矿业",
+								parentId: "390090725934497792",
+								sort: 5,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "银山矿业",
+								key: "436935493695832064"
+							},
+							{
+								value: "436936484168138752",
+								label: "东同矿业",
+								parentId: "390090725934497792",
+								sort: 6,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "东同矿业",
+								key: "436936484168138752"
+							},
+							{
+								value: "436936900947738624",
+								label: "四川稀土",
+								parentId: "390090725934497792",
+								sort: 7,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "四川稀土",
+								key: "436936900947738624"
+							},
+							{
+								value: "436937049254133760",
+								label: "七宝山矿业",
+								parentId: "390090725934497792",
+								sort: 8,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "七宝山矿业",
+								key: "436937049254133760"
+							},
+							{
+								value: "436937866908532736",
+								label: "贵溪冶炼厂",
+								parentId: "390090725934497792",
+								sort: 9,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "贵溪冶炼厂",
+								key: "436937866908532736"
+							},
+							{
+								value: "436942583181082624",
+								label: "铅锌公司",
+								parentId: "390090725934497792",
+								sort: 10,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "铅锌公司",
+								key: "436942583181082624"
+							},
+							{
+								value: "436942983275741184",
+								label: "金德铅业",
+								parentId: "390090725934497792",
+								sort: 11,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "金德铅业",
+								key: "436942983275741184"
+							},
+							{
+								value: "436943904206487552",
+								label: "江铜清远",
+								parentId: "390090725934497792",
+								sort: 12,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "江铜清远",
+								key: "436943904206487552"
+							},
+							{
+								value: "436948078520434688",
+								label: "铜加工事业部",
+								parentId: "390090725934497792",
+								sort: 13,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "铜加工事业部",
+								key: "436948078520434688"
+							},
+							{
+								value: "436944350979555328",
+								label: "铜板带公司",
+								parentId: "390090725934497792",
+								sort: 14,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "铜板带公司",
+								key: "436944350979555328"
+							},
+							{
+								value: "436944640503971840",
+								label: "铜箔公司",
+								parentId: "390090725934497792",
+								sort: 15,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "铜箔公司",
+								key: "436944640503971840"
+							},
+							{
+								value: "436945762669035520",
+								label: "铜材公司",
+								parentId: "390090725934497792",
+								sort: 16,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "铜材公司",
+								key: "436945762669035520"
+							},
+							{
+								value: "462948831454035968",
+								label: "广州铜材",
+								parentId: "390090725934497792",
+								sort: 17,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "广州铜材",
+								key: "462948831454035968"
+							},
+							{
+								value: "481028643292708864",
+								label: "江铜物流",
+								parentId: "390090725934497792",
+								sort: 18,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "江铜物流",
+								key: "481028643292708864"
+							},
+							{
+								value: "481029125448925184",
+								label: "南方公司",
+								parentId: "390090725934497792",
+								sort: 19,
+								level: 2,
+								children: [],
+								selectable: false,
+								title: "南方公司",
+								key: "481029125448925184"
+							}
+						],
+						selectable: false,
+						title: "江西铜业集团有限公司",
+						key: "390090725934497792"
+					}
+				]
+			});
+			this.loadListData([
+				{
+					name: "文件名test0",
+					unit: "德兴铜矿",
+					person: "admin",
+					date: "2020-06-07",
+					remarks:
+						"djslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkjdjslkahljashlgjkhasfkj"
+				}
+			]);
+		}
 	}
 
 	render() {
-		const { pageLoading, boardData, boardData2 } = this.state;
-		const { selectData, columns, tableData, tableLoading } = this.state;
-		const { tipsData, detailData } = this.state;
+		const { pageLoading, detail } = this.state;
+
+		const conditionList = [
+			{
+				label: "单位",
+				field: "institution",
+				type: "selecttree",
+				data: this.state.institutions
+			},
+			{
+				// label: "类型",
+				field: "type",
+				type: "radios",
+				data: this.state.types
+			}
+		];
+
 		return (
 			<div className="app-container">
 				<div className="app-contents">
+					<Details
+						ref="detail"
+						title="详情"
+						data={detail}
+						extra={() => (
+							<a style={{ paddingBottom: "10px" }}>
+								<span onClick={() => util.traceBack("history")}>
+									查看历史数据
+								</span>
+							</a>
+						)}
+					/>
 					{pageLoading ? <PageLoading /> : null}
-					{<Tips ref="tips" data={tipsData} />}
-					{<Detail ref="detail" data={detailData} />}
-					<TopTitle title="隐患排查治理" canBack />
-					<BoardInfo
-						title="检查公示"
-						data={boardData}
-						onClick={this.onClickBoard1}
+					<TopTitle title={`在线监测实时数据`} canBack />
+					<TopSearcher
+						// placeholder="报告名称"
+						onClickQuery={this.onQuery}
+						conditionList={conditionList}
+						noinput
 					/>
-					<BoardInfo
-						title="整改公示"
-						data={boardData2}
-						onClick={this.onClickBoard2}
+					<ListView
+						ref="lv"
+						height={document.documentElement.clientHeight}
+						onClick={this.onClickItem}
+						renderItem={renderListItem}
+						onRefresh={this.onRefreshList}
+						onEndReached={this.onEndReached}
+						separator={null}
 					/>
-					<Panel title="隐患排查与治理台账">
-						<ul className="condition-ul">
-							<li>
-								<label>检查项目名称</label>
-								<Input ref="input" onChange={this.onChangeInput} />
-							</li>
-							<li>
-								<label>责任单位</label>
-								<SelectTree
-									ref="select"
-									data={selectData}
-									placeholder={"选择责任单位"}
-									onChange={this.onChangeSelect}
-								/>
-							</li>
-							<li>
-								<label>开始时间</label>
-								<DatePicker ref="date" onChange={this.onChangeDate} />
-							</li>
-							<li>
-								<label>结束时间</label>
-								<DatePicker ref="date2" onChange={this.onChangeDate2} />
-							</li>
-						</ul>
-						<ul className="btns">
-							<li>
-								<Button text="查询" onClick={this.onClickQuery} />
-							</li>
-						</ul>
-						<div className="table-container">
-							<Table
-								columns={columns}
-								loading={tableLoading}
-								dataSource={tableData}
-								pagination={false}
-								onRow={record => {
-									return {
-										// 点击行
-										onClick: event => {
-											event.preventDefault();
-											util.setItUp(
-												event.target.parentNode,
-												event.target.parentNode.parentNode
-											);
-											this.onClickTableRow(record);
-										}
-									};
-								}}
-							/>
-						</div>
-					</Panel>
 				</div>
 			</div>
 		);
 	}
 
-	onClickBoard1 = item => {
-		util.traceBack("board1", { ...item });
-		this.refs.tips.show();
+	onQuery = condition => {
+		util.traceBack("onChangeConditions", condition);
 	};
 
-	onClickBoard2 = item => {
-		util.traceBack("board2", { ...item });
-		this.refs.tips.show();
-	};
-
-	onClickQuery = () => {
-		const condition = {
-			input: this.refs.input.getValue(),
-			select: this.refs.select.getValue(),
-			startDate: this.refs.date.getValue().format("YYYY-MM-DD"),
-			endDate: this.refs.date2.getValue().format("YYYY-MM-DD")
-		};
-		util.traceBack("btn-query", condition);
-	};
-
-	onChangeSelect = obj => {
-		util.traceBack("onChangeSelect", obj);
-	};
-
-	onChangeDate = v => {
-		util.traceBack("date", v);
-	};
-
-	onChangeDate2 = v => {
-		util.traceBack("date2", v);
-	};
-
-	onClickTableRow = record => {
-		util.traceBack("onClickTableRow", { ...record });
+	onClickItem = x => {
 		this.refs.detail.show();
+		if (debugging) {
+			setTimeout(() => {
+				this.setState({
+					detail: {
+						fieldContents: [
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{
+								label: "名称",
+								content: "抗洪抢险，江铜在行动 4",
+								multiLines: true
+							},
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{ label: "名称", content: "抗洪抢险，江铜在行动 4" }
+						],
+						files: [
+							{
+								id: 1,
+								title: "f1",
+								type: "xlsx",
+								url: "xxxxxx1"
+							},
+							{
+								id: 2,
+								title: "f2",
+								type: "pdf",
+								url: "xxxxxx2"
+							},
+							{
+								id: 3,
+								title: "f3",
+								type: "txt",
+								url: "xxxxxx3"
+							}
+						]
+					}
+				});
+			}, 1000);
+		}
+	};
+
+	listLoading = () => {
+		this.refs.lv.loading();
+	};
+
+	listLoaded = () => {
+		this.refs.lv.loaded();
+	};
+
+	noMoreItem = () => {
+		this.refs.lv.nomore();
+	};
+
+	loadListData = data => {
+		this.refs.lv.loadData(data);
+	};
+
+	setListData = data => {
+		this.refs.lv.setData(data);
+	};
+
+	onRefreshList = reset => {
+		this.refs.lv.refreshing();
+		if (debugging) {
+			setTimeout(() => {
+				this.loadListData([
+					{
+						name: "文件名test01111111111111",
+						person: "admin",
+						date: "2020-06-07",
+						remarks: "djslkahljashlgjkhasfkj",
+						files: [
+							{
+								id: 1,
+								name: "f1",
+								type: "xlsx",
+								url: "xxxxxx1"
+							},
+							{
+								id: 2,
+								name: "f2",
+								type: "pdf",
+								url: "xxxxxx2"
+							},
+							{
+								id: 3,
+								name: "f3",
+								type: "txt",
+								url: "xxxxxx3"
+							}
+						]
+					}
+				]);
+				this.listLoaded();
+			}, 1500);
+		}
+
+		util.traceBack("onRefreshList");
+	};
+
+	onEndReached = ps => {
+		if (debugging) {
+			setTimeout(() => {
+				this.setListData([
+					{
+						name: "文件名test02222222222222",
+						person: "admin",
+						date: "2020-06-07",
+						remarks: "djslkahljashlgjkhasfkj",
+						files: [
+							{
+								id: 1,
+								name: "f1",
+								type: "xlsx",
+								url: "xxxxxx1"
+							},
+							{
+								id: 2,
+								name: "f2",
+								type: "pdf",
+								url: "xxxxxx2"
+							},
+							{
+								id: 3,
+								name: "f3",
+								type: "txt",
+								url: "xxxxxx3"
+							}
+						]
+					}
+				]);
+			}, 1500);
+		}
+		util.traceBack("onEndReached", { ps });
 	};
 }
 

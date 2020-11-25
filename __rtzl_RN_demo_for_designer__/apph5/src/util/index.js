@@ -1,5 +1,7 @@
 const util = {};
 
+
+// ============================================================
 //通向RN端
 //信息传输
 //字符串表示简单信息(生命周期相关)
@@ -19,6 +21,24 @@ util.traceBack = (etype, info) => {
     }
   }
 };
+
+util.init=()=>{
+  //监听事件以及时读取RN传回的数据
+    document.addEventListener("message", event => {
+      let res = JSON.parse(event.data);
+      if (res.etype === "data") {
+        let obj = { ...res };
+        delete obj.etype;
+        this.setState({
+          ...obj
+        });
+      } else if (res.etype === "event") {
+        let { event, args } = res;
+        if (typeof this[event] === "function") this[event](args);
+      }
+    });
+}
+// ============================================================
 
 //
 util.dateToString = (startDate, endDate) => {

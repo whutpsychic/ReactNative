@@ -99,6 +99,14 @@
 	padding-left: 10px;
 }
 
+.detail-container .main-container ul li label + span.red {
+	color: red;
+}
+
+.detail-container .main-container ul li label + span.orange {
+	color: orange;
+}
+
 .detail-container .main-container ul li.align-center {
 	justify-content: center;
 }

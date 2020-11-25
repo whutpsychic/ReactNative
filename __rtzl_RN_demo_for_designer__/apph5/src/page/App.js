@@ -2,142 +2,135 @@ import React from "react";
 import "./App.css";
 import util from "../util/index";
 // ====================================
-import Body from "../components/Body/index";
-import ListView from "../components/ListView/index";
+import List from "../components/List/index";
 // ====================================
 import TopTitle from "../UI/TopTitle/index";
-import ajax from "./ajax.js";
+import PageLoading from "../UI/PageLoading/index";
+
+const { renderListItem } = List;
 
 // debug模式
-const debugging = true;
+const debugging = false;
 
-// 渲染每一项
-const renderListItem = ({
-	data,
-	onClick,
-	itemIndex,
-	rowData,
-	sectionID,
-	rowID
-}) => {
-	if (itemIndex < 0) {
-		itemIndex = data.length - 1;
+const ListItems = [
+	{ label: "日期", type: "date" },
+	{
+		label: "单位",
+		type: "tree-select",
+		data: [
+			{ title: "全部", key: "all" },
+			{
+				title: "根节点",
+				key: "gjd",
+				children: [
+					{
+						title: "子节点1",
+						key: "z1",
+						children: [
+							{ title: "叶子结点1", key: "yz1" },
+							{ title: "叶子结点2", key: "yz2" },
+							{ title: "叶子结点3", key: "yz3" },
+							{ title: "叶子结点4", key: "yz4" }
+						]
+					},
+					{
+						title: "子节点2",
+						key: "z2",
+						children: [
+							{ title: "叶子结点1", key: "yz21" },
+							{ title: "叶子结点2", key: "yz22" },
+							{ title: "叶子结点3", key: "yz23" },
+							{ title: "叶子结点4", key: "yz24" }
+						]
+					}
+				]
+			}
+		]
+	},
+	{
+		label: "监测地点",
+		type: "select",
+		data: [
+			{ label: "xxx1", value: 1 },
+			{ label: "xxx2", value: 2 },
+			{ label: "xxx3", value: 3 },
+			{ label: "xxx4", value: 4 }
+		]
+	},
+	{
+		label: "水库水位/m",
+		type: "number",
+		disabled: true,
+		defaultValue: 8
+	},
+	{
+		label: "距离溢流口高度/m",
+		type: "number"
+	},
+	{
+		label: "备注",
+		type: "text-area",
+		defaultValue: "2020-08-21"
 	}
-	const obj = data[itemIndex];
-	if (!obj) return null;
-	return (
-		<div
-			key={rowID}
-			className="item-outer"
-			onClick={() => {
-				if (typeof onClick === "function") onClick(obj);
-				util.traceBack("clickItem", obj);
-			}}
-		>
-			<p className="title">{obj.name}</p>
-			<p className="remarks">{obj.remarks}</p>
-			<div className="spliter"></div>
-			<p className="detail">
-				<span>上传人：{obj.person}</span>
-				<span>上传时间：{obj.date}</span>
-			</p>
-		</div>
-	);
-};
+];
 
 class App extends React.Component {
 	state = {
-		title: "",
 		pageLoading: false,
-		detail: {}
+		title: "",
+		institutions: [],
+		selectData: []
 	};
 
 	componentDidMount() {
 		//告知RN页面已经装载完毕
 		util.traceBack("pageState", "componentDidMount");
 		//监听事件以及时读取RN传回的数据
-		document.addEventListener("message", event => {
-			let res = JSON.parse(event.data);
-			if (res.etype === "data") {
-				let obj = { ...res };
-				delete obj.etype;
-				this.setState({
-					...obj
-				});
-			} else if (res.etype === "event") {
-				let { event, args } = res;
-				if (typeof this[event] === "function") this[event](args);
-			}
-		});
+		util.init();
 
 		// ***************************************************
 		if (debugging) {
-			this.loadListData(ajax.data());
+			this.setState({
+				pageLoading: true
+			});
+			setTimeout(() => {
+				this.setState({
+					title: "酸性水库信息维护",
+					pageLoading: false
+				});
+			}, 1000);
 		}
 	}
 
 	render() {
+		const { pageLoading, title } = this.state;
+		const { institutions, selectData1 } = this.state;
+
+		const btns = [
+			{
+				label: "提交",
+				func: this.onClickSubmit
+			}
+		];
+
 		return (
-			<Body>
-				<TopTitle title={`一般列表页`} canBack />
-				<div style={{ width: "100%", height: "10px" }} />
-				<ListView
-					ref="lv"
-					height={document.documentElement.clientHeight}
-					onClick={this.onClickItem}
-					renderItem={renderListItem}
-					onRefresh={this.onRefreshList}
-					onEndReached={this.onEndReached}
-					separator={null}
-				/>
-			</Body>
+			<div className="app-container">
+				<div className="app-contents">
+					{pageLoading ? <PageLoading /> : null}
+					<TopTitle title={"表单输入"} canBack />
+					<List btns={btns} ref="list">
+						{ListItems.map((item, i) => {
+							return renderListItem(item, i);
+						})}
+					</List>
+				</div>
+			</div>
 		);
 	}
 
-	onClickItem = x => {
-		if (debugging) {
-			util.traceBack("clickItem");
-		}
-	};
-
-	listLoading = () => {
-		this.refs.lv.loading();
-	};
-
-	listLoaded = () => {
-		this.refs.lv.loaded();
-	};
-
-	noMoreItem = () => {
-		this.refs.lv.nomore();
-	};
-
-	loadListData = data => {
-		this.refs.lv.loadData(data);
-	};
-
-	setListData = data => {
-		this.refs.lv.setData(data);
-	};
-
-	onRefreshList = reset => {
-		this.refs.lv.refreshing();
-		if (debugging) {
-			setTimeout(() => {
-				this.loadListData(ajax.reData());
-				this.listLoaded();
-			}, 1500);
-		}
-		util.traceBack("onRefreshList");
-	};
-
-	onEndReached = ps => {
-		if (debugging) {
-			setTimeout(() => {
-				this.setListData(ajax.moreData());
-			}, 1500);
-		}
-		util.traceBack("onEndReached", { ps });
+	onClickSubmit = () => {
+		let conditions = this.refs.list.getValue(this);
+		util.traceBack("submit", conditions);
 	};
 }
 

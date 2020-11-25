@@ -6,10 +6,16 @@ import api from '../../api/index';
 import Toast from '../../components/Toast';
 import {putupData, run} from '../../core/common.js';
 
+import getDetail from './getDetail.js';
+
 const pageUri = 'file:///android_asset/h5/monitor-oldata-list/index.html';
 
 let currPage = 0;
 const ps = 20;
+
+// 默认是 1
+// 1：废水，2：废气
+let feiqi_feiye = 1;
 
 class Default extends React.Component {
   state = {
@@ -76,6 +82,7 @@ class Default extends React.Component {
     else if (etype === 'onChangeConditions') {
       putupData(this, {pageLoading: true});
       const {institution, type} = receivedData;
+      feiqi_feiye = type || 1;
       let condition = {
         institutionId:
           institution && institution[0] ? institution[0] : undefined,
@@ -87,41 +94,36 @@ class Default extends React.Component {
 
     // 点击更多
     else if (etype === 'clickItem') {
-      const {name, remarks, person, date, dataSource} = receivedData;
+      const {name, dataSource} = receivedData;
+
       this.setState({
         title: name,
         mnNumber: dataSource.mnNumber,
       });
-      putupData(this, {
-        detail: {
-          fieldContents: [
-            {label: '企业名称', content: dataSource.institutionName},
-            {label: '监控点名称', content: dataSource.areaName},
-            {
-              label: '监测时间',
-              content: dataSource.dataTime,
-            },
-            {
-              label: '流量(升/秒)',
-              content: dataSource.liuliang,
-            },
-            {label: 'pH(无量纲)', content: dataSource.ph},
-            {
-              label: '化学需氧量(毫克/升)',
-              content: dataSource.xuyang,
-            },
-            {
-              label: '氨氮(毫克/升)',
-              content: dataSource.andan,
-            },
-          ],
-        },
-      });
+
+      // =======================
+      // 在这儿区分是废气数据还是废液数据
+      // 废水
+      if (feiqi_feiye === 1) {
+        putupData(this, {
+          detail: {
+            fieldContents: getDetail(feiqi_feiye, dataSource),
+          },
+        });
+      }
+      // 废气
+      else {
+        putupData(this, {
+          detail: {
+            fieldContents: getDetail(feiqi_feiye, dataSource),
+          },
+        });
+      }
     }
     // 点击浏览文件
     else if (etype === 'history') {
       const {title, mnNumber} = this.state;
-      navigate('monitor_oldata_history', {title, mnNumber});
+      navigate('monitor_oldata_history', {title, mnNumber, type: feiqi_feiye});
     } else if (etype === 'back-btn') {
       navigation.goBack();
     }

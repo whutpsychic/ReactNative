@@ -5,7 +5,7 @@ import util from "../util/index";
 import TopTitle from "../components/TopTitle/index";
 import PageLoading from "../components/PageLoading/index";
 import TopSearcher from "../UI/TopSearcher/index";
-// import Details from "../UI/Details/index";
+import Details from "../UI/Details/index";
 // ====================================
 import ListView from "../components/ListView/index";
 import { renderImgIcon } from "../common/index";
@@ -51,22 +51,7 @@ const renderListItem = ({
 			}}
 		>
 			<p className="title">{obj.name}</p>
-			<p>
-				<span> 流量（升/秒）</span>
-				<span>{obj.value1}</span>
-			</p>
-			<p>
-				<span>pH（无量纲）</span>
-				<span>{obj.value2}</span>
-			</p>
-			<p>
-				<span>化学需氧量（毫克/升）</span>
-				<span>{obj.value3}</span>
-			</p>
-			<p>
-				<span>氨氮（毫克/升）</span>
-				<span>{obj.value4}</span>
-			</p>
+			<p className="remarks">{obj.remarks}</p>
 			<div className="spliter"></div>
 			<p className="detail">
 				<span>监测时间：{obj.time}</span>
@@ -141,7 +126,7 @@ class App extends React.Component {
 	}
 
 	render() {
-		const { pageLoading, otherConditions = [] } = this.state;
+		const { pageLoading, otherConditions = [], detail } = this.state;
 
 		const conditionList = [
 			{
@@ -209,6 +194,7 @@ class App extends React.Component {
 		return (
 			<div className="app-container">
 				<div className="app-contents">
+					<Details ref="detail" title="详情" data={detail} />
 					{pageLoading ? <PageLoading /> : null}
 					<TopTitle title={`历史数据`} canBack />
 					<TopSearcher
@@ -251,8 +237,16 @@ class App extends React.Component {
 							},
 							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
 							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
-							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
-							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
+							{
+								label: "名称",
+								content: "抗洪抢险，江铜在行动 4",
+								color: "red"
+							},
+							{
+								label: "名称",
+								content: "抗洪抢险，江铜在行动 4",
+								color: "orange"
+							},
 							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
 							{ label: "名称", content: "抗洪抢险，江铜在行动 4" },
 							{ label: "名称", content: "抗洪抢险，江铜在行动 4" }
