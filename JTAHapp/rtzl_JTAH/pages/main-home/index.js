@@ -4,6 +4,7 @@ import {StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
 import util from '../../core/util.js';
 import api from '../../api/index';
+import config from '../../config/index';
 
 const pageUri = 'file:///android_asset/h5/main-home/index.html';
 
@@ -26,7 +27,16 @@ class Default extends React.Component {
     s2: null,
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    //
+    const {
+      navigation: {navigate},
+    } = this.props;
+    const {mode} = config;
+    if (mode === 'preview') {
+      navigate('table');
+    }
+  }
 
   postMessage = (obj) => {
     this.refs.webview.postMessage(JSON.stringify(obj));

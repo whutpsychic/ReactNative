@@ -81,8 +81,8 @@ class Default extends React.Component {
 					<div className="msk" onClick={this.onHideBox} />
 					<div className="pickerview">
 						<div className="top-btns">
-							<span onClick={this.confirm}>确定</span>
 							<span onClick={this.cancel}>取消</span>
+							<span onClick={this.confirm}>确定</span>
 						</div>
 						<div className="tree-box">
 							{showBox ? (

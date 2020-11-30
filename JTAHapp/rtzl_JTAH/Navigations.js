@@ -12,6 +12,8 @@ import Logo from './pages/logo/index';
 import Login from './pages/login/index';
 // pdf 阅览页
 import pdf from './pages/_pdf';
+// table 表格页
+import table from './pages/_table/index';
 // -------------------------------------------
 import Main_Home from './pages/main-home/index';
 import Main_Mine from './pages/main-mine/index';
@@ -178,6 +180,7 @@ class App extends React.Component {
           ) : isLogin ? (
             <Fragment>
               {<Stack.Screen name="pdf" component={pdf} />}
+              {<Stack.Screen name="table" component={table} />}
               <Stack.Screen
                 name="common_video_player"
                 component={common_video_player}

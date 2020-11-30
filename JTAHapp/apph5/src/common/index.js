@@ -1,6 +1,26 @@
 import React from "react";
 import imgs from "../img/img.js";
+import util from "../util/index.js";
 
+const init = _this => {
+	//告知RN页面已经装载完毕
+	util.traceBack("pageState", "componentDidMount");
+	//监听事件以及时读取RN传回的数据
+	document.addEventListener("message", event => {
+		let res = JSON.parse(event.data);
+		if (res.etype === "data") {
+			let obj = { ...res };
+			delete obj.etype;
+			_this.setState({
+				...obj
+			});
+		} else if (res.etype === "event") {
+			let { event, args } = res;
+			if (typeof _this[event] === "function") _this[event](...args);
+		}
+	});
+};
+// ===========================================
 const {
 	fileIcon_xlsx,
 	fileIcon_pdf,
@@ -30,4 +50,4 @@ const renderImgIcon = item => {
 	}
 };
 
-export { renderImgIcon };
+export { init, renderImgIcon };

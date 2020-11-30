@@ -52,3 +52,7 @@ input {
 	height: 100%;
 	overflow: hidden;
 }
+
+.app-contents.horizontal{
+	max-width: unset;
+}

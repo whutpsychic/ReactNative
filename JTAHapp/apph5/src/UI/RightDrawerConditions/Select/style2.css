@@ -47,7 +47,7 @@
 	width: 100vw;
 	height: 80vh;
 	background-color: #fff;
-	bottom: -60vh;
+	bottom: -30vh;
 	animation: select-moveIn 0.15s;
 }
 
@@ -68,21 +68,14 @@
 		bottom: -100vh;
 	}
 	to {
-		bottom: -60vh;
-	}
-}
-
-/*=========================横屏样式================================*/
-.horizontal .rtmcc-rnweb-select + .pickerview-container .pickerview {
-	bottom: -30vh;
-	animation: select_moveIn_horizontal 0.15s;
-}
-
-@keyframes select_moveIn_horizontal {
-	from {
-		bottom: -100vh;
-	}
-	to {
 		bottom: -30vh;
 	}
 }
+
+
+/*=========================横屏样式================================*/
+
+
+
+
+

@@ -146,11 +146,11 @@ class Default extends React.Component {
 							})}
 						</ul>
 						<div className="drawer-btns">
-							<Button type="primary" size="small" onClick={this.onConfirm}>
-								确定
-							</Button>
 							<Button type="primary" size="small" onClick={this.hide}>
 								取消
+							</Button>
+							<Button type="primary" size="small" onClick={this.onConfirm}>
+								确定
 							</Button>
 						</div>
 					</div>

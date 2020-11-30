@@ -1,10 +1,10 @@
 const config = {};
 
-config.mode = 'production';
+// config.mode = 'production';
 // config.mode = 'develop';
-// config.mode = 'preview';
+config.mode = 'preview';
 
-config.inposition = false;
+config.inposition = true;
 
 config.bottomTabHeight = 56;
 
