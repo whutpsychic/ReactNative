@@ -22,6 +22,8 @@ import TreeSelectItem from "./TreeSelectItem/index";
 import TextAreaItem from "./TextAreaItem/index";
 import Button from "./Button/index";
 
+import "antd-mobile/es/picker-view/style/css.js";
+
 const renderListItem = (item, index) => {
 	const { type, label, disabled, defaultValue, data } = item;
 

@@ -9,6 +9,7 @@ import React from "react";
 import "./style.css";
 // ===============================================================
 import { Button } from "antd-mobile";
+import "antd-mobile/es/button/style/css.js";
 
 class Default extends React.Component {
 	componentDidMount() {}
