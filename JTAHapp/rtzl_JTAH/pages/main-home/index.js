@@ -33,8 +33,8 @@ class Default extends React.Component {
       navigation: {navigate},
     } = this.props;
     const {mode} = config;
-    if (mode === 'preview') {
-      navigate('table');
+    if (mode === 'develop') {
+      navigate('monitor_oldata_list2');
     }
   }
 

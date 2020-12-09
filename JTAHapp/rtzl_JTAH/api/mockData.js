@@ -93,7 +93,8 @@ data.mainQueryData = [
 		children: [
 			{label: '异常（集团）', position: 'abnormal_info_group'},
 			{label: '异常（企业）', position: 'abnormal_info_enterprise'},
-			{label: '实时数据', position: 'monitor_oldata_list'},
+			// {label: '实时数据', position: 'monitor_oldata_list'},
+			{label: '实时数据', position: 'monitor_oldata_list2'},
 		],
 	},
 ];

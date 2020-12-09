@@ -15,8 +15,8 @@ class Default extends React.Component {
 	componentDidMount() {
 		const {login, initialized} = this.props;
 
-		if (config.mode === 'preview') {
-			login(true);
+		if (config.mode === 'develop') {
+			login(false);
 			initialized();
 			return;
 		}

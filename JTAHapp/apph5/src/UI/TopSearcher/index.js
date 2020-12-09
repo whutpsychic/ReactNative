@@ -22,7 +22,7 @@ class Default extends React.Component {
 		const { showDrawer } = this.state;
 		return (
 			<Fragment>
-				<div className="top-searcher">
+				<div className={noinput ? "top-searcher noinput" : "top-searcher"}>
 					{noinput ? null : (
 						<div className="main-input">
 							<input

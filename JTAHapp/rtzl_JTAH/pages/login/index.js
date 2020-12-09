@@ -5,6 +5,7 @@ import {WebView} from 'react-native-webview';
 import {connect} from 'react-redux';
 import {login} from '../../redux/actions.js';
 import Toast from '../../components/Toast/index';
+import Tips from '../../components/Tips/index';
 import storage from '../../core/storage.js';
 import api from '../../api/index';
 
@@ -27,6 +28,7 @@ class Default extends React.Component {
           source={{uri: pageUri}}
           onMessage={this.onReceive}
         />
+        <Tips ref="tips" />
       </View>
     );
   }
@@ -73,6 +75,7 @@ class Default extends React.Component {
   };
 
   login = ({name, psw, rememberPsw}) => {
+    this.refs.tips.modal('正在登录...');
     console.log(name, psw, rememberPsw);
     const {login} = this.props;
 
@@ -83,6 +86,7 @@ class Default extends React.Component {
       const {errcode, data} = res;
       //成功
       if (!errcode && data) {
+        this.refs.tips.hide();
         // 记住身份
         if (rememberPsw) {
           p1 = storage.setData('jtah_userName', name);
@@ -110,6 +114,7 @@ class Default extends React.Component {
       // 错误
       else {
         Toast.show('登录错误，请检查用户名密码是否正确');
+        this.refs.tips.hide();
         login(false);
         initialized();
         return;

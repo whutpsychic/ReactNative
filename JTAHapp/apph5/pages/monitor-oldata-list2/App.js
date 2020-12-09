@@ -9,31 +9,12 @@ import TopSearcher from "../UI/TopSearcher/index";
 // ====================================
 import { Table } from "antd";
 import "antd/es/table/style/css.js";
-
-import {
-	treeData,
-	tableColumns,
-	tableData,
-	fakeConditionList
-} from "../faker.js";
+import columns1 from "./feishui.js";
+import columns2 from "./feiqi.js";
+import { treeData, tableData, tb2 } from "../faker.js";
 
 // debug模式
 const debugging = false;
-
-const renderColor = item => {
-	item.render = x => {
-		if (x === `第1行第2列数据`) {
-			return <span style={{ color: "red" }}>{x}</span>;
-		} else if (x === `第2行第2列数据`) {
-			return <span style={{ color: "green" }}>{x}</span>;
-		} else if (x === `第3行第2列数据`) {
-			return <span style={{ color: "#389edc" }}>{x}</span>;
-		} else {
-			return x;
-		}
-	};
-	return item;
-};
 
 class App extends React.Component {
 	state = {
@@ -41,35 +22,52 @@ class App extends React.Component {
 		title: "",
 		conditionList: [],
 		ps: 5,
-		tableScroller: 1500,
-		columns: [],
+		tableScroller: 1200,
+		columns: columns1,
 		dataSource: [],
-		institutions: []
+		// ==
+		institutions: [],
+		types: [
+			{ label: "废水", value: 1 },
+			{ label: "废气", value: 2 }
+		]
 	};
 
 	componentDidMount() {
 		init(this);
 		// ***************************************************
 		if (debugging) {
+			console.log(tb2);
 			this.setState({
 				pageLoading: true
 			});
 			setTimeout(() => {
 				this.setState({
 					pageLoading: false,
-					conditionList: fakeConditionList(),
-					columns: tableColumns(20),
-					dataSource: tableData(20, 21)
+					institutions: treeData,
+					dataSource: tb2
 				});
-
-				this.setColumnColor(1, 6);
 			}, 1000);
 		}
 	}
 
 	render() {
-		const { pageLoading, title } = this.state;
-		const { conditionList, columns, dataSource, ps } = this.state;
+		const { pageLoading, title, tableScroller } = this.state;
+		const { columns, dataSource, ps } = this.state;
+
+		const conditionList = [
+			{
+				label: "单位",
+				field: "institution",
+				type: "selecttree",
+				data: this.state.institutions
+			},
+			{
+				field: "type",
+				type: "radios",
+				data: this.state.types
+			}
+		];
 
 		return (
 			<div className="app-container">
@@ -77,15 +75,16 @@ class App extends React.Component {
 					{pageLoading ? <PageLoading /> : null}
 					<TopTitle title={`${title}`} canBack />
 					<TopSearcher
-						placeholder="项目/文档名称"
 						conditionList={conditionList}
+						onClickQuery={this.onClickQuery}
+						noinput
 					/>
 					<div className="table-container">
 						<Table
 							dataSource={dataSource}
 							columns={columns}
 							pagination={{ pageSize: ps }}
-							scroll={{ x: 8000 }}
+							scroll={{ x: tableScroller }}
 							onRow={record => {
 								return {
 									className: "td-row",
@@ -105,17 +104,21 @@ class App extends React.Component {
 		);
 	}
 
-	setColumnColor = (start, end) => {
-		const { columns } = this.state;
-		let result = columns.map((item, i) => {
-			if (i >= start && i <= end) {
-				renderColor(item);
-			}
-			return item;
-		});
-		this.setState({
-			columns: result
-		});
+	onClickQuery = conditions => {
+		console.log(conditions);
+		const { type } = conditions;
+		if (type === 1) {
+			this.setState({
+				columns: columns1,
+				tableScroller: 1200
+			});
+		} else if (type === 2) {
+			this.setState({
+				columns: columns2,
+				tableScroller: 2100
+			});
+		}
+		util.traceBack("onChangeCondition", conditions);
 	};
 }
 

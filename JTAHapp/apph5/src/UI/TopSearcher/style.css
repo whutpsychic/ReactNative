@@ -5,6 +5,10 @@
 	padding: 8px 0;
 }
 
+.top-searcher.noinput{
+	justify-content: flex-end;
+}
+
 .top-searcher .main-input {
 	flex-basis: 100%;
 	margin: 0 10px;

@@ -85,8 +85,10 @@ import archives_rules from './pages/archives-rules/index';
 import archives_others from './pages/archives-others/index';
 // 在线监测实时数据
 import monitor_oldata_list from './pages/monitor-oldata-list/index';
+import monitor_oldata_list2 from './pages/monitor-oldata-list2/index';
 // 在线监测实时数据（历史数据）
 import monitor_oldata_history from './pages/monitor-oldata-history/index';
+import monitor_oldata_history2 from './pages/monitor-oldata-history2/index';
 
 // 生态信息修复
 import ecology_repair_info from './pages/ecology-repair-info/index';
@@ -274,8 +276,16 @@ class App extends React.Component {
                 component={monitor_oldata_list}
               />
               <Stack.Screen
+                name="monitor_oldata_list2"
+                component={monitor_oldata_list2}
+              />
+              <Stack.Screen
                 name="monitor_oldata_history"
                 component={monitor_oldata_history}
+              />
+              <Stack.Screen
+                name="monitor_oldata_history2"
+                component={monitor_oldata_history2}
               />
               <Stack.Screen
                 name="risk_tips_approval"

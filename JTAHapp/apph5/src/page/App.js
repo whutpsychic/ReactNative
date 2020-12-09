@@ -1,91 +1,167 @@
 import React from "react";
 import "./App.css";
 import util from "../util/index";
-import { init } from "../common/index";
 // ====================================
 import TopTitle from "../components/TopTitle/index";
 import PageLoading from "../components/PageLoading/index";
 import TopSearcher from "../UI/TopSearcher/index";
 // ====================================
+import moment from "moment";
 import { Table } from "antd";
 import "antd/es/table/style/css.js";
-
-import {
-	treeData,
-	tableColumns,
-	tableData,
-	fakeConditionList
-} from "../faker.js";
+import columns1 from "./feishui.js";
+import columns2 from "./feiqi.js";
+import { treeData, tableData, tb2 } from "../faker.js";
 
 // debug模式
 const debugging = false;
 
-const renderColor = item => {
-	item.render = x => {
-		if (x === `第1行第2列数据`) {
-			return <span style={{ color: "red" }}>{x}</span>;
-		} else if (x === `第2行第2列数据`) {
-			return <span style={{ color: "green" }}>{x}</span>;
-		} else if (x === `第3行第2列数据`) {
-			return <span style={{ color: "#389edc" }}>{x}</span>;
-		} else {
-			return x;
-		}
-	};
-	return item;
-};
-
 class App extends React.Component {
 	state = {
 		pageLoading: false,
-		title: "",
-		conditionList: [],
-		ps: 5,
-		tableScroller: 1500,
-		columns: [],
+		tableScroller: 1200,
+		columns: columns1,
 		dataSource: [],
-		institutions: []
+		ps: 5,
+		otherConditions: [
+			{
+				label: "开始时间",
+				field: "time1",
+				type: "time",
+				disabled: true,
+				defaultValue: `${moment().format("YYYY-MM-DD")} 00:00`
+			},
+			{
+				label: "结束时间",
+				field: "time2",
+				type: "time",
+				disabled: true,
+				defaultValue: `${moment().format("YYYY-MM-DD HH:MM")}`
+			}
+		],
+		types: [
+			{ label: "实时数据", value: 1 },
+			{ label: "小时数据", value: 2 },
+			{ label: "日数据", value: 3 }
+		]
 	};
 
 	componentDidMount() {
-		init(this);
+		//告知RN页面已经装载完毕
+		util.traceBack("pageState", "componentDidMount");
+		//监听事件以及时读取RN传回的数据
+		document.addEventListener("message", event => {
+			let res = JSON.parse(event.data);
+			if (res.etype === "data") {
+				let obj = { ...res };
+				delete obj.etype;
+				this.setState({
+					...obj
+				});
+			} else if (res.etype === "event") {
+				let { event, args } = res;
+				if (typeof this[event] === "function") this[event](args);
+			}
+		});
+
 		// ***************************************************
 		if (debugging) {
+			// console.log(tb2);
 			this.setState({
 				pageLoading: true
 			});
 			setTimeout(() => {
 				this.setState({
 					pageLoading: false,
-					conditionList: fakeConditionList(),
-					columns: tableColumns(20),
-					dataSource: tableData(20, 21)
+					dataSource: tb2
 				});
-
-				this.setColumnColor(1, 6);
 			}, 1000);
 		}
 	}
 
 	render() {
-		const { pageLoading, title } = this.state;
-		const { conditionList, columns, dataSource, ps } = this.state;
+		const { pageLoading, title, otherConditions = [] } = this.state;
+		const { tableScroller, columns, dataSource, ps } = this.state;
+		const conditionList = [
+			{
+				label: "均值类型",
+				field: "type",
+				type: "select",
+				data: this.state.types,
+				onChange: x => {
+					const { value } = x;
+					switch (value) {
+						case 1:
+							this.setState({
+								otherConditions: [
+									{
+										label: "开始时间",
+										field: "time1",
+										type: "time",
+										disabled: true,
+										defaultValue: `${moment().format("YYYY-MM-DD")} 00:00`
+									},
+									{
+										label: "结束时间",
+										field: "time2",
+										type: "time",
+										disabled: true,
+										defaultValue: `${moment().format("YYYY-MM-DD HH:MM")}`
+									}
+								]
+							});
+							return;
+						case 2:
+							this.setState({
+								otherConditions: [
+									{
+										label: "开始时间",
+										field: "time1",
+										type: "time",
+										defaultValue: `${moment().format("YYYY-MM-DD")} 00:00`
+									},
+									{
+										label: "结束时间",
+										field: "time2",
+										type: "time",
+										defaultValue: `${moment().format("YYYY-MM-DD HH:MM")}`
+									}
+								]
+							});
+							return;
+						case 3:
+							this.setState({
+								otherConditions: [
+									{ label: "开始时间", field: "time1", type: "date" },
+									{ label: "结束时间", field: "time2", type: "date" }
+								]
+							});
+							return;
+						default:
+							return;
+					}
+				}
+			},
+			...otherConditions
+		];
 
 		return (
 			<div className="app-container">
 				<div className="app-contents horizontal">
 					{pageLoading ? <PageLoading /> : null}
-					<TopTitle title={`${title}`} canBack />
+					<TopTitle title={title} canBack />
 					<TopSearcher
-						placeholder="项目/文档名称"
+						// placeholder="报告名称"
+						onClickQuery={this.onQuery}
 						conditionList={conditionList}
+						noinput
 					/>
 					<div className="table-container">
 						<Table
 							dataSource={dataSource}
 							columns={columns}
 							pagination={{ pageSize: ps }}
-							scroll={{ x: 8000 }}
+							scroll={{ x: tableScroller }}
 							onRow={record => {
 								return {
 									className: "td-row",
@@ -105,16 +181,14 @@ class App extends React.Component {
 		);
 	}
 
-	setColumnColor = (start, end) => {
-		const { columns } = this.state;
-		let result = columns.map((item, i) => {
-			if (i >= start && i <= end) {
-				renderColor(item);
-			}
-			return item;
-		});
+	onQuery = condition => {
+		console.log(condition);
+		util.traceBack("onChangeConditions", condition);
+	};
+
+	changeToFeiqi = () => {
 		this.setState({
-			columns: result
+			columns: columns2
 		});
 	};
 }

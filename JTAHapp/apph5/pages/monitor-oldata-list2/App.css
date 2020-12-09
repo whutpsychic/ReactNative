@@ -26,3 +26,11 @@ table .td-row td {
 	background-color: #fff;
 	padding: 10px;
 }
+
+table .td-row td .red {
+	color: red;
+}
+
+table .td-row td .orange {
+	color: orange;
+}

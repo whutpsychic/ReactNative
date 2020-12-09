@@ -8,7 +8,7 @@ const {mainQueryData} = mockData;
 // =================================================
 const xcUrl = 'http://10.99.189.116';
 const xcPort = '18085';
-const gsUrl = 'http://192.168.0.127';
+const gsUrl = 'http://192.168.0.123';
 const gsPort = '18085';
 
 let proxy;
