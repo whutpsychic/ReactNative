@@ -40,7 +40,7 @@ const columns = [
 		title: `监控点名称`,
 		dataIndex: `areaName`,
 		key: `areaName`,
-		width: 180,
+		width: 100,
 		fixed: "left"
 	},
 	{
@@ -53,7 +53,9 @@ const columns = [
 	{
 		title: `企业名称`,
 		dataIndex: `institutionName`,
-		key: `institutionName`
+		key: `institutionName`,
+		width: 100,
+		fixed: "left"
 	},
 	{
 		title: `烟气流速(米/秒)`,

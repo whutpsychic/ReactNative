@@ -5,6 +5,7 @@ import {WebView} from 'react-native-webview';
 import {preReceive, putupData, run} from '../../core/common.js';
 import api from '../../api/index';
 import Toast from '../../components/Toast/index';
+import moment from 'moment';
 
 const pageUri = 'file:///android_asset/h5/monitor-oldata-history2/index.html';
 
@@ -13,7 +14,7 @@ const onReceive = (etype, _this, receivedData) => {
     navigation,
     navigation: {navigate},
     route: {
-      params: {type, line},
+      params: {type, line, mnNumber},
     },
   } = _this.props;
 
@@ -33,20 +34,23 @@ const onReceive = (etype, _this, receivedData) => {
       }
     });
 
-    _this.query();
+    _this.query({
+      sdatetime: moment().subtract(1, 'hours').format('YYYY-MM-DD HH:mm:00'),
+      edatetime: moment().format('YYYY-MM-DD HH:mm:00'),
+    });
   }
   // 当改变查询条件的时候
   else if (etype === 'onChangeConditions') {
-    putupData(this, {pageLoading: true});
+    putupData(_this, {pageLoading: true});
     const {type, time1, time2} = receivedData;
     let condition = {
       mnNumber: mnNumber,
-      sdatetime: time1,
-      edatetime: time2,
+      sdatetime: `${time1}:00`,
+      edatetime: `${time2}:00`,
       avgType: type && type[0] ? type[0] : 1,
     };
 
-    this.query(condition);
+    _this.query(condition);
   } else if (etype === 'back-btn') {
     navigation.goBack();
   }

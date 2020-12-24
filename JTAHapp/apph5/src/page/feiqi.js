@@ -1,4 +1,6 @@
 import React from "react";
+import util from "../util/index";
+import { UnorderedListOutlined } from "@ant-design/icons";
 
 const judgeColor = (value, warnUp, warnDown, alarmUp, alarmDown) => {
 	if (value != null) {
@@ -40,7 +42,7 @@ const columns = [
 		title: `监控点名称`,
 		dataIndex: `areaName`,
 		key: `areaName`,
-		width: 180,
+		width: 100,
 		fixed: "left"
 	},
 	{
@@ -53,7 +55,9 @@ const columns = [
 	{
 		title: `企业名称`,
 		dataIndex: `institutionName`,
-		key: `institutionName`
+		key: `institutionName`,
+		width: 100,
+		fixed: "left"
 	},
 	{
 		title: `烟气流速(米/秒)`,
@@ -316,6 +320,20 @@ const columns = [
 				>
 					{x}
 				</span>
+			);
+		}
+	},
+	{
+		title: `历史数据`,
+		key: `history`,
+		render: (x, line) => {
+			return (
+				<UnorderedListOutlined
+					style={{ color: "#389edc" }}
+					onClick={() => {
+						util.traceBack("history", { line });
+					}}
+				/>
 			);
 		}
 	}

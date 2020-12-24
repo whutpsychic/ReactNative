@@ -74,7 +74,7 @@ class Default extends React.Component {
     putupData(this, {
       pageLoading: true,
     });
-    api.getMonitorOlDataList({page: 1, ps: 9999, ...conditions}).then((res) => {
+    api.getMonitorOlDataList({page: 0, ps: 9999, ...conditions}).then((res) => {
       console.log(res);
       const {data} = res;
       // 成功

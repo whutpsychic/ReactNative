@@ -16,10 +16,21 @@ import { treeData, tableData, tb2 } from "../faker.js";
 // debug模式
 const debugging = false;
 
+const insistEm = (_this, callback) => {
+	_this.setState(
+		{
+			otherConditions: []
+		},
+		() => {
+			callback();
+		}
+	);
+};
+
 class App extends React.Component {
 	state = {
 		pageLoading: false,
-		tableScroller: 1200,
+		tableScroller: 1000,
 		columns: columns1,
 		dataSource: [],
 		ps: 5,
@@ -28,15 +39,15 @@ class App extends React.Component {
 				label: "开始时间",
 				field: "time1",
 				type: "time",
-				disabled: true,
-				defaultValue: `${moment().format("YYYY-MM-DD")} 00:00`
+				defaultValue: `${moment()
+					.subtract(1, "hours")
+					.format("YYYY-MM-DD HH:mm")}`
 			},
 			{
 				label: "结束时间",
 				field: "time2",
 				type: "time",
-				disabled: true,
-				defaultValue: `${moment().format("YYYY-MM-DD HH:MM")}`
+				defaultValue: `${moment().format("YYYY-MM-DD HH:mm")}`
 			}
 		],
 		types: [
@@ -66,7 +77,6 @@ class App extends React.Component {
 
 		// ***************************************************
 		if (debugging) {
-			// console.log(tb2);
 			this.setState({
 				pageLoading: true
 			});
@@ -92,51 +102,71 @@ class App extends React.Component {
 					const { value } = x;
 					switch (value) {
 						case 1:
-							this.setState({
-								otherConditions: [
-									{
-										label: "开始时间",
-										field: "time1",
-										type: "time",
-										disabled: true,
-										defaultValue: `${moment().format("YYYY-MM-DD")} 00:00`
-									},
-									{
-										label: "结束时间",
-										field: "time2",
-										type: "time",
-										disabled: true,
-										defaultValue: `${moment().format("YYYY-MM-DD HH:MM")}`
-									}
-								]
+							insistEm(this, () => {
+								this.setState({
+									otherConditions: [
+										{
+											label: "开始时间",
+											field: "time1",
+											type: "time",
+											defaultValue: `${moment()
+												.subtract(1, "hours")
+												.format("YYYY-MM-DD HH:mm")}`
+										},
+										{
+											label: "结束时间",
+											field: "time2",
+											type: "time",
+											defaultValue: `${moment().format("YYYY-MM-DD HH:mm")}`
+										}
+									]
+								});
 							});
-							return;
+							break;
 						case 2:
-							this.setState({
-								otherConditions: [
-									{
-										label: "开始时间",
-										field: "time1",
-										type: "time",
-										defaultValue: `${moment().format("YYYY-MM-DD")} 00:00`
-									},
-									{
-										label: "结束时间",
-										field: "time2",
-										type: "time",
-										defaultValue: `${moment().format("YYYY-MM-DD HH:MM")}`
-									}
-								]
+							insistEm(this, () => {
+								this.setState({
+									otherConditions: [
+										{
+											label: "开始时间",
+											field: "time1",
+											type: "time",
+											defaultValue: `${moment()
+												.subtract(7, "days")
+												.format("YYYY-MM-DD HH:mm")}`
+										},
+										{
+											label: "结束时间",
+											field: "time2",
+											type: "time",
+											defaultValue: `${moment().format("YYYY-MM-DD HH:mm")}`
+										}
+									]
+								});
 							});
-							return;
+							break;
 						case 3:
-							this.setState({
-								otherConditions: [
-									{ label: "开始时间", field: "time1", type: "date" },
-									{ label: "结束时间", field: "time2", type: "date" }
-								]
+							insistEm(this, () => {
+								this.setState({
+									otherConditions: [
+										{
+											label: "开始时间",
+											field: "time1",
+											type: "date",
+											defaultValue: `${moment()
+												.subtract(7, "days")
+												.format("YYYY-MM-DD")}`
+										},
+										{
+											label: "结束时间",
+											field: "time2",
+											type: "date",
+											defaultValue: `${moment().format("YYYY-MM-DD")}`
+										}
+									]
+								});
 							});
-							return;
+							break;
 						default:
 							return;
 					}
@@ -182,13 +212,14 @@ class App extends React.Component {
 	}
 
 	onQuery = condition => {
-		console.log(condition);
+		// console.log(condition);
 		util.traceBack("onChangeConditions", condition);
 	};
 
 	changeToFeiqi = () => {
 		this.setState({
-			columns: columns2
+			columns: columns2,
+			tableScroller: 1800
 		});
 	};
 }

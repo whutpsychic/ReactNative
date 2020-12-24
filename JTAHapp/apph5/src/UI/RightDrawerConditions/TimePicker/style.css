@@ -73,6 +73,11 @@
 	animation: moveIn 0.15s;
 }
 
+.horizontal .pickerview{
+	height: 80vh;
+	bottom: -20vh;
+}
+
 .top-btns {
 	color: #389edc;
 	display: flex;
@@ -90,7 +95,7 @@
 		bottom: -100vh;
 	}
 	to {
-		bottom: -60vh;
+		bottom: -20vh;
 	}
 }
 /*=================================*/

@@ -1,12 +1,12 @@
 import React from "react";
 import "./App.css";
 import util from "../util/index";
+import { init } from "../common/index";
 // ====================================
 import TopTitle from "../components/TopTitle/index";
 import PageLoading from "../components/PageLoading/index";
 import TopSearcher from "../UI/TopSearcher/index";
 // ====================================
-import moment from "moment";
 import { Table } from "antd";
 import "antd/es/table/style/css.js";
 import columns1 from "./feishui.js";
@@ -19,60 +19,32 @@ const debugging = false;
 class App extends React.Component {
 	state = {
 		pageLoading: false,
+		title: "",
+		conditionList: [],
+		ps: 5,
 		tableScroller: 1200,
 		columns: columns1,
 		dataSource: [],
-		ps: 5,
-		otherConditions: [
-			{
-				label: "开始时间",
-				field: "time1",
-				type: "time",
-				disabled: true,
-				defaultValue: `${moment().format("YYYY-MM-DD")} 00:00`
-			},
-			{
-				label: "结束时间",
-				field: "time2",
-				type: "time",
-				disabled: true,
-				defaultValue: `${moment().format("YYYY-MM-DD HH:MM")}`
-			}
-		],
+		// ==
+		institutions: [],
 		types: [
-			{ label: "实时数据", value: 1 },
-			{ label: "小时数据", value: 2 },
-			{ label: "日数据", value: 3 }
+			{ label: "废水", value: 1 },
+			{ label: "废气", value: 2 }
 		]
 	};
 
 	componentDidMount() {
-		//告知RN页面已经装载完毕
-		util.traceBack("pageState", "componentDidMount");
-		//监听事件以及时读取RN传回的数据
-		document.addEventListener("message", event => {
-			let res = JSON.parse(event.data);
-			if (res.etype === "data") {
-				let obj = { ...res };
-				delete obj.etype;
-				this.setState({
-					...obj
-				});
-			} else if (res.etype === "event") {
-				let { event, args } = res;
-				if (typeof this[event] === "function") this[event](args);
-			}
-		});
-
+		init(this);
 		// ***************************************************
 		if (debugging) {
-			// console.log(tb2);
+			console.log(tb2);
 			this.setState({
 				pageLoading: true
 			});
 			setTimeout(() => {
 				this.setState({
 					pageLoading: false,
+					institutions: treeData,
 					dataSource: tb2
 				});
 			}, 1000);
@@ -80,80 +52,31 @@ class App extends React.Component {
 	}
 
 	render() {
-		const { pageLoading, title, otherConditions = [] } = this.state;
-		const { tableScroller, columns, dataSource, ps } = this.state;
+		const { pageLoading, title, tableScroller } = this.state;
+		const { columns, dataSource, ps } = this.state;
+
 		const conditionList = [
 			{
-				label: "均值类型",
-				field: "type",
-				type: "select",
-				data: this.state.types,
-				onChange: x => {
-					const { value } = x;
-					switch (value) {
-						case 1:
-							this.setState({
-								otherConditions: [
-									{
-										label: "开始时间",
-										field: "time1",
-										type: "time",
-										disabled: true,
-										defaultValue: `${moment().format("YYYY-MM-DD")} 00:00`
-									},
-									{
-										label: "结束时间",
-										field: "time2",
-										type: "time",
-										disabled: true,
-										defaultValue: `${moment().format("YYYY-MM-DD HH:MM")}`
-									}
-								]
-							});
-							return;
-						case 2:
-							this.setState({
-								otherConditions: [
-									{
-										label: "开始时间",
-										field: "time1",
-										type: "time",
-										defaultValue: `${moment().format("YYYY-MM-DD")} 00:00`
-									},
-									{
-										label: "结束时间",
-										field: "time2",
-										type: "time",
-										defaultValue: `${moment().format("YYYY-MM-DD HH:MM")}`
-									}
-								]
-							});
-							return;
-						case 3:
-							this.setState({
-								otherConditions: [
-									{ label: "开始时间", field: "time1", type: "date" },
-									{ label: "结束时间", field: "time2", type: "date" }
-								]
-							});
-							return;
-						default:
-							return;
-					}
-				}
+				label: "单位",
+				field: "institution",
+				type: "selecttree",
+				data: this.state.institutions
 			},
-			...otherConditions
+			{
+				field: "type",
+				type: "radios",
+				data: this.state.types
+			}
 		];
 
 		return (
 			<div className="app-container">
 				<div className="app-contents horizontal">
 					{pageLoading ? <PageLoading /> : null}
-					<TopTitle title={title} canBack />
+					<TopTitle title={`${title}`} canBack />
 					<TopSearcher
-						// placeholder="报告名称"
-						onClickQuery={this.onQuery}
 						conditionList={conditionList}
+						onClickQuery={this.onClickQuery}
 						noinput
 					/>
 					<div className="table-container">
@@ -181,15 +104,21 @@ class App extends React.Component {
 		);
 	}
 
-	onQuery = condition => {
-		console.log(condition);
-		util.traceBack("onChangeConditions", condition);
-	};
-
-	changeToFeiqi = () => {
-		this.setState({
-			columns: columns2
-		});
+	onClickQuery = conditions => {
+		console.log(conditions);
+		const { type } = conditions;
+		if (type === 1) {
+			this.setState({
+				columns: columns1,
+				tableScroller: 1200
+			});
+		} else if (type === 2) {
+			this.setState({
+				columns: columns2,
+				tableScroller: 2100
+			});
+		}
+		util.traceBack("onChangeCondition", conditions);
 	};
 }
 
