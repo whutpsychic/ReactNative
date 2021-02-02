@@ -39,6 +39,13 @@ const judgeColor = (value, warnUp, warnDown, alarmUp, alarmDown) => {
 
 const columns = [
 	{
+		title: `企业名称`,
+		dataIndex: `institutionName`,
+		key: `institutionName`,
+		width: 100,
+		fixed: "left"
+	},
+	{
 		title: `监控点名称`,
 		dataIndex: `areaName`,
 		key: `areaName`,
@@ -50,13 +57,6 @@ const columns = [
 		dataIndex: `dataTime`,
 		key: `dataTime`,
 		width: 180,
-		fixed: "left"
-	},
-	{
-		title: `企业名称`,
-		dataIndex: `institutionName`,
-		key: `institutionName`,
-		width: 100,
 		fixed: "left"
 	},
 	{

@@ -10,7 +10,7 @@
 }
 
 .ant-table-thead > tr.th-row > th {
-	white-space: nowrap;
+	padding: 8px;
 	text-align: center;
 }
 

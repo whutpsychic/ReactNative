@@ -1,6 +1,4 @@
 import React from "react";
-import util from "../util/index";
-import { UnorderedListOutlined } from "@ant-design/icons";
 
 const judgeColor = (value, warnUp, warnDown, alarmUp, alarmDown) => {
 	if (value != null) {
@@ -39,6 +37,13 @@ const judgeColor = (value, warnUp, warnDown, alarmUp, alarmDown) => {
 
 const columns = [
 	{
+		title: `企业名称`,
+		dataIndex: `institutionName`,
+		key: `institutionName`,
+		width: 100,
+		fixed: "left"
+	},
+	{
 		title: `监控点名称`,
 		dataIndex: `areaName`,
 		key: `areaName`,
@@ -50,13 +55,6 @@ const columns = [
 		dataIndex: `dataTime`,
 		key: `dataTime`,
 		width: 180,
-		fixed: "left"
-	},
-	{
-		title: `企业名称`,
-		dataIndex: `institutionName`,
-		key: `institutionName`,
-		width: 100,
 		fixed: "left"
 	},
 	{
@@ -320,20 +318,6 @@ const columns = [
 				>
 					{x}
 				</span>
-			);
-		}
-	},
-	{
-		title: `历史数据`,
-		key: `history`,
-		render: (x, line) => {
-			return (
-				<UnorderedListOutlined
-					style={{ color: "#389edc" }}
-					onClick={() => {
-						util.traceBack("history", { line });
-					}}
-				/>
 			);
 		}
 	}

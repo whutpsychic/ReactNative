@@ -30,7 +30,7 @@ const insistEm = (_this, callback) => {
 class App extends React.Component {
 	state = {
 		pageLoading: false,
-		tableScroller: 1000,
+		tableScroller: 800,
 		columns: columns1,
 		dataSource: [],
 		ps: 5,
@@ -219,7 +219,7 @@ class App extends React.Component {
 	changeToFeiqi = () => {
 		this.setState({
 			columns: columns2,
-			tableScroller: 1800
+			tableScroller: 1500
 		});
 	};
 }

@@ -22,7 +22,7 @@ class App extends React.Component {
 		title: "",
 		conditionList: [],
 		ps: 5,
-		tableScroller: 1200,
+		tableScroller: 800,
 		columns: columns1,
 		dataSource: [],
 		// ==
@@ -110,12 +110,12 @@ class App extends React.Component {
 		if (type === 1) {
 			this.setState({
 				columns: columns1,
-				tableScroller: 1200
+				tableScroller: 800
 			});
 		} else if (type === 2) {
 			this.setState({
 				columns: columns2,
-				tableScroller: 2100
+				tableScroller: 1500
 			});
 		}
 		util.traceBack("onChangeCondition", conditions);

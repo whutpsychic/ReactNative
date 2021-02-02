@@ -23,6 +23,11 @@ const onReceive = (etype, _this, receivedData) => {
     putupData(_this, {
       title: `${line.institutionName}-${line.areaName}-历史数据`,
     });
+
+    if (type === 2) {
+      run(_this, 'changeToFeiqi');
+    }
+
     // 加载一次树形结构数据
     api.getInstitutionRoleItems().then((data) => {
       if (data) {
