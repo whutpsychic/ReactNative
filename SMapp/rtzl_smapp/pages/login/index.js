@@ -16,6 +16,7 @@ import api from '../../api/index';
 import storage from '../../core/storage.js';
 import {Provider, Modal} from '@ant-design/react-native';
 import Toast from '../../components/ToastModule/index';
+import config from '../../config.js';
 
 const url = 'file:///android_asset/h5/login/index.html';
 
@@ -25,7 +26,42 @@ class Default extends React.Component {
     tipsText: '',
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    const debuging = config.mode == 'debug';
+
+    if (debuging) {
+      this.showTips({
+        tipsText: '登陆中',
+      });
+      api
+        .login({uname: config.test_username, pwd: config.test_psw})
+        .then((res) => {
+          alert(JSON.stringify(res));
+          if (res.USER_ID) {
+            //记录登录状态
+            storage.setData('smapp_isLoggin', true);
+            //记录用户ID，用户名
+            storage.setData('smapp_userId', res.USER_ID);
+            storage.setData('smapp_userName', res.USER_NAME);
+
+            //跳转
+            this.jumpToMain();
+            Toast.show('登陆成功');
+          } else {
+            this.postMessage({etype: 'data', errmsg: '用户名或密码错误'});
+          }
+          this.setState({
+            showTips: false,
+          });
+        })
+        .catch((err) => {
+          this.postMessage({etype: 'data', errmsg: '用户名或密码错误'});
+          this.setState({
+            showTips: false,
+          });
+        });
+    }
+  }
 
   render() {
     return (
@@ -55,7 +91,7 @@ class Default extends React.Component {
   };
 
   //监听页面事件变化
-  onReceive = e => {
+  onReceive = (e) => {
     let receivedData = JSON.parse(e.nativeEvent.data);
     //页面初始加载完毕时
     if (
@@ -70,7 +106,7 @@ class Default extends React.Component {
       // });
     } else if (receivedData.etype === 'cancel') {
       //强制报错退出
-      alert(zbc)
+      alert(zbc);
     }
     //如果是点击登录按钮
     else if (receivedData.etype === 'login') {
@@ -79,7 +115,7 @@ class Default extends React.Component {
       });
       api
         .login({uname: receivedData.userName, pwd: receivedData.psw})
-        .then(res => {
+        .then((res) => {
           console.log(res);
           if (res.USER_ID) {
             //记录登录状态
@@ -100,7 +136,7 @@ class Default extends React.Component {
             showTips: false,
           });
         })
-        .catch(err => {
+        .catch((err) => {
           console.warn(err);
           this.postMessage({etype: 'data', errmsg: '用户名或密码错误'});
           this.setState({
@@ -111,7 +147,7 @@ class Default extends React.Component {
   };
 
   //往页面传数据
-  postMessage = obj => {
+  postMessage = (obj) => {
     this.refs.webview.postMessage(JSON.stringify(obj));
   };
 
@@ -147,7 +183,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default connect(
-  null,
-  mapDispatchToProps,
-)(Default);
+export default connect(null, mapDispatchToProps)(Default);

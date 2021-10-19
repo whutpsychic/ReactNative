@@ -1,0 +1,1 @@
+1、在工程中导入SDK文件DataCollection.jar。 2、在AndroidManifest.xml中加入下面的代码来获取扫描权限。 <uses-permission android:name="com.honeywell.decode.permission.DECODE" /> 3、在Activity类（如MainActivity）的声明中加入BarcodeListener和TriggerListener，以便进行扫描键触发处理和条码事件处理。

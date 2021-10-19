@@ -86,14 +86,15 @@ class Default extends React.MyPage {
         //传回选择的车号
         const {
           currentLine,
-          currentLine: {danjuhao, chengfang, pizhong},
+          currentLine: {danjuhao, chengfang, pizhong, DataId},
         } = receivedData;
-        console.log(pizhong);
+        alert(JSON.stringify(currentLine));
         navigation.navigate('chukudan-detail', {
           chehao: currentLine.number,
           danjuhao,
           chengfang,
           pizhong,
+          DataId,
         });
       }
     }

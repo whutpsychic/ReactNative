@@ -37,14 +37,7 @@ const getOption = ({ xAxis, data }) => {
 			// axisLabel: { interval: 0 }
 		},
 		yAxis: {
-			type: "value",
-			min: 0,
-			max: 100,
-			axisLabel: {
-				formatter: v => {
-					return v + "%";
-				}
-			}
+			type: "value"
 		},
 		series: data
 	};
