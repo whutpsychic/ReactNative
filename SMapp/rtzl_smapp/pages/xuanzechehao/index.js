@@ -88,7 +88,7 @@ class Default extends React.MyPage {
           currentLine,
           currentLine: {danjuhao, chengfang, pizhong, DataId},
         } = receivedData;
-        alert(JSON.stringify(currentLine));
+        // alert(JSON.stringify(currentLine));
         navigation.navigate('chukudan-detail', {
           chehao: currentLine.number,
           danjuhao,
