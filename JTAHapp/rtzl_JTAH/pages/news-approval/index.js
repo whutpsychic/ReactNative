@@ -104,6 +104,9 @@ class Default extends React.Component {
     if (etype === 'pageState' && receivedData.info === 'componentDidMount') {
       // 加载一次树形结构数据
       api.getInstitutionRoleItems().then((data) => {
+        console.log(" ------------------------ ")
+        console.log(data)
+        console.log(" ------------------------ ")
         if (data) {
           this.postMessage({
             etype: 'data',

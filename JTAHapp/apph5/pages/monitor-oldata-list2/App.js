@@ -21,7 +21,7 @@ class App extends React.Component {
 		pageLoading: false,
 		title: "",
 		conditionList: [],
-		ps: 5,
+		ps: 999,
 		tableScroller: 800,
 		columns: columns1,
 		dataSource: [],

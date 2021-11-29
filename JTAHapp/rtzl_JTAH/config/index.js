@@ -2,7 +2,7 @@ const config = {};
 
 config.mode = 'production';
 // config.mode = 'preview';
-config.mode = 'develop';
+// config.mode = 'develop';
 
 config.inposition = true;
 

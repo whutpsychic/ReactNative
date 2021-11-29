@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\android",
+    "\\android\\libs",
+    "\\android\\res",
+    "\\android\\res\\values",
+    "\\android\\src",
+    "\\android\\src\\com",
+    "\\android\\src\\com\\honeywell",
+    "\\android\\src\\com\\honeywell\\scantest"
+  ],
+  "SelectedNode": "\\android\\src\\com\\honeywell\\scantest\\MainActivity.java",
+  "PreviewInSolutionExplorer": false
+}

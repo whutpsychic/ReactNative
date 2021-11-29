@@ -33,6 +33,9 @@ const getTabArr = (xml, strArr) => {
 				result[_item] = _res;
 				result[_item] = _res.split(`</${_item}>`)[0];
 			}
+			else{
+				result[_item] = ""
+			}
 		});
 		return result;
 	});
@@ -240,8 +243,14 @@ api.getCHUKUDAN = (condition) => {
 //查询选择车号
 api.chooseCHEHAO = (condition) => {
 	condition.strTruckNo = ``;
-	return soap('GetTruckNo', condition).then((res) => {
-		let result = getTabArr(res._response, ['车号', '单据号', '秤房', '皮重']);
+	return soap('GetTruckNo2', condition).then((res) => {
+		let result = getTabArr(res._response, [
+			'车号',
+			'单据号',
+			'秤房',
+			'皮重',
+			'DataId',
+		]);
 
 		result = result.map((item) => {
 			item['皮重'] = parseFloat(item['皮重']).toFixed(4);
@@ -253,6 +262,7 @@ api.chooseCHEHAO = (condition) => {
 			['车号', '单据号', '秤房', '皮重'],
 			['number', 'danjuhao', 'chengfang', 'pizhong'],
 		);
+
 		return result;
 	});
 };
@@ -271,11 +281,11 @@ api.checkBatchNo = (condition) => {
 
 //将扫描记录存储到数据库
 api.uploadBarcodes = (condition) => {
-	return soap('ScanConfirm3', condition)
+	return soap('ScanConfirm33', condition)
 		.then((res) => {
 			const {_response} = res;
-			let result = arrange(_response, ['ScanConfirm3Result', 'strMsg']);
-			result.ScanConfirm3Result === 'false'
+			let result = arrange(_response, ['ScanConfirm33Result', 'strMsg']);
+			result.ScanConfirm33Result === 'false'
 				? (result.result = false)
 				: (result.result = true);
 			return result;

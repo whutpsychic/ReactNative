@@ -28,6 +28,14 @@ class Default extends React.Component {
 			// 如果有记住用户名和密码
 			if (resArr[0] && resArr[1]) {
 				api.login(resArr[0], resArr[1]).then((res) => {
+					console.log(res);
+
+					if (!res) {
+						login(false);
+						initialized();
+						return;
+					}
+
 					const {errcode, data} = res;
 					//成功
 					if (!errcode && data) {

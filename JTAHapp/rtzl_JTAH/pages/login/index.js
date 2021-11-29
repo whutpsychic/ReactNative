@@ -81,20 +81,28 @@ class Default extends React.Component {
 
     let p1, p2;
 
+    // 记住身份
+    if (rememberPsw) {
+      p1 = storage.setData('jtah_userName', name);
+      p2 = storage.setData('jtah_psw', psw);
+    } else {
+      p1 = storage.setData('jtah_userName', null);
+      p2 = storage.setData('jtah_psw', null);
+    }
+
     api.login(name, psw).then((res) => {
       console.log(res);
+
+      if (!res) {
+        this.refs.tips.hide();
+        Toast.show('登录失败，请检查网络连接');
+        login(false);
+      }
+
       const {errcode, data} = res;
       //成功
       if (!errcode && data) {
         this.refs.tips.hide();
-        // 记住身份
-        if (rememberPsw) {
-          p1 = storage.setData('jtah_userName', name);
-          p2 = storage.setData('jtah_psw', psw);
-        } else {
-          p1 = storage.setData('jtah_userName', null);
-          p2 = storage.setData('jtah_psw', null);
-        }
 
         Promise.all([p1, p2]).then((resArr) => {
           Toast.show('登录成功');

@@ -364,7 +364,7 @@ class Default extends React.Component {
 
     const {
       route: {
-        params: {fahuodanhao, chehao, chengfang, danjuhao},
+        params: {fahuodanhao, chehao, chengfang, danjuhao, DataId},
       },
       navigation: {navigate},
     } = this.props;
@@ -395,7 +395,8 @@ class Default extends React.Component {
       //单据
       condition.id = danjuhao || '';
 
-      // condition.id = '';
+      //新增的DataId
+      condition.strDataId = DataId;
       //
       api.uploadBarcodes(condition).then((res) => {
         const {result, strMsg} = res;

@@ -5,13 +5,104 @@ import {WebView} from 'react-native-webview';
 import util from '../../core/util.js';
 import api from '../../api/index';
 import config from '../../config/index';
+import moment from 'moment';
 
 const pageUri = 'file:///android_asset/h5/main-home/index.html';
 
 const getOption = (data) => {
+  var markLine = [];
+
+  if (data.ml1) {
+    markLine.push({
+      silent: true, //鼠标悬停事件  true没有，false有
+      lineStyle: {
+        //警戒线的样式  ，虚实  颜色
+        type: 'solid',
+        color: 'red',
+      },
+      label: {
+        position: 'middle',
+        formatter: `报警值下限${data.ml1}`,
+      },
+      yAxis: data.ml1 || 0, // 警戒线的标注值，可以有多个yAxis,多条警示线   或者采用   {type : 'average', name: '平均值'}，type值有  max  min  average，分为最大，最小，平均值
+    });
+  }
+
+  if (data.ml2) {
+    markLine.push({
+      silent: true, //鼠标悬停事件  true没有，false有
+      lineStyle: {
+        //警戒线的样式  ，虚实  颜色
+        type: 'solid',
+        color: 'red',
+      },
+      label: {
+        position: 'middle',
+        formatter: `报警值下限${data.ml2}`,
+      },
+      yAxis: data.ml2 || 0, // 警戒线的标注值，可以有多个yAxis,多条警示线   或者采用   {type : 'average', name: '平均值'}，type值有  max  min  average，分为最大，最小，平均值
+    });
+  }
+
+  if (data.ml3) {
+    markLine.push({
+      silent: true, //鼠标悬停事件  true没有，false有
+      lineStyle: {
+        //警戒线的样式  ，虚实  颜色
+        type: 'solid',
+        color: 'red',
+      },
+      label: {
+        position: 'middle',
+        formatter: `报警值下限${data.ml3}`,
+      },
+      yAxis: data.ml3 || 0, // 警戒线的标注值，可以有多个yAxis,多条警示线   或者采用   {type : 'average', name: '平均值'}，type值有  max  min  average，分为最大，最小，平均值
+    });
+  }
+
+  if (data.ml4) {
+    markLine.push({
+      silent: true, //鼠标悬停事件  true没有，false有
+      lineStyle: {
+        //警戒线的样式  ，虚实  颜色
+        type: 'solid',
+        color: 'red',
+      },
+      label: {
+        position: 'middle',
+        formatter: `报警值下限${data.ml4}`,
+      },
+      yAxis: data.ml4 || 0, // 警戒线的标注值，可以有多个yAxis,多条警示线   或者采用   {type : 'average', name: '平均值'}，type值有  max  min  average，分为最大，最小，平均值
+    });
+  }
+
+  if (markLine.length)
+    return {
+      xAxis: data.xAxis,
+      data: [
+        {
+          name: '',
+          type: 'line',
+          lineStyle: {color: '#389edc'},
+          data: data.data,
+          markLine: {
+            symbol: 'none',
+            data: markLine,
+          },
+        },
+      ],
+    };
+
   return {
     xAxis: data.xAxis,
-    data: [{name: '', type: 'line', data: data.data}],
+    data: [
+      {
+        name: '',
+        type: 'line',
+        lineStyle: {color: '#389edc'},
+        data: data.data,
+      },
+    ],
   };
 };
 
@@ -19,11 +110,13 @@ class Default extends React.Component {
   state = {
     // 图表的全部选项数据
     allSelectData: [],
-    // 格式化图表的全部选项之后的数据结构
-    formatData: [],
+    radios: [
+      {label: '废水', value: 32},
+      {label: '废气', value: 31},
+    ],
 
+    radio: 32,
     s1: null,
-    radio: null,
     s2: null,
   };
 
@@ -54,128 +147,63 @@ class Default extends React.Component {
     );
   }
 
-  //加载单位下拉框数据
-  //仅初始化之后一次
-  loadSelect1Data = () => {
-    const {allSelectData} = this.state;
-    //整理出单位的数据，并归拢其radio数据
-    let clonedArr = util.deepClone(allSelectData);
-    let resArr = [];
-
-    while (clonedArr.length) {
-      //取走第一项同时删除掉了第一个元素
-      let firstItem = clonedArr.shift();
-      resArr.push(firstItem);
-      clonedArr = clonedArr.filter((item) => {
-        return item.institutionid !== firstItem.institutionid;
-      });
-    }
-    resArr = resArr.map((item) => {
-      let arr;
-      arr = allSelectData
-        .filter((_item) => {
-          return item.institutionid === _item.institutionid;
-        })
-        .map((_item) => {
-          return _item.type;
-        });
-      item.type = arr;
-      return item;
-    });
-
-    let selectData1 = resArr.map((item) => {
-      return {label: item.institutionName, value: item.institutionid};
-    });
-
+  //加载radio数据
+  //初始仅加载一次
+  loadRadiosData = (x) => {
+    const {radios} = this.state;
     this.postMessage({
       etype: 'data',
-      selectData1,
+      radios: radios,
     });
-
-    this.setState(
-      {
-        formatData: resArr,
-        s1: selectData1[0].value,
-      },
-      () => {
-        this.loadRadiosData();
-      },
-    );
-
-    return resArr;
   };
 
-  //加载radio数据
-  //每次改变单位选项后触发
-  loadRadiosData = (x) => {
-    const {allSelectData, formatData, radio} = this.state;
-    if (!x) x = formatData[0].institutionid;
-
-    let data = allSelectData
-      .filter((item) => {
-        return item.institutionid === x;
-      })
+  // 加载单位数据
+  loadSelect1Data = () => {
+    const {allSelectData, radio} = this.state;
+    console.log(allSelectData);
+    const arr = allSelectData
+      .filter((item) => item.type == radio)
       .map((item) => {
-        switch (item.type) {
-          case 1:
-            return {label: '废水', value: 1};
-          case 2:
-            return {label: '废气', value: 2};
-          default:
-            return {};
-        }
+        item.label = item.institutionName;
+        item.value = item.institutionid;
+        return item;
       });
-
-    //初始化值
-    if (!this.state.radio)
-      this.setState(
-        {
-          radio: data[0].value,
-        },
-        () => {
-          this.loadSelect2Data(null, radio);
-        },
-      );
-    //
-
     this.postMessage({
       etype: 'data',
-      radios: data,
+      selectData1: arr,
     });
+    this.setState(
+      {
+        s1: arr[0].value,
+      },
+      () => {
+        this.loadSelect2Data(arr[0].item);
+      },
+    );
   };
 
   //加载监测项目下拉框数据
   //每当改变下拉框1或radio数据时触发
-  loadSelect2Data = (data1, radio) => {
-    const {allSelectData, formatData} = this.state;
+  loadSelect2Data = (it) => {
+    const {allSelectData, s1} = this.state;
+    let arr = [];
 
-    if (!data1) data1 = formatData[0].institutionid;
-    if (!radio) radio = formatData[0].type[0];
-
-    let data = allSelectData.filter((item) => {
-      return item.institutionid === data1 && item.type === radio;
-    })[0];
-
-    let resArr = [];
-
-    for (let i in data.item) {
-      resArr.push({label: data.item[i], value: i});
+    for (let i in it) {
+      arr.push({label: it[i], value: it[i]});
     }
+    this.postMessage({
+      etype: 'data',
+      selectData2: arr,
+    });
 
-    //默认查询动作
     this.setState(
       {
-        s2: resArr[0].value,
+        s2: arr[0].value,
       },
       () => {
         this.loadChart();
       },
     );
-
-    this.postMessage({
-      etype: 'data',
-      selectData2: resArr,
-    });
   };
 
   onReceive = (event) => {
@@ -191,7 +219,8 @@ class Default extends React.Component {
       this.postMessage({
         etype: 'data',
         loadingChart: true,
-        chartTitle: '工业废气PH日数据',
+        chartTitle: '',
+        pageLoading: false,
       });
       // newsPic 顶部图片
       // newsOne 公司要闻
@@ -269,16 +298,13 @@ class Default extends React.Component {
           });
         }
       });
+      this.loadRadiosData();
 
       //下拉框数据
-      api.getHomeSelectors().then((res) => {
-        const {
-          data: {list = []},
-        } = res;
-
+      api.getHomeAllSelectors().then((res) => {
         this.setState(
           {
-            allSelectData: list,
+            allSelectData: res.data.list,
           },
           () => {
             this.loadSelect1Data();
@@ -286,32 +312,31 @@ class Default extends React.Component {
         );
       });
     }
-    //改变select1时
-    else if (etype === 'onChangeSelect1') {
-      const {label, value} = receivedData;
-      this.loadRadiosData(value);
-      this.setState(
-        {
-          s1: value,
-        },
-        () => {
-          this.loadChart();
-        },
-      );
-    }
     //改变radio时
     else if (etype === 'onChangeRadio') {
       const {label, value} = receivedData;
-      this.loadSelect2Data(this.state.s1, value);
       this.setState(
         {
           radio: value,
         },
         () => {
-          this.loadChart();
+          this.loadSelect1Data();
         },
       );
     }
+    //改变select1时
+    else if (etype === 'onChangeSelect1') {
+      const {label, value, item} = receivedData;
+      this.setState(
+        {
+          s1: value,
+        },
+        () => {
+          this.loadSelect2Data(item);
+        },
+      );
+    }
+
     //改变select2时
     else if (etype === 'onChangeSelect2') {
       const {label, value} = receivedData;
@@ -331,23 +356,36 @@ class Default extends React.Component {
       etype: 'data',
       loadingChart: true,
     });
-    const {s1, s2} = this.state;
+    const {radio, s1, s2} = this.state;
+    const params = {
+      avgType: 2,
+      mnNumber: s1,
+      factorCode: s2,
+      type: radio == 32 ? 1 : 2,
+      sdatetime: moment().subtract(1, 'days').format('YYYY-MM-DD HH:mm:ss'),
+      edatetime: moment().format('YYYY-MM-DD HH:mm:ss'),
+    };
 
     api
-      .getMainChart({institutionId: s1, code: s2})
+      .getMainChart(params)
       .then((res) => {
-        const {
-          data: {list},
-        } = res;
+        console.log(res);
+        const {data} = res;
 
         let op = getOption({
-          xAxis: list.map((item) => {
-            return item.xData;
+          xAxis: data.map((item) => {
+            return item.dataTime;
           }),
-          data: list.map((item) => {
-            return item.yData;
+          data: data.map((item) => {
+            return item.dtaValue;
           }),
+          ml1: data[0].alarmDown,
+          ml2: data[0].warnDown,
+          ml3: data[0].warnUp,
+          ml4: data[0].alarmUp,
         });
+
+        console.log(op);
 
         this.postMessage({
           etype: 'data',

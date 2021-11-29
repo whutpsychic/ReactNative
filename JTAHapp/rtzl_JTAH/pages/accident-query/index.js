@@ -173,6 +173,7 @@ class Default extends React.Component {
         ...conditions,
       })
       .then((res) => {
+        console.log(res)
         const {errcode, errmsg, data} = res;
         // 超时
         if (errcode === 504) {

@@ -6,9 +6,10 @@ import mockData from './mockData.js';
 // main-query
 const {mainQueryData} = mockData;
 // =================================================
-const xcUrl = 'http://10.99.189.116';
+const xcUrl = 'http://192.168.0.133';
+// const xcUrl = 'http://10.99.189.116';
 const xcPort = '18085';
-const gsUrl = 'http://192.168.0.123';
+const gsUrl = 'http://192.168.0.133';
 const gsPort = '18085';
 
 let proxy;
@@ -83,7 +84,8 @@ api.login = (userName, password) => {
 		'post',
 	)
 		.then((response) => {
-			return response.json();
+			let result = response.json();
+			return result;
 		})
 		.catch((err) => {
 			// 超时之后的错误不予以处理
@@ -130,7 +132,10 @@ api.getInstitutionsDepartment = () => {
 api.getInstitutionRoleItems = () => {
 	return buildFetcher(commonPrefix + 'users/institutionRoleTree', {}).then(
 		(res) => {
+			console.log(' ------------------------ cfb ----------------------- ');
+
 			console.log(res);
+			console.log(' ------------------------ cfb ----------------------- ');
 			const {errcode, errmsg, data} = res;
 			// 超时
 			if (errcode === 504) {
@@ -300,6 +305,11 @@ api.getHomeMainData = () => {
 	return buildFetcher(commonPrefix + 'message/mainList', {ofs: 1, ps: 20});
 };
 
+// 获取所有下拉框数据
+api.getHomeAllSelectors = () => {
+	return buildFetcher(commonPrefix + 'AqhbEcharts/all');
+};
+
 // main-home
 // 【首页】
 // 获取下拉框数据
@@ -311,16 +321,21 @@ api.getHomeSelectors = () => {
 // 【首页】
 // 获取图表数据
 api.getMainChart = (conditions) => {
-	return buildFetcher(commonPrefix + 'AqhbEcharts/list', conditions);
+	return buildFetcher(commonPrefix + 'AqhbAdataAuto/echartList', conditions);
 };
 
 // main-query
 // 【首页-信息管理】
 // 获取菜单
 api.getMainQueryMenuList = () => {
+	// 假菜单
 	return new Promise((resolve) => {
 		resolve(mainQueryData);
 	});
+};
+
+api.getMainQueryMenuList2 = () => {
+	return buildFetcher(commonPrefix + 'menus/list/loginuser');
 };
 // =============================================================
 // risk-grade-control-list

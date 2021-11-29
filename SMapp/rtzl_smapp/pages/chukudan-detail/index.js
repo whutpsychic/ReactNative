@@ -99,7 +99,7 @@ class Default extends React.MyPage {
     if (receivedData.etype === 'scanBtn') {
       const {
         route: {
-          params: {data, chehao, danjuhao, chengfang, pizhong},
+          params: {data, chehao, danjuhao, chengfang, pizhong, DataId},
         },
       } = this.props;
 
@@ -116,6 +116,7 @@ class Default extends React.MyPage {
         chengfang,
         danjuhao,
         pizhong,
+        DataId
       });
     } else if (receivedData.etype === 'backBtn') {
       navigation.goBack();

@@ -33,7 +33,7 @@ class App extends React.Component {
 		tableScroller: 800,
 		columns: columns1,
 		dataSource: [],
-		ps: 5,
+		ps: 999,
 		otherConditions: [
 			{
 				label: "开始时间",
