@@ -14,7 +14,7 @@
   "dependencies": {
     "@ant-design/react-native": "^3.3.0",
     "react": "16.11.0",
-    "react-native": "0.62.2",
+    "react-native": "0.62.3",
     "react-native-keyevent": "^0.2.8",
     "react-native-webview": "^9.4.0"
   },
